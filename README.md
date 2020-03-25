@@ -3,12 +3,17 @@
 ==============
 
 このファイルは、
-blancoRest
+blancoRestGenerator
 のREADMEファイルです。
 
-blancoRest はJava によるRestful APIを生成するためのツールです。
+blancoRestGenerator はJava によるRestful API の電文と電文処理を生成するためのツールです。
+
 1.電文処理定義書・電文定義書から Reqeust, Response, AbstractApi コードを自動生成します。
- 2.Apache Antタスクの形式で配布されています。
+
+2.Apache Antタスクの形式で配布されています。
+
+3.blacoRest から派生しています。blancoRestとの差異は、電文定義やAPI処理の基底クラスと、Serveletが含まれないことです。
+
  > - ant -f task.xml clean で一時ファイルは全てクリーンされます
  > - ant -f task.xml meta で最低限必要な Java ソースを生成します（一回目はエラーになりますが気にしないで下さい）
  > - ant -f task.xml compile で必要な Java ソースをコンパイルします
