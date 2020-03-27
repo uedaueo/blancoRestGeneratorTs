@@ -7,12 +7,12 @@
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
  */
-package blanco.restgenerator;
+package blanco.restgeneratorts;
 
-import blanco.restgenerator.task.BlancoRestGeneratorProcessImpl;
-import blanco.restgenerator.task.valueobject.BlancoRestGeneratorProcessInput;
-import blanco.valueobject.task.BlancoValueObjectProcessImpl;
-import blanco.valueobject.task.valueobject.BlancoValueObjectProcessInput;
+import blanco.restgeneratorts.task.BlancoRestGeneratorTsProcessImpl;
+import blanco.restgeneratorts.task.valueobject.BlancoRestGeneratorTsProcessInput;
+import blanco.valueobjectts.task.BlancoValueObjectTsProcessImpl;
+import blanco.valueobjectts.task.valueobject.BlancoValueObjectTsProcessInput;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -23,14 +23,14 @@ import java.io.IOException;
  * @author IGA Tosiki
  * @author tueda
  */
-public class BlancoRestGeneratorTest {
+public class BlancoRestGeneratorTsTest {
 
     @Test
     public void testBlancoRestGenerator() {
         /*
          * まず ValueObject を生成します。
          */
-        BlancoValueObjectProcessInput inputValueObject = new BlancoValueObjectProcessInput();
+        BlancoValueObjectTsProcessInput inputValueObject = new BlancoValueObjectTsProcessInput();
         inputValueObject.setMetadir("meta/objects");
         inputValueObject.setEncoding("UTF-8");
         inputValueObject.setSheetType("php");
@@ -39,7 +39,7 @@ public class BlancoRestGeneratorTest {
         inputValueObject.setTargetStyle("maven");
         inputValueObject.setVerbose(true);
 
-        BlancoValueObjectProcessImpl impleValueObject = new BlancoValueObjectProcessImpl();
+        BlancoValueObjectTsProcessImpl impleValueObject = new BlancoValueObjectTsProcessImpl();
         try {
             impleValueObject.execute(inputValueObject);
         } catch (IOException e) {
@@ -49,16 +49,17 @@ public class BlancoRestGeneratorTest {
         /*
          * その後、電文と電文処理を生成します。
          */
-        BlancoRestGeneratorProcessInput inputRestGenerator = new BlancoRestGeneratorProcessInput();
+        BlancoRestGeneratorTsProcessInput inputRestGenerator = new BlancoRestGeneratorTsProcessInput();
         inputRestGenerator.setMetadir("meta/api");
         inputRestGenerator.setEncoding("UTF-8");
         inputRestGenerator.setSheetType("php");
         inputRestGenerator.setTmpdir("tmpTest");
         inputRestGenerator.setTargetdir("sample/blanco");
         inputRestGenerator.setTargetStyle("maven");
+        inputRestGenerator.setNameAdjust(true);
         inputRestGenerator.setVerbose(true);
 
-        BlancoRestGeneratorProcessImpl imple = new BlancoRestGeneratorProcessImpl();
+        BlancoRestGeneratorTsProcessImpl imple = new BlancoRestGeneratorTsProcessImpl();
         imple.execute(inputRestGenerator);
     }
 

@@ -7,7 +7,7 @@
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
  */
-package blanco.restgenerator;
+package blanco.restgeneratorts;
 
 import blanco.cg.BlancoCgObjectFactory;
 import blanco.cg.BlancoCgSupportedLang;
@@ -16,10 +16,10 @@ import blanco.cg.util.BlancoCgLineUtil;
 import blanco.cg.valueobject.*;
 import blanco.commons.util.BlancoNameAdjuster;
 import blanco.commons.util.BlancoStringUtil;
-import blanco.restgenerator.resourcebundle.BlancoRestGeneratorResourceBundle;
-import blanco.restgenerator.valueobject.BlancoRestGeneratorTelegram;
-import blanco.restgenerator.valueobject.BlancoRestGeneratorTelegramField;
-import blanco.restgenerator.valueobject.BlancoRestGeneratorTelegramProcess;
+import blanco.restgeneratorts.resourcebundle.BlancoRestGeneratorTsResourceBundle;
+import blanco.restgeneratorts.valueobject.BlancoRestGeneratorTsTelegram;
+import blanco.restgeneratorts.valueobject.BlancoRestGeneratorTsTelegramField;
+import blanco.restgeneratorts.valueobject.BlancoRestGeneratorTsTelegramProcess;
 import blanco.valueobject.valueobject.BlancoValueObjectClassStructure;
 import blanco.xml.bind.BlancoXmlBindingUtil;
 import blanco.xml.bind.BlancoXmlUnmarshaller;
@@ -39,7 +39,7 @@ import java.util.List;
  * @author IGA Tosiki
  * @author tueda
  */
-public class BlancoRestGeneratorXml2SourceFile {
+public class BlancoRestGeneratorTsXml2SourceFile {
 
     /**
      * HTTPメソッド名のint表現
@@ -66,12 +66,12 @@ public class BlancoRestGeneratorXml2SourceFile {
     /**
      * このプロダクトのリソースバンドルへのアクセスオブジェクト。
      */
-    private final BlancoRestGeneratorResourceBundle fBundle = new BlancoRestGeneratorResourceBundle();
+    private final BlancoRestGeneratorTsResourceBundle fBundle = new BlancoRestGeneratorTsResourceBundle();
 
     /**
      * 出力対象となるプログラミング言語。
      */
-    private int fTargetLang = BlancoCgSupportedLang.JAVA;
+    private int fTargetLang = BlancoCgSupportedLang.TS;
 
     /**
      * 入力シートに期待するプログラミング言語
@@ -136,7 +136,7 @@ public class BlancoRestGeneratorXml2SourceFile {
             final boolean argNameAdjust, final File argDirectoryTarget)
             throws IOException {
 
-        System.out.println("BlancoRestGeneratorXml2SourceFile#process file = " + argMetaXmlSourceFile.getName());
+        System.out.println("BlancoRestGeneratorTsXml2SourceFile#process file = " + argMetaXmlSourceFile.getName());
 
         fNameAdjust = argNameAdjust;
 
@@ -154,14 +154,14 @@ public class BlancoRestGeneratorXml2SourceFile {
         }
 
         // まずは電文を生成します．
-        BlancoRestGeneratorTelegram listTelegram[][] = new BlancoRestGeneratorTelegram[4][2];
+        BlancoRestGeneratorTsTelegram listTelegram[][] = new BlancoRestGeneratorTsTelegram[4][2];
         processTelegram(argDirectoryTarget, elementRoot, listTelegram);
 
         // 次に電文処理を生成します
         processTelegramProcess(argDirectoryTarget, elementRoot, listTelegram);
     }
 
-    private void processTelegramProcess(final File argDirectoryTarget, BlancoXmlElement elementRoot, BlancoRestGeneratorTelegram[][] argListTelegrams) {
+    private void processTelegramProcess(final File argDirectoryTarget, BlancoXmlElement elementRoot, BlancoRestGeneratorTsTelegram[][] argListTelegrams) {
         // sheet(Excelシート)のリストを取得します。
         final List<BlancoXmlElement> listSheet = BlancoXmlBindingUtil
                 .getElementsByTagName(elementRoot, "sheet");
@@ -200,7 +200,7 @@ public class BlancoRestGeneratorXml2SourceFile {
             // 電文処理には一覧情報はありません
 
             // シートから詳細な情報を取得します。
-            final BlancoRestGeneratorTelegramProcess structure = parseProcessSheet(
+            final BlancoRestGeneratorTsTelegramProcess structure = parseProcessSheet(
                     elementCommon, elementExtends);
 
             if (structure != null) {
@@ -211,11 +211,11 @@ public class BlancoRestGeneratorXml2SourceFile {
         }
     }
 
-    private BlancoRestGeneratorTelegramProcess parseProcessSheet(
+    private BlancoRestGeneratorTsTelegramProcess parseProcessSheet(
             final BlancoXmlElement argElementCommon,
             final BlancoXmlElement argElementExtends) {
 
-        final BlancoRestGeneratorTelegramProcess structure = new BlancoRestGeneratorTelegramProcess();
+        final BlancoRestGeneratorTsTelegramProcess structure = new BlancoRestGeneratorTsTelegramProcess();
         structure.setName(BlancoXmlBindingUtil.getTextContent(
                 argElementCommon, "name"));
         structure.setPackage(BlancoXmlBindingUtil.getTextContent(
@@ -295,7 +295,7 @@ public class BlancoRestGeneratorXml2SourceFile {
         return structure;
     }
 
-    private void processTelegram(final File argDirectoryTarget, BlancoXmlElement elementRoot, BlancoRestGeneratorTelegram[][] argListTelegrams) {
+    private void processTelegram(final File argDirectoryTarget, BlancoXmlElement elementRoot, BlancoRestGeneratorTsTelegram[][] argListTelegrams) {
 
         // sheet(Excelシート)のリストを取得します。
         final List<BlancoXmlElement> listSheet = BlancoXmlBindingUtil
@@ -337,7 +337,7 @@ public class BlancoRestGeneratorXml2SourceFile {
                     .getElement(elementSheet, fBundle.getMeta2xmlTeregramList());
 
             // シートから詳細な情報を取得します。
-            final BlancoRestGeneratorTelegram processTelegram = parseTelegramSheet(
+            final BlancoRestGeneratorTsTelegram processTelegram = parseTelegramSheet(
                     elementCommon, elementExtends, elementList);
 
             // 電文をHTTPメソッド×IN-OUTの2次元配列に格納する
@@ -401,12 +401,12 @@ public class BlancoRestGeneratorXml2SourceFile {
      *            現在処理しているListノード。
      * @return 収集されたメタ情報構造データ。
      */
-    private BlancoRestGeneratorTelegram parseTelegramSheet(
+    private BlancoRestGeneratorTsTelegram parseTelegramSheet(
             final BlancoXmlElement argElementCommon,
             final BlancoXmlElement argElementExtends,
             final BlancoXmlElement argElementList) {
 
-        final BlancoRestGeneratorTelegram processTelegram = new BlancoRestGeneratorTelegram();
+        final BlancoRestGeneratorTsTelegram processTelegram = new BlancoRestGeneratorTsTelegram();
         processTelegram.setName(BlancoXmlBindingUtil.getTextContent(
                 argElementCommon, "name"));
         processTelegram.setPackage(BlancoXmlBindingUtil.getTextContent(
@@ -481,7 +481,7 @@ public class BlancoRestGeneratorXml2SourceFile {
             }
 
             final BlancoXmlElement elementField = (BlancoXmlElement) nodeField;
-            BlancoRestGeneratorTelegramField field = new BlancoRestGeneratorTelegramField();
+            BlancoRestGeneratorTsTelegramField field = new BlancoRestGeneratorTsTelegramField();
             field
                     .setNo(BlancoXmlBindingUtil.getTextContent(elementField,
                             "no"));
@@ -497,7 +497,7 @@ public class BlancoRestGeneratorXml2SourceFile {
             // 既に同じ内容が登録されていないかどうかのチェック。
             for (int indexPast = 0; indexPast < processTelegram.getListField()
                     .size(); indexPast++) {
-                final BlancoRestGeneratorTelegramField fieldPast = processTelegram
+                final BlancoRestGeneratorTsTelegramField fieldPast = processTelegram
                         .getListField().get(indexPast);
                 if (fieldPast.getName().equals(field.getName())) {
                     throw new IllegalArgumentException(
@@ -578,8 +578,8 @@ public class BlancoRestGeneratorXml2SourceFile {
      *            ソースコードの出力先フォルダ。
      */
     public void process(
-            final BlancoRestGeneratorTelegramProcess argStructure,
-            final BlancoRestGeneratorTelegram[][] argListTelegrams,
+            final BlancoRestGeneratorTsTelegramProcess argStructure,
+            final BlancoRestGeneratorTsTelegram[][] argListTelegrams,
             final File argDirectoryTarget) {
 
         // Excelシートで指定された出力先形式を採用します。
@@ -589,14 +589,14 @@ public class BlancoRestGeneratorXml2SourceFile {
         fCgSourceFile = fCgFactory.createSourceFile(argStructure
                 .getPackage(), "このソースコードは blanco Frameworkによって自動生成されています。");
         fCgSourceFile.setEncoding(fEncoding);
-        fCgClass = fCgFactory.createClass(BlancoRestGeneratorConstants.PREFIX_ABSTRACT + argStructure.getName(),
+        fCgClass = fCgFactory.createClass(BlancoRestGeneratorTsConstants.PREFIX_ABSTRACT + argStructure.getName(),
                 BlancoStringUtil.null2Blank(argStructure
                         .getDescription()));
         // ApiBase クラスを継承
         BlancoCgType fCgType = new BlancoCgType();
         String superClass = argStructure.getSuperClass();
         if (superClass == null) {
-            superClass = BlancoRestGeneratorConstants.BASE_CLASS;
+            superClass = BlancoRestGeneratorTsConstants.BASE_CLASS;
         }
         fCgType.setName(superClass);
         fCgClass.setExtendClassList(new ArrayList<BlancoCgType>());
@@ -613,14 +613,14 @@ public class BlancoRestGeneratorXml2SourceFile {
         }
 
         final String methodName[][] = new String[4][2];
-        methodName[HTTP_METHOD_GET][TELEGRAM_INPUT] = BlancoRestGeneratorConstants.API_GET_REQUESTID_METHOD;
-        methodName[HTTP_METHOD_GET][TELEGRAM_OUTPUT] = BlancoRestGeneratorConstants.API_GET_RESPONSEID_METHOD;
-        methodName[HTTP_METHOD_POST][TELEGRAM_INPUT] = BlancoRestGeneratorConstants.API_POST_REQUESTID_METHOD;
-        methodName[HTTP_METHOD_POST][TELEGRAM_OUTPUT] = BlancoRestGeneratorConstants.API_POST_RESPONSEID_METHOD;
-        methodName[HTTP_METHOD_PUT][TELEGRAM_INPUT] = BlancoRestGeneratorConstants.API_PUT_REQUESTID_METHOD;
-        methodName[HTTP_METHOD_PUT][TELEGRAM_OUTPUT] = BlancoRestGeneratorConstants.API_PUT_RESPONSEID_METHOD;
-        methodName[HTTP_METHOD_DELETE][TELEGRAM_INPUT] = BlancoRestGeneratorConstants.API_DELETE_REQUESTID_METHOD;
-        methodName[HTTP_METHOD_DELETE][TELEGRAM_OUTPUT] = BlancoRestGeneratorConstants.API_DELETE_RESPONSEID_METHOD;
+        methodName[HTTP_METHOD_GET][TELEGRAM_INPUT] = BlancoRestGeneratorTsConstants.API_GET_REQUESTID_METHOD;
+        methodName[HTTP_METHOD_GET][TELEGRAM_OUTPUT] = BlancoRestGeneratorTsConstants.API_GET_RESPONSEID_METHOD;
+        methodName[HTTP_METHOD_POST][TELEGRAM_INPUT] = BlancoRestGeneratorTsConstants.API_POST_REQUESTID_METHOD;
+        methodName[HTTP_METHOD_POST][TELEGRAM_OUTPUT] = BlancoRestGeneratorTsConstants.API_POST_RESPONSEID_METHOD;
+        methodName[HTTP_METHOD_PUT][TELEGRAM_INPUT] = BlancoRestGeneratorTsConstants.API_PUT_REQUESTID_METHOD;
+        methodName[HTTP_METHOD_PUT][TELEGRAM_OUTPUT] = BlancoRestGeneratorTsConstants.API_PUT_RESPONSEID_METHOD;
+        methodName[HTTP_METHOD_DELETE][TELEGRAM_INPUT] = BlancoRestGeneratorTsConstants.API_DELETE_REQUESTID_METHOD;
+        methodName[HTTP_METHOD_DELETE][TELEGRAM_OUTPUT] = BlancoRestGeneratorTsConstants.API_DELETE_RESPONSEID_METHOD;
 
         final String requestIdName[] = new String[4];
         requestIdName[HTTP_METHOD_GET] = argStructure.getGetRequestId();
@@ -654,20 +654,20 @@ public class BlancoRestGeneratorXml2SourceFile {
             String defaultApiResponseId = null;
             switch (i) {
                 case 0:
-                    defaultApiRequestId = BlancoRestGeneratorConstants.VALUEOBJECT_PACKAGE + "." + BlancoRestGeneratorConstants.DEFAULT_API_GET_REQUESTID;
-                    defaultApiResponseId = BlancoRestGeneratorConstants.VALUEOBJECT_PACKAGE + "." + BlancoRestGeneratorConstants.DEFAULT_API_GET_RESPONSEID;
+                    defaultApiRequestId = BlancoRestGeneratorTsConstants.VALUEOBJECT_PACKAGE + "." + BlancoRestGeneratorTsConstants.DEFAULT_API_GET_REQUESTID;
+                    defaultApiResponseId = BlancoRestGeneratorTsConstants.VALUEOBJECT_PACKAGE + "." + BlancoRestGeneratorTsConstants.DEFAULT_API_GET_RESPONSEID;
                     break;
                 case 1:
-                    defaultApiRequestId = BlancoRestGeneratorConstants.VALUEOBJECT_PACKAGE + "." + BlancoRestGeneratorConstants.DEFAULT_API_POST_REQUESTID;
-                    defaultApiResponseId = BlancoRestGeneratorConstants.VALUEOBJECT_PACKAGE + "." + BlancoRestGeneratorConstants.DEFAULT_API_POST_RESPONSEID;
+                    defaultApiRequestId = BlancoRestGeneratorTsConstants.VALUEOBJECT_PACKAGE + "." + BlancoRestGeneratorTsConstants.DEFAULT_API_POST_REQUESTID;
+                    defaultApiResponseId = BlancoRestGeneratorTsConstants.VALUEOBJECT_PACKAGE + "." + BlancoRestGeneratorTsConstants.DEFAULT_API_POST_RESPONSEID;
                     break;
                 case 2:
-                    defaultApiRequestId = BlancoRestGeneratorConstants.VALUEOBJECT_PACKAGE + "." + BlancoRestGeneratorConstants.DEFAULT_API_PUT_REQUESTID;
-                    defaultApiResponseId = BlancoRestGeneratorConstants.VALUEOBJECT_PACKAGE + "." + BlancoRestGeneratorConstants.DEFAULT_API_PUT_RESPONSEID;
+                    defaultApiRequestId = BlancoRestGeneratorTsConstants.VALUEOBJECT_PACKAGE + "." + BlancoRestGeneratorTsConstants.DEFAULT_API_PUT_REQUESTID;
+                    defaultApiResponseId = BlancoRestGeneratorTsConstants.VALUEOBJECT_PACKAGE + "." + BlancoRestGeneratorTsConstants.DEFAULT_API_PUT_RESPONSEID;
                     break;
                 case 3:
-                    defaultApiRequestId = BlancoRestGeneratorConstants.VALUEOBJECT_PACKAGE + "." + BlancoRestGeneratorConstants.DEFAULT_API_DELETE_REQUESTID;
-                    defaultApiResponseId = BlancoRestGeneratorConstants.VALUEOBJECT_PACKAGE + "." + BlancoRestGeneratorConstants.DEFAULT_API_DELETE_RESPONSEID;
+                    defaultApiRequestId = BlancoRestGeneratorTsConstants.VALUEOBJECT_PACKAGE + "." + BlancoRestGeneratorTsConstants.DEFAULT_API_DELETE_REQUESTID;
+                    defaultApiResponseId = BlancoRestGeneratorTsConstants.VALUEOBJECT_PACKAGE + "." + BlancoRestGeneratorTsConstants.DEFAULT_API_DELETE_RESPONSEID;
                     break;
             }
 
@@ -705,7 +705,7 @@ public class BlancoRestGeneratorXml2SourceFile {
                 fCgSourceFile, fileBlancoMain);
     }
 
-    private void createAbstractMethod(String requestId, String responseId, BlancoRestGeneratorTelegram[]  argListTelegrams) {
+    private void createAbstractMethod(String requestId, String responseId, BlancoRestGeneratorTsTelegram[]  argListTelegrams) {
 
         // Initializer の定義
 //        final BlancoCgMethod cgInitializerMethod = fCgFactory.createMethod(
@@ -717,7 +717,7 @@ public class BlancoRestGeneratorXml2SourceFile {
 
         // Processor の定義
         final BlancoCgMethod cgProcessorMethod = fCgFactory.createMethod(
-                BlancoRestGeneratorConstants.API_PROCESS_METHOD, fBundle.getXml2sourceFileProcessorDescription());
+                BlancoRestGeneratorTsConstants.API_PROCESS_METHOD, fBundle.getXml2sourceFileProcessorDescription());
 
         fCgClass.getMethodList().add(cgProcessorMethod);
         cgProcessorMethod.setAccess("protected");
@@ -737,8 +737,8 @@ public class BlancoRestGeneratorXml2SourceFile {
 //            }
 //        }
 
-        BlancoRestGeneratorTelegram input = argListTelegrams[TELEGRAM_INPUT];
-        BlancoRestGeneratorTelegram output = argListTelegrams[TELEGRAM_OUTPUT];
+        BlancoRestGeneratorTsTelegram input = argListTelegrams[TELEGRAM_INPUT];
+        BlancoRestGeneratorTsTelegram output = argListTelegrams[TELEGRAM_OUTPUT];
         //System.out.println("### type = " + input.getTelegramType());
 //        System.out.println("(createAbstractMethod)### method = " + output.getTelegramMethod());
 
@@ -756,7 +756,7 @@ public class BlancoRestGeneratorXml2SourceFile {
          * デフォルトの例外（BlancoRestException）を throws に加える
          */
         BlancoCgType blancoCgType = new BlancoCgType();
-        blancoCgType.setName(BlancoRestGeneratorConstants.DEFAULT_EXCEPTION);
+        blancoCgType.setName(BlancoRestGeneratorTsConstants.DEFAULT_EXCEPTION);
         blancoCgType.setDescription(fBundle.getXml2sourceFileDefaultExceptionTypeLangdoc());
 
         BlancoCgException blancoCgException = new BlancoCgException();
@@ -772,9 +772,9 @@ public class BlancoRestGeneratorXml2SourceFile {
     private void createExecuteMethod(String requestId, String responseId,
                                      String defaultApiResquestId,
                                      String defaultApiResponseId,
-                                     BlancoRestGeneratorTelegram[]  argListTelegrams) {
+                                     BlancoRestGeneratorTsTelegram[]  argListTelegrams) {
         final BlancoCgMethod cgExecutorMethod = fCgFactory.createMethod(
-                BlancoRestGeneratorConstants.BASE_EXECUTOR_METHOD, fBundle.getXml2sourceFileExecutorDescription());
+                BlancoRestGeneratorTsConstants.BASE_EXECUTOR_METHOD, fBundle.getXml2sourceFileExecutorDescription());
         fCgClass.getMethodList().add(cgExecutorMethod);
         cgExecutorMethod.setAccess("protected");
         final List<String> ListLine = cgExecutorMethod.getLineList();
@@ -796,8 +796,8 @@ public class BlancoRestGeneratorXml2SourceFile {
 //            }
 //        }
 
-        BlancoRestGeneratorTelegram input = argListTelegrams[TELEGRAM_INPUT];
-        BlancoRestGeneratorTelegram output = argListTelegrams[TELEGRAM_OUTPUT];
+        BlancoRestGeneratorTsTelegram input = argListTelegrams[TELEGRAM_INPUT];
+        BlancoRestGeneratorTsTelegram output = argListTelegrams[TELEGRAM_OUTPUT];
         //System.out.println("### type = " + input.getTelegramType());
 //        System.out.println("(createExecuteMethod)### method = " + output.getTelegramMethod());
 
@@ -821,7 +821,7 @@ public class BlancoRestGeneratorXml2SourceFile {
          * デフォルトの例外（BlancoRestException）を throws に加える
          */
         BlancoCgType blancoCgType = new BlancoCgType();
-        blancoCgType.setName(BlancoRestGeneratorConstants.DEFAULT_EXCEPTION);
+        blancoCgType.setName(BlancoRestGeneratorTsConstants.DEFAULT_EXCEPTION);
         blancoCgType.setDescription(fBundle.getXml2sourceFileDefaultExceptionTypeLangdoc());
 
         BlancoCgException blancoCgException = new BlancoCgException();
@@ -836,7 +836,7 @@ public class BlancoRestGeneratorXml2SourceFile {
         // メソッドの実装
         ListLine.add(
                 responseId + " " + BlancoCgLineUtil.getVariablePrefix(fTargetLang) + "ret" + responseSubId + " = "
-                        + BlancoCgLineUtil.getVariablePrefix(fTargetLang) + "this." + BlancoRestGeneratorConstants.API_PROCESS_METHOD
+                        + BlancoCgLineUtil.getVariablePrefix(fTargetLang) + "this." + BlancoRestGeneratorTsConstants.API_PROCESS_METHOD
                         + "( " +  "("+requestCastId+ ")" +  BlancoCgLineUtil.getVariablePrefix(fTargetLang) + "arg" + requestSubId + " )"
                         + BlancoCgLineUtil.getTerminator(fTargetLang));
 
@@ -849,7 +849,7 @@ public class BlancoRestGeneratorXml2SourceFile {
 
     private void createExecuteMethodNotImplemented(String requestId, String responseId, String defaultApiResquestId, String defaultApiResponseId) {
         final BlancoCgMethod cgExecutorMethod = fCgFactory.createMethod(
-                BlancoRestGeneratorConstants.BASE_EXECUTOR_METHOD, fBundle.getXml2sourceFileExecutorDescription());
+                BlancoRestGeneratorTsConstants.BASE_EXECUTOR_METHOD, fBundle.getXml2sourceFileExecutorDescription());
         fCgClass.getMethodList().add(cgExecutorMethod);
         cgExecutorMethod.setAccess("protected");
         final List<String> ListLine = cgExecutorMethod.getLineList();
@@ -876,7 +876,7 @@ public class BlancoRestGeneratorXml2SourceFile {
          * デフォルトの例外（BlancoRestException）を throws に加える
          */
         BlancoCgType blancoCgType = new BlancoCgType();
-        blancoCgType.setName(BlancoRestGeneratorConstants.DEFAULT_EXCEPTION);
+        blancoCgType.setName(BlancoRestGeneratorTsConstants.DEFAULT_EXCEPTION);
         blancoCgType.setDescription(fBundle.getXml2sourceFileDefaultExceptionTypeLangdoc());
 
         BlancoCgException blancoCgException = new BlancoCgException();
@@ -891,7 +891,7 @@ public class BlancoRestGeneratorXml2SourceFile {
         // メソッドの実装
         //throw new BlancoRestException("GetMethod is not implemented in this api");
         ListLine.add(
-                "throw new " + BlancoRestGeneratorConstants.DEFAULT_EXCEPTION + "( " + BlancoCgLineUtil.getStringLiteralEnclosure(fTargetLang) +
+                "throw new " + BlancoRestGeneratorTsConstants.DEFAULT_EXCEPTION + "( " + BlancoCgLineUtil.getStringLiteralEnclosure(fTargetLang) +
                         fBundle.getBlancorestErrorMsg05(requestCastId) + BlancoCgLineUtil.getStringLiteralEnclosure(fTargetLang)  +")" + BlancoCgLineUtil.getTerminator(fTargetLang));
 
 //        ListLine.add(
@@ -907,8 +907,8 @@ public class BlancoRestGeneratorXml2SourceFile {
 
     }
 
-    private void overrideAuthenticationRequired(BlancoRestGeneratorTelegramProcess argStructure) {
-        String methodName = BlancoRestGeneratorConstants.API_AUTHENTICATION_REQUIRED;
+    private void overrideAuthenticationRequired(BlancoRestGeneratorTsTelegramProcess argStructure) {
+        String methodName = BlancoRestGeneratorTsConstants.API_AUTHENTICATION_REQUIRED;
 
         final BlancoCgMethod cgAuthenticationRequiredMethod = fCgFactory.createMethod(
                 methodName, fBundle.getXml2sourceFileAuthflagDescription());
@@ -993,7 +993,7 @@ public class BlancoRestGeneratorXml2SourceFile {
      *            ソースコードの出力先フォルダ。
      */
     public void process(
-            final BlancoRestGeneratorTelegram argStructure,
+            final BlancoRestGeneratorTsTelegram argStructure,
             final File argDirectoryTarget) {
 
         // Excel定義書で指定された出力先を採用します。
@@ -1013,14 +1013,14 @@ public class BlancoRestGeneratorXml2SourceFile {
 
             /* search the superclass from valueobject parsed list  */
             BlancoValueObjectClassStructure objectClassStructure =
-                    BlancoRestGeneratorObjectsInfo.objects.get(telegramBase);
+                    BlancoRestGeneratorTsObjectsInfo.objects.get(telegramBase);
 
             String packageName = null;
 
             if (objectClassStructure == null) {
                 /* search from blancoRest default valueobjects */
                 try {
-                    String tmpBase = BlancoRestGeneratorConstants.VALUEOBJECT_PACKAGE + "." + telegramBase;
+                    String tmpBase = BlancoRestGeneratorTsConstants.VALUEOBJECT_PACKAGE + "." + telegramBase;
                     Class.forName(tmpBase);
                     telegramBase = tmpBase;
                 } catch (ClassNotFoundException e) {
@@ -1062,11 +1062,11 @@ public class BlancoRestGeneratorXml2SourceFile {
      *            メタファイルから収集できた処理構造データ。
      */
     private void expandValueObject(
-            final BlancoRestGeneratorTelegram argProcessStructure) {
+            final BlancoRestGeneratorTsTelegram argProcessStructure) {
 
         for (int indexField = 0; indexField < argProcessStructure
                 .getListField().size(); indexField++) {
-            final BlancoRestGeneratorTelegramField fieldLook = argProcessStructure
+            final BlancoRestGeneratorTsTelegramField fieldLook = argProcessStructure
                     .getListField().get(indexField);
 
             expandField(argProcessStructure, fieldLook);
@@ -1087,8 +1087,8 @@ public class BlancoRestGeneratorXml2SourceFile {
      * @param argProcessStructure
      */
     private void expandField(
-            final BlancoRestGeneratorTelegram argProcessStructure,
-            final BlancoRestGeneratorTelegramField fieldLook) {
+            final BlancoRestGeneratorTsTelegram argProcessStructure,
+            final BlancoRestGeneratorTsTelegramField fieldLook) {
         String fieldName = fieldLook.getName();
         if (fNameAdjust) {
             fieldName = BlancoNameAdjuster.toClassName(fieldName);
@@ -1122,8 +1122,8 @@ public class BlancoRestGeneratorXml2SourceFile {
      * @param argProcessStructure
      */
     private void expandMethodSet(
-            final BlancoRestGeneratorTelegram argProcessStructure,
-            final BlancoRestGeneratorTelegramField fieldLook) {
+            final BlancoRestGeneratorTsTelegram argProcessStructure,
+            final BlancoRestGeneratorTsTelegramField fieldLook) {
         String fieldName = fieldLook.getName();
         if (fNameAdjust) {
             fieldName = BlancoNameAdjuster.toClassName(fieldName);
@@ -1162,8 +1162,8 @@ public class BlancoRestGeneratorXml2SourceFile {
      * @param argProcessStructure
      */
     private void expandMethodGet(
-            final BlancoRestGeneratorTelegram argProcessStructure,
-            final BlancoRestGeneratorTelegramField fieldLook) {
+            final BlancoRestGeneratorTsTelegram argProcessStructure,
+            final BlancoRestGeneratorTsTelegramField fieldLook) {
         String fieldName = fieldLook.getName();
         if (fNameAdjust) {
             fieldName = BlancoNameAdjuster.toClassName(fieldName);
@@ -1203,8 +1203,8 @@ public class BlancoRestGeneratorXml2SourceFile {
      * @param fieldLook
      */
     private void expandMethodType(
-            final BlancoRestGeneratorTelegram argProcessStructure,
-            final BlancoRestGeneratorTelegramField fieldLook) {
+            final BlancoRestGeneratorTsTelegram argProcessStructure,
+            final BlancoRestGeneratorTsTelegramField fieldLook) {
         String fieldName = fieldLook.getName();
         if (fNameAdjust) {
             fieldName = BlancoNameAdjuster.toClassName(fieldName);
@@ -1245,7 +1245,7 @@ public class BlancoRestGeneratorXml2SourceFile {
      * @param argProcessStructure
      */
     private void expandMethodToString(
-            final BlancoRestGeneratorTelegram argProcessStructure) {
+            final BlancoRestGeneratorTsTelegram argProcessStructure) {
         final BlancoCgMethod method = fCgFactory.createMethod("toString",
                 "このバリューオブジェクトの文字列表現を取得します。");
         fCgClass.getMethodList().add(method);
@@ -1279,7 +1279,7 @@ public class BlancoRestGeneratorXml2SourceFile {
                 + BlancoCgLineUtil.getTerminator(fTargetLang));
         for (int indexField = 0; indexField < argProcessStructure
                 .getListField().size(); indexField++) {
-            final BlancoRestGeneratorTelegramField fieldLook = argProcessStructure
+            final BlancoRestGeneratorTsTelegramField fieldLook = argProcessStructure
                     .getListField().get(indexField);
 
             String fieldName = fieldLook.getName();
@@ -1376,7 +1376,7 @@ public class BlancoRestGeneratorXml2SourceFile {
             javaType = "java.lang.Object";
         } else {
                     /* この名前の package を探す */
-            BlancoValueObjectClassStructure structure = BlancoRestGeneratorObjectsInfo.objects.get(phpType);
+            BlancoValueObjectClassStructure structure = BlancoRestGeneratorTsObjectsInfo.objects.get(phpType);
             if (structure != null) {
                 String packageName = structure.getPackage();
                 if (packageName != null) {
@@ -1384,7 +1384,7 @@ public class BlancoRestGeneratorXml2SourceFile {
                 } else {
                 /* search from blancoRest default valueobjects */
                     try {
-                        String tmpBase = BlancoRestGeneratorConstants.VALUEOBJECT_PACKAGE + "." + phpType;
+                        String tmpBase = BlancoRestGeneratorTsConstants.VALUEOBJECT_PACKAGE + "." + phpType;
                         Class.forName(tmpBase);
                         javaType = tmpBase;
                     } catch (ClassNotFoundException e) {
@@ -1394,7 +1394,7 @@ public class BlancoRestGeneratorXml2SourceFile {
             } else {
                 /* search from blancoRest default valueobjects */
                 try {
-                    String tmpBase = BlancoRestGeneratorConstants.VALUEOBJECT_PACKAGE + "." + phpType;
+                    String tmpBase = BlancoRestGeneratorTsConstants.VALUEOBJECT_PACKAGE + "." + phpType;
                     Class.forName(tmpBase);
                     javaType = tmpBase;
                 } catch (ClassNotFoundException e) {

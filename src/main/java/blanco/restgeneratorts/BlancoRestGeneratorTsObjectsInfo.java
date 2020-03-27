@@ -1,8 +1,8 @@
-package blanco.restgenerator;
+package blanco.restgeneratorts;
 
 import blanco.cg.BlancoCgSupportedLang;
-import blanco.restgenerator.resourcebundle.BlancoRestGeneratorResourceBundle;
-import blanco.restgenerator.task.valueobject.BlancoRestGeneratorProcessInput;
+import blanco.restgeneratorts.resourcebundle.BlancoRestGeneratorTsResourceBundle;
+import blanco.restgeneratorts.task.valueobject.BlancoRestGeneratorTsProcessInput;
 import blanco.valueobject.BlancoValueObjectXmlParser;
 import blanco.valueobject.valueobject.BlancoValueObjectClassStructure;
 
@@ -16,11 +16,11 @@ import java.util.Map;
  *
  * Created by tueda on 15/07/05.
  */
-public class BlancoRestGeneratorObjectsInfo {
+public class BlancoRestGeneratorTsObjectsInfo {
     /**
      * ValueObject 用リソースバンドルへのアクセスオブジェクト。
      */
-    private final static BlancoRestGeneratorResourceBundle fBundle = new BlancoRestGeneratorResourceBundle();
+    private final static BlancoRestGeneratorTsResourceBundle fBundle = new BlancoRestGeneratorTsResourceBundle();
 
     public static Map<String, Integer> mapCommons = new HashMap<String, Integer>() {
         {put(fBundle.getMeta2xmlElementCommon(), BlancoCgSupportedLang.JAVA);}
@@ -58,18 +58,18 @@ public class BlancoRestGeneratorObjectsInfo {
 
     public static HashMap<String, BlancoValueObjectClassStructure> objects = new HashMap<>();
 
-    public void process(final BlancoRestGeneratorProcessInput input) throws IOException {
+    public void process(final BlancoRestGeneratorTsProcessInput input) throws IOException {
 
         // XML化された中間ファイルから情報を読み込む
         final File[] fileMeta3 = new File(input.getTmpdir()
-                + BlancoRestGeneratorConstants.OBJECT_SUBDIRECTORY)
+                + BlancoRestGeneratorTsConstants.OBJECT_SUBDIRECTORY)
                 .listFiles();
 
         if (fileMeta3 == null) {
             System.out.println("!!! NO FILES in " + input.getTmpdir()
-                    + BlancoRestGeneratorConstants.OBJECT_SUBDIRECTORY);
+                    + BlancoRestGeneratorTsConstants.OBJECT_SUBDIRECTORY);
             throw new IllegalArgumentException("!!! NO FILES in " + input.getTmpdir()
-                    + BlancoRestGeneratorConstants.OBJECT_SUBDIRECTORY);
+                    + BlancoRestGeneratorTsConstants.OBJECT_SUBDIRECTORY);
         }
 
         for (int index = 0; index < fileMeta3.length; index++) {

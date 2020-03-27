@@ -7,34 +7,33 @@
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
  */
-package blanco.restgenerator.task;
+package blanco.restgeneratorts.task;
 
 import blanco.cg.BlancoCgSupportedLang;
-import blanco.restgenerator.BlancoRestGeneratorConstants;
-import blanco.restgenerator.BlancoRestGeneratorMeta2Xml;
-import blanco.restgenerator.BlancoRestGeneratorObjectsInfo;
-import blanco.restgenerator.BlancoRestGeneratorXml2SourceFile;
-import blanco.restgenerator.resourcebundle.BlancoRestGeneratorResourceBundle;
-import blanco.restgenerator.task.valueobject.BlancoRestGeneratorProcessInput;
-import blanco.valueobject.BlancoValueObjectConstants;
+import blanco.restgeneratorts.BlancoRestGeneratorTsConstants;
+import blanco.restgeneratorts.BlancoRestGeneratorTsMeta2Xml;
+import blanco.restgeneratorts.BlancoRestGeneratorTsObjectsInfo;
+import blanco.restgeneratorts.BlancoRestGeneratorTsXml2SourceFile;
+import blanco.restgeneratorts.resourcebundle.BlancoRestGeneratorTsResourceBundle;
+import blanco.restgeneratorts.task.valueobject.BlancoRestGeneratorTsProcessInput;
 
 import javax.xml.transform.TransformerException;
 import java.io.File;
 import java.io.IOException;
 
-public class BlancoRestGeneratorProcessImpl implements
-        BlancoRestGeneratorProcess {
+public class BlancoRestGeneratorTsProcessImpl implements
+        BlancoRestGeneratorTsProcess {
     /**
      * このプロダクトのリソースバンドルへのアクセスオブジェクト。
      */
-    private final BlancoRestGeneratorResourceBundle fBundle = new BlancoRestGeneratorResourceBundle();
+    private final BlancoRestGeneratorTsResourceBundle fBundle = new BlancoRestGeneratorTsResourceBundle();
 
     /**
      * {@inheritDoc}
      */
-    public int execute(final BlancoRestGeneratorProcessInput input) {
-        System.out.println("- " + BlancoRestGeneratorConstants.PRODUCT_NAME
-                + " (" + BlancoRestGeneratorConstants.VERSION + ")" + " for " + input.getSheetType());
+    public int execute(final BlancoRestGeneratorTsProcessInput input) {
+        System.out.println("- " + BlancoRestGeneratorTsConstants.PRODUCT_NAME
+                + " (" + BlancoRestGeneratorTsConstants.VERSION + ")" + " for " + input.getSheetType());
 
         try {
             final File fileMetadir = new File(input.getMetadir());
@@ -60,11 +59,11 @@ public class BlancoRestGeneratorProcessImpl implements
             // ここを通ったら常にtrue
             boolean isTargetStyleAdvanced = true;
 
-            if (style != null && BlancoRestGeneratorConstants.TARGET_STYLE_MAVEN.equals(style)) {
-                strTarget = strTarget + "/" + BlancoRestGeneratorConstants.TARGET_DIR_SUFFIX_MAVEN;
+            if (style != null && BlancoRestGeneratorTsConstants.TARGET_STYLE_MAVEN.equals(style)) {
+                strTarget = strTarget + "/" + BlancoRestGeneratorTsConstants.TARGET_DIR_SUFFIX_MAVEN;
             } else if (style == null ||
-                    !BlancoRestGeneratorConstants.TARGET_STYLE_FREE.equals(style)) {
-                strTarget = strTarget + "/" + BlancoRestGeneratorConstants.TARGET_DIR_SUFFIX_BLANCO;
+                    !BlancoRestGeneratorTsConstants.TARGET_STYLE_FREE.equals(style)) {
+                strTarget = strTarget + "/" + BlancoRestGeneratorTsConstants.TARGET_DIR_SUFFIX_BLANCO;
             }
             /* style が free だったらtargetdirをそのまま使う */
             if (input.getVerbose()) {
@@ -75,31 +74,31 @@ public class BlancoRestGeneratorProcessImpl implements
              * validator を作る時に使うために，
              * ValueObject で既に定義されている（はずの）オブジェクトを取得しておく
              */
-            final BlancoRestGeneratorObjectsInfo objectsInfo = new BlancoRestGeneratorObjectsInfo();
+            final BlancoRestGeneratorTsObjectsInfo objectsInfo = new BlancoRestGeneratorTsObjectsInfo();
             objectsInfo.setEncoding(input.getEncoding());
             objectsInfo.setVerbose(input.getVerbose());
             objectsInfo.process(input);
 
             // テンポラリディレクトリを作成。
             new File(input.getTmpdir()
-                    + BlancoRestGeneratorConstants.TARGET_SUBDIRECTORY)
+                    + BlancoRestGeneratorTsConstants.TARGET_SUBDIRECTORY)
                     .mkdirs();
 
             // 指定されたメタディレクトリを処理します。
-            new BlancoRestGeneratorMeta2Xml()
+            new BlancoRestGeneratorTsMeta2Xml()
                     .processDirectory(fileMetadir, input.getTmpdir()
-                            + BlancoRestGeneratorConstants.TARGET_SUBDIRECTORY);
+                            + BlancoRestGeneratorTsConstants.TARGET_SUBDIRECTORY);
 
             // XML化された中間ファイルからソースコードを生成
             final File[] fileMeta2 = new File(input.getTmpdir()
-                    + BlancoRestGeneratorConstants.TARGET_SUBDIRECTORY)
+                    + BlancoRestGeneratorTsConstants.TARGET_SUBDIRECTORY)
                     .listFiles();
             for (int index = 0; index < fileMeta2.length; index++) {
                 if (fileMeta2[index].getName().endsWith(".xml") == false) {
                     continue;
                 }
 
-                final BlancoRestGeneratorXml2SourceFile xml2source = new BlancoRestGeneratorXml2SourceFile();
+                final BlancoRestGeneratorTsXml2SourceFile xml2source = new BlancoRestGeneratorTsXml2SourceFile();
                 xml2source.setEncoding(input.getEncoding());
                 xml2source.setSheetLang(new BlancoCgSupportedLang().convertToInt(input.getSheetType()));
                 xml2source.setVerbose(input.getVerbose());

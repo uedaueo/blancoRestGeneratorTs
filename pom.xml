@@ -2,11 +2,11 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>blanco.restgenerator</groupId>
-	<artifactId>blanco-restgenerator</artifactId>
+	<groupId>blanco.restgeneratorts</groupId>
+	<artifactId>blanco-restgeneratorts</artifactId>
 	<packaging>jar</packaging>
 	<version>0.1.0</version>
-	<name>blanco-restgenerator</name>
+	<name>blanco-restgeneratorts</name>
 	<url>https://igapyon.github.io/blancofw-maven2</url>
 
 	<!-- basic spec for jar -->
@@ -88,6 +88,12 @@
 			<groupId>blanco.valueobject</groupId>
 			<artifactId>blanco-valueobject</artifactId>
 			<version>[2.0,3.0)</version>
+		</dependency>
+
+		<dependency>
+			<groupId>blanco.valueobjectts</groupId>
+			<artifactId>blanco-valueobjectts</artifactId>
+			<version>[0.0,1.0)</version>
 		</dependency>
 
 		<dependency>
@@ -260,16 +266,16 @@
 					</execution>
 
 					<execution>
-						<id>blanco-meta-restgenerator-test</id>
+						<id>blanco-meta-restgeneratorts-test</id>
 						<phase>generate-test-sources</phase>
 						<configuration>
 							<target>
 								<taskdef name="blancovalueobject" classname="blanco.valueobject.task.BlancoValueObjectTask" classpathref="maven.runtime.classpath">
 								</taskdef>
-								<taskdef name="blancorestgenerator" classname="blanco.restgenerator.task.BlancoRestGeneratorTask" classpathref="maven.runtime.classpath">
+								<taskdef name="blancorestgeneratorts" classname="blanco.restgeneratorts.task.BlancoRestGeneratorTsTask" classpathref="maven.runtime.classpath">
 								</taskdef>
 								<blancovalueobject metadir="meta/objects" encoding="${project.build.sourceEncoding}" sheetType="php" tmpdir="tmpTest" targetdir="sample/blanco" targetStyle="maven" verbose="true" />
-								<blancorestgenerator metadir="meta/api" encoding="${project.build.sourceEncoding}" sheetType="php" tmpdir="tmpTest" targetdir="sample/blanco" targetStyle="maven" verbose="true" />
+								<blancorestgeneratorts metadir="meta/api" encoding="${project.build.sourceEncoding}" sheetType="php" tmpdir="tmpTest" targetdir="sample/blanco" targetStyle="maven" verbose="true" />
 							</target>
 						</configuration>
 						<goals>
