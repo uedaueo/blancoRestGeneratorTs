@@ -21,6 +21,22 @@ blancoRestGenerator はJava によるRestful API の電文と電文処理を生�
  > - ant compile
  > - ant jar : ここで作成されたjarファイルを各プロジェクトで使用します．
 
+## 電文ID, 電文処理IDに関するルール
+
+電文IDは、以下のルールで電文処理IDから一意に決定されます。
+
+```
+電文ID = 電文処理ID + HTTPメソッド名 + Request|Response
+```
+
+### 例
+
+|項目|値|備考|
+|:--|:--|:--|
+|電文処理ID|BlancoApi|API名|
+|要求電文ID (GETメソッド)|BlancoApiGetRequest|要求電文ID|
+|応答電文ID (GETメソッド)|BlancoApiGetResponse|応答電文ID|
+
 ##開発者
 うえだうえお(tueda)
 

@@ -174,6 +174,66 @@ public class BlancoRestGeneratorTsResourceBundle {
     }
 
     /**
+     * bundle[BlancoRestGeneratorTs], key[META2XML.TELEGRAM_IMPLEMENTS]
+     *
+     * [blancotelegram-implements] (ja)<br>
+     *
+     * @return key[META2XML.TELEGRAM_IMPLEMENTS]に対応する値。外部から読み込みができない場合には、定義書の値を戻します。必ずnull以外の値が戻ります。
+     */
+    public String getMeta2xmlTelegramImplements() {
+        // 初期値として定義書の値を利用します。
+        String strFormat = "blancotelegram-implements";
+        try {
+            if (fResourceBundle != null) {
+                strFormat = fResourceBundle.getString("META2XML.TELEGRAM_IMPLEMENTS");
+            }
+        } catch (MissingResourceException ex) {
+        }
+        // 置換文字列はひとつもありません。
+        return strFormat;
+    }
+
+    /**
+     * bundle[BlancoRestGeneratorTs], key[META2XML.TELEGRAM_IMPORT]
+     *
+     * [blancotelegram-import] (ja)<br>
+     *
+     * @return key[META2XML.TELEGRAM_IMPORT]に対応する値。外部から読み込みができない場合には、定義書の値を戻します。必ずnull以外の値が戻ります。
+     */
+    public String getMeta2xmlTelegramImport() {
+        // 初期値として定義書の値を利用します。
+        String strFormat = "blancotelegram-import";
+        try {
+            if (fResourceBundle != null) {
+                strFormat = fResourceBundle.getString("META2XML.TELEGRAM_IMPORT");
+            }
+        } catch (MissingResourceException ex) {
+        }
+        // 置換文字列はひとつもありません。
+        return strFormat;
+    }
+
+    /**
+     * bundle[BlancoRestGeneratorTs], key[META2XML.TELEGRAM_HEADER]
+     *
+     * [blancotelegram-header] (ja)<br>
+     *
+     * @return key[META2XML.TELEGRAM_HEADER]に対応する値。外部から読み込みができない場合には、定義書の値を戻します。必ずnull以外の値が戻ります。
+     */
+    public String getMeta2xmlTelegramHeader() {
+        // 初期値として定義書の値を利用します。
+        String strFormat = "blancotelegram-header";
+        try {
+            if (fResourceBundle != null) {
+                strFormat = fResourceBundle.getString("META2XML.TELEGRAM_HEADER");
+            }
+        } catch (MissingResourceException ex) {
+        }
+        // 置換文字列はひとつもありません。
+        return strFormat;
+    }
+
+    /**
      * bundle[BlancoRestGeneratorTs], key[META2XML.TEREGRAM_LIST]
      *
      * [blancotelegram-list] (ja)<br>
@@ -226,6 +286,86 @@ public class BlancoRestGeneratorTsResourceBundle {
         try {
             if (fResourceBundle != null) {
                 strFormat = fResourceBundle.getString("META2XML.PROCESS_EXTENDS");
+            }
+        } catch (MissingResourceException ex) {
+        }
+        // 置換文字列はひとつもありません。
+        return strFormat;
+    }
+
+    /**
+     * bundle[BlancoRestGeneratorTs], key[META2XML.PROCESS_IMPLEMENTS]
+     *
+     * [blancotelegramprocess-implements] (ja)<br>
+     *
+     * @return key[META2XML.PROCESS_IMPLEMENTS]に対応する値。外部から読み込みができない場合には、定義書の値を戻します。必ずnull以外の値が戻ります。
+     */
+    public String getMeta2xmlProcessImplements() {
+        // 初期値として定義書の値を利用します。
+        String strFormat = "blancotelegramprocess-implements";
+        try {
+            if (fResourceBundle != null) {
+                strFormat = fResourceBundle.getString("META2XML.PROCESS_IMPLEMENTS");
+            }
+        } catch (MissingResourceException ex) {
+        }
+        // 置換文字列はひとつもありません。
+        return strFormat;
+    }
+
+    /**
+     * bundle[BlancoRestGeneratorTs], key[META2XML.PROCESS_IMPORT]
+     *
+     * [blancotelegramprocess-import] (ja)<br>
+     *
+     * @return key[META2XML.PROCESS_IMPORT]に対応する値。外部から読み込みができない場合には、定義書の値を戻します。必ずnull以外の値が戻ります。
+     */
+    public String getMeta2xmlProcessImport() {
+        // 初期値として定義書の値を利用します。
+        String strFormat = "blancotelegramprocess-import";
+        try {
+            if (fResourceBundle != null) {
+                strFormat = fResourceBundle.getString("META2XML.PROCESS_IMPORT");
+            }
+        } catch (MissingResourceException ex) {
+        }
+        // 置換文字列はひとつもありません。
+        return strFormat;
+    }
+
+    /**
+     * bundle[BlancoRestGeneratorTs], key[META2XML.PROCESS_HEADER]
+     *
+     * [blancotelegramprocess-header] (ja)<br>
+     *
+     * @return key[META2XML.PROCESS_HEADER]に対応する値。外部から読み込みができない場合には、定義書の値を戻します。必ずnull以外の値が戻ります。
+     */
+    public String getMeta2xmlProcessHeader() {
+        // 初期値として定義書の値を利用します。
+        String strFormat = "blancotelegramprocess-header";
+        try {
+            if (fResourceBundle != null) {
+                strFormat = fResourceBundle.getString("META2XML.PROCESS_HEADER");
+            }
+        } catch (MissingResourceException ex) {
+        }
+        // 置換文字列はひとつもありません。
+        return strFormat;
+    }
+
+    /**
+     * bundle[BlancoRestGeneratorTs], key[META2XML.PROCESS_LIST]
+     *
+     * [blancotelegramprocess-list] (ja)<br>
+     *
+     * @return key[META2XML.PROCESS_LIST]に対応する値。外部から読み込みができない場合には、定義書の値を戻します。必ずnull以外の値が戻ります。
+     */
+    public String getMeta2xmlProcessList() {
+        // 初期値として定義書の値を利用します。
+        String strFormat = "blancotelegramprocess-list";
+        try {
+            if (fResourceBundle != null) {
+                strFormat = fResourceBundle.getString("META2XML.PROCESS_LIST");
             }
         } catch (MissingResourceException ex) {
         }
@@ -560,6 +700,81 @@ public class BlancoRestGeneratorTsResourceBundle {
         final StringBuffer strbuf = new StringBuffer();
         // 与えられた引数を元に置換文字列を置き換えます。
         messageFormat.format(new Object[] {arg0, arg1, arg2, arg3}, strbuf, null);
+        return strbuf.toString();
+    }
+
+    /**
+     * bundle[BlancoRestGeneratorTs], key[XML2SOURCE_FILE.ERR007]
+     *
+     * [クラス名[{0}] フィールド[{1}]の「最大値」が数値ではありません。] (ja)<br>
+     *
+     * @param arg0 置換文字列{0}を置換する値。java.lang.String型を与えてください。
+     * @param arg1 置換文字列{1}を置換する値。java.lang.String型を与えてください。
+     * @return key[XML2SOURCE_FILE.ERR007]に対応する値。外部から読み込みができない場合には、定義書の値を戻します。必ずnull以外の値が戻ります。
+     */
+    public String getXml2sourceFileErr007(final String arg0, final String arg1) {
+        // 初期値として定義書の値を利用します。
+        String strFormat = "クラス名[{0}] フィールド[{1}]の「最大値」が数値ではありません。";
+        try {
+            if (fResourceBundle != null) {
+                strFormat = fResourceBundle.getString("XML2SOURCE_FILE.ERR007");
+            }
+        } catch (MissingResourceException ex) {
+        }
+        final MessageFormat messageFormat = new MessageFormat(strFormat);
+        final StringBuffer strbuf = new StringBuffer();
+        // 与えられた引数を元に置換文字列を置き換えます。
+        messageFormat.format(new Object[] {arg0, arg1}, strbuf, null);
+        return strbuf.toString();
+    }
+
+    /**
+     * bundle[BlancoRestGeneratorTs], key[XML2SOURCE_FILE.ERR008]
+     *
+     * [クラス名[{0}] フィールド[{1}]の「最小値」が数値ではありません。] (ja)<br>
+     *
+     * @param arg0 置換文字列{0}を置換する値。java.lang.String型を与えてください。
+     * @param arg1 置換文字列{1}を置換する値。java.lang.String型を与えてください。
+     * @return key[XML2SOURCE_FILE.ERR008]に対応する値。外部から読み込みができない場合には、定義書の値を戻します。必ずnull以外の値が戻ります。
+     */
+    public String getXml2sourceFileErr008(final String arg0, final String arg1) {
+        // 初期値として定義書の値を利用します。
+        String strFormat = "クラス名[{0}] フィールド[{1}]の「最小値」が数値ではありません。";
+        try {
+            if (fResourceBundle != null) {
+                strFormat = fResourceBundle.getString("XML2SOURCE_FILE.ERR008");
+            }
+        } catch (MissingResourceException ex) {
+        }
+        final MessageFormat messageFormat = new MessageFormat(strFormat);
+        final StringBuffer strbuf = new StringBuffer();
+        // 与えられた引数を元に置換文字列を置き換えます。
+        messageFormat.format(new Object[] {arg0, arg1}, strbuf, null);
+        return strbuf.toString();
+    }
+
+    /**
+     * bundle[BlancoRestGeneratorTs], key[XML2SOURCE_FILE.ERR009]
+     *
+     * [クラス名[{0}] フィールド[{1}]の「デフォルト値」がセットされていません。] (ja)<br>
+     *
+     * @param arg0 置換文字列{0}を置換する値。java.lang.String型を与えてください。
+     * @param arg1 置換文字列{1}を置換する値。java.lang.String型を与えてください。
+     * @return key[XML2SOURCE_FILE.ERR009]に対応する値。外部から読み込みができない場合には、定義書の値を戻します。必ずnull以外の値が戻ります。
+     */
+    public String getXml2sourceFileErr009(final String arg0, final String arg1) {
+        // 初期値として定義書の値を利用します。
+        String strFormat = "クラス名[{0}] フィールド[{1}]の「デフォルト値」がセットされていません。";
+        try {
+            if (fResourceBundle != null) {
+                strFormat = fResourceBundle.getString("XML2SOURCE_FILE.ERR009");
+            }
+        } catch (MissingResourceException ex) {
+        }
+        final MessageFormat messageFormat = new MessageFormat(strFormat);
+        final StringBuffer strbuf = new StringBuffer();
+        // 与えられた引数を元に置換文字列を置き換えます。
+        messageFormat.format(new Object[] {arg0, arg1}, strbuf, null);
         return strbuf.toString();
     }
 

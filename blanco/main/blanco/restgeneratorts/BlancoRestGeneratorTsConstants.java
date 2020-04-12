@@ -170,7 +170,7 @@ public class BlancoRestGeneratorTsConstants {
      * 項目番号:28<br>
      * BlancoRestの標準例外クラス名です．
      */
-    public static final String DEFAULT_EXCEPTION = "blanco.rest.Exception.BlancoRestException";
+    public static final String DEFAULT_EXCEPTION = "Error";
 
     /**
      * 項目番号:29<br>
@@ -231,4 +231,40 @@ public class BlancoRestGeneratorTsConstants {
      * デフォルトのAPIのリクエストID
      */
     public static final String DEFAULT_API_DELETE_RESPONSEID = "ApiDeleteTelegram";
+
+    /**
+     * 項目番号:39<br>
+     * HTTPメソッドGETを表す文字列
+     */
+    public static final String HTTP_METHOD_GET = "HTTP_METHOD_GET";
+
+    /**
+     * 項目番号:40<br>
+     * HTTPメソッドPOSTを表す文字列
+     */
+    public static final String HTTP_METHOD_POST = "HTTP_METHOD_POST";
+
+    /**
+     * 項目番号:41<br>
+     * HTTPメソッドPUTを表す文字列
+     */
+    public static final String HTTP_METHOD_PUT = "HTTP_METHOD_PUT";
+
+    /**
+     * 項目番号:42<br>
+     * HTTPメソッドDELETEを表す文字列
+     */
+    public static final String HTTP_METHOD_DELETE = "HTTP_METHOD_DELETE";
+
+    /**
+     * 項目番号:43<br>
+     * 電文種別INPUTを表す文字列
+     */
+    public static final String TELEGRAM_INPUT = "TELEGRAM_INPUT";
+
+    /**
+     * 項目番号:44<br>
+     * 電文種別OUTPUTを表す文字列
+     */
+    public static final String TELEGRAM_OUTPUT = "TELEGRAM_OUTPUT";
 }

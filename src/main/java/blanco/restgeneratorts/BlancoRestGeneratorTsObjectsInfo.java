@@ -3,8 +3,8 @@ package blanco.restgeneratorts;
 import blanco.cg.BlancoCgSupportedLang;
 import blanco.restgeneratorts.resourcebundle.BlancoRestGeneratorTsResourceBundle;
 import blanco.restgeneratorts.task.valueobject.BlancoRestGeneratorTsProcessInput;
-import blanco.valueobject.BlancoValueObjectXmlParser;
-import blanco.valueobject.valueobject.BlancoValueObjectClassStructure;
+import blanco.valueobjectts.BlancoValueObjectTsXmlParser;
+import blanco.valueobjectts.valueobject.BlancoValueObjectTsClassStructure;
 
 import java.io.File;
 import java.io.IOException;
@@ -56,7 +56,7 @@ public class BlancoRestGeneratorTsObjectsInfo {
         return this.fVerbose;
     }
 
-    public static HashMap<String, BlancoValueObjectClassStructure> objects = new HashMap<>();
+    public static HashMap<String, BlancoValueObjectTsClassStructure> objects = new HashMap<>();
 
     public void process(final BlancoRestGeneratorTsProcessInput input) throws IOException {
 
@@ -77,13 +77,13 @@ public class BlancoRestGeneratorTsObjectsInfo {
                 continue;
             }
 
-            BlancoValueObjectXmlParser parser = new BlancoValueObjectXmlParser();
+            BlancoValueObjectTsXmlParser parser = new BlancoValueObjectTsXmlParser();
             parser.setVerbose(this.isVerbose());
-            final BlancoValueObjectClassStructure[] structures = parser.parse(fileMeta3[index]);
+            final BlancoValueObjectTsClassStructure[] structures = parser.parse(fileMeta3[index]);
 
             if (structures != null ) {
                 for (int index2 = 0; index2 < structures.length; index2++) {
-                    BlancoValueObjectClassStructure structure = structures[index2];
+                    BlancoValueObjectTsClassStructure structure = structures[index2];
                     if (structure != null) {
                         objects.put(structure.getName(), structure);
                     } else {

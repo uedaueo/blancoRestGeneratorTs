@@ -13,23 +13,19 @@ import blanco.cg.BlancoCgObjectFactory;
 import blanco.cg.BlancoCgSupportedLang;
 import blanco.cg.transformer.BlancoCgTransformerFactory;
 import blanco.cg.util.BlancoCgLineUtil;
+import blanco.cg.util.BlancoCgSourceUtil;
 import blanco.cg.valueobject.*;
 import blanco.commons.util.BlancoNameAdjuster;
 import blanco.commons.util.BlancoStringUtil;
 import blanco.restgeneratorts.resourcebundle.BlancoRestGeneratorTsResourceBundle;
-import blanco.restgeneratorts.valueobject.BlancoRestGeneratorTsTelegram;
-import blanco.restgeneratorts.valueobject.BlancoRestGeneratorTsTelegramField;
-import blanco.restgeneratorts.valueobject.BlancoRestGeneratorTsTelegramProcess;
-import blanco.valueobject.valueobject.BlancoValueObjectClassStructure;
-import blanco.xml.bind.BlancoXmlBindingUtil;
-import blanco.xml.bind.BlancoXmlUnmarshaller;
-import blanco.xml.bind.valueobject.BlancoXmlDocument;
-import blanco.xml.bind.valueobject.BlancoXmlElement;
+import blanco.restgeneratorts.valueobject.BlancoRestGeneratorTsTelegramStructure;
+import blanco.restgeneratorts.valueobject.BlancoRestGeneratorTsTelegramFieldStructure;
+import blanco.restgeneratorts.valueobject.BlancoRestGeneratorTsTelegramProcessStructure;
 
+import javax.xml.transform.TransformerException;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * 「メッセージ定義書」Excel様式からメッセージを処理するクラス・ソースコードを生成。
@@ -40,20 +36,6 @@ import java.util.List;
  * @author tueda
  */
 public class BlancoRestGeneratorTsXml2SourceFile {
-
-    /**
-     * HTTPメソッド名のint表現
-     */
-    private static final int HTTP_METHOD_GET = 0;
-    private static final int HTTP_METHOD_POST = 1;
-    private static final int HTTP_METHOD_PUT = 2;
-    private static final int HTTP_METHOD_DELETE = 3;
-
-    /**
-     * INPUT,OUTPUTのint表現
-     */
-    private static final int TELEGRAM_INPUT = 0;
-    private static final int TELEGRAM_OUTPUT = 1;
 
     private boolean fVerbose = false;
     public void setVerbose(boolean argVerbose) {
@@ -83,6 +65,17 @@ public class BlancoRestGeneratorTsXml2SourceFile {
     }
 
     /**
+     * ソースコード生成先ディレクトリのスタイル
+     */
+    private boolean fTargetStyleAdvanced = false;
+    public void setTargetStyleAdvanced(boolean argTargetStyleAdvanced) {
+        this.fTargetStyleAdvanced = argTargetStyleAdvanced;
+    }
+    public boolean isTargetStyleAdvanced() {
+        return this.fTargetStyleAdvanced;
+    }
+
+    /**
      * 内部的に利用するblancoCg用ファクトリ。
      */
     private BlancoCgObjectFactory fCgFactory = null;
@@ -99,6 +92,7 @@ public class BlancoRestGeneratorTsXml2SourceFile {
 
     /**
      * フィールド名やメソッド名の名前変形を行うかどうか。
+     *
      */
     private boolean fNameAdjust = true;
 
@@ -127,727 +121,243 @@ public class BlancoRestGeneratorTsXml2SourceFile {
      *            メタ情報が含まれているXMLファイル。
      * @param argDirectoryTarget
      *            ソースコード生成先ディレクトリ (/mainを除く部分を指定します)。
-     * @param argNameAdjust
-     *            名前変形を行うかどうか。
      * @throws IOException
      *             入出力例外が発生した場合。
      */
     public void process(final File argMetaXmlSourceFile,
-            final boolean argNameAdjust, final File argDirectoryTarget)
-            throws IOException {
+                        final File argDirectoryTarget)
+            throws IOException, TransformerException {
 
-        System.out.println("BlancoRestGeneratorTsXml2SourceFile#process file = " + argMetaXmlSourceFile.getName());
+        if (this.isVerbose()) {
+            System.out.println("BlancoRestGeneratorTsXml2SourceFile#process file = " + argMetaXmlSourceFile.getName());
+        }
 
-        fNameAdjust = argNameAdjust;
+        fNameAdjust = true; // BlancoRestGenerator では常にフィールド名を変形します。
 
-        // メタ情報を解析してバリューオブジェクトのツリーを取得します。
-        final BlancoXmlDocument documentMeta = new BlancoXmlUnmarshaller()
-                .unmarshal(argMetaXmlSourceFile);
+        BlancoRestGeneratorTsXmlParser parser = new BlancoRestGeneratorTsXmlParser();
+        parser.setVerbose(this.isVerbose());
+        BlancoRestGeneratorTsTelegramProcessStructure[] processStructures =
+                parser.parse(argMetaXmlSourceFile);
 
-        // ルートエレメントを取得します。
-        final BlancoXmlElement elementRoot = BlancoXmlBindingUtil
-                .getDocumentElement(documentMeta);
-        if (elementRoot == null) {
-            // ルートエレメントが無い場合には処理中断します。
-            System.out.println("BlancoRestXmlSourceFile#process !!! NO ROOT ELEMENT !!!");
+        if (processStructures == null) {
+            System.out.println("!!! SKIP !!!! " + argMetaXmlSourceFile.getName());
             return;
         }
 
-        // まずは電文を生成します．
-        BlancoRestGeneratorTsTelegram listTelegram[][] = new BlancoRestGeneratorTsTelegram[4][2];
-        processTelegram(argDirectoryTarget, elementRoot, listTelegram);
-
-        // 次に電文処理を生成します
-        processTelegramProcess(argDirectoryTarget, elementRoot, listTelegram);
-    }
-
-    private void processTelegramProcess(final File argDirectoryTarget, BlancoXmlElement elementRoot, BlancoRestGeneratorTsTelegram[][] argListTelegrams) {
-        // sheet(Excelシート)のリストを取得します。
-        final List<BlancoXmlElement> listSheet = BlancoXmlBindingUtil
-                .getElementsByTagName(elementRoot, "sheet");
-        final int sizeListSheet = listSheet.size();
-        for (int index = 0; index < sizeListSheet; index++) {
-            // おのおののシートを処理します。
-            final BlancoXmlElement elementSheet = (BlancoXmlElement) listSheet
-                    .get(index);
-
-            // 共通情報を取得します。
-            final BlancoXmlElement elementCommon = BlancoXmlBindingUtil
-                    .getElement(elementSheet, fBundle
-                            .getMeta2xmlProcessCommon());
-            if (elementCommon == null) {
-                // commonが無い場合には、このシートの処理をスキップします。
-                // System.out.println("BlancoRestXmlSourceFile#processTelegramProcess !!! NO COMMON !!!");
-                continue;
-            }
-
-            final String name = BlancoXmlBindingUtil.getTextContent(
-                    elementCommon, "name");
-
-            if (BlancoStringUtil.null2Blank(name).trim().length() == 0) {
-                // nameが空の場合には処理をスキップします。
-                // System.out.println("BlancoRestXmlSourceFile#processTelegramProcess !!! NO NAME !!!");
-                continue;
-            }
-
-            System.out.println("BlancoRestXmlSourceFile#processTelegramProcess name = " + name);
-
-            // 継承情報を取得します．
-            final BlancoXmlElement elementExtends = BlancoXmlBindingUtil
-                    .getElement(elementSheet, fBundle
-                            .getMeta2xmlProcessExtends());
-
-            // 電文処理には一覧情報はありません
-
-            // シートから詳細な情報を取得します。
-            final BlancoRestGeneratorTsTelegramProcess structure = parseProcessSheet(
-                    elementCommon, elementExtends);
-
-            if (structure != null) {
-                // メタ情報の解析結果をもとにソースコード自動生成を実行します。
-                process(structure, argListTelegrams, argDirectoryTarget);
-            }
-
+        for (int index = 0; index < processStructures.length; index++) {
+            BlancoRestGeneratorTsTelegramProcessStructure processStructure = processStructures[index];
+            // 得られた情報から TypeScript コードを生成します。
+            generate(processStructure, argDirectoryTarget);
         }
     }
 
-    private BlancoRestGeneratorTsTelegramProcess parseProcessSheet(
-            final BlancoXmlElement argElementCommon,
-            final BlancoXmlElement argElementExtends) {
+    private void generate(final BlancoRestGeneratorTsTelegramProcessStructure argProcessStructure, final File argDirectoryTarget) {
 
-        final BlancoRestGeneratorTsTelegramProcess structure = new BlancoRestGeneratorTsTelegramProcess();
-        structure.setName(BlancoXmlBindingUtil.getTextContent(
-                argElementCommon, "name"));
-        structure.setPackage(BlancoXmlBindingUtil.getTextContent(
-                argElementCommon, "package"));
-
-        if (BlancoStringUtil.null2Blank(structure.getPackage()).trim()
-                .length() == 0) {
-            throw new IllegalArgumentException(fBundle
-                    .getXml2sourceFileErr001(structure.getName()));
-        }
-
-        // 継承情報を処理する
-        String superClass = null;
-        if (argElementExtends != null) {
-            superClass = BlancoXmlBindingUtil.getTextContent(
-                    argElementExtends, "superClass");
-            if (superClass != null) {
-                String myPackage = BlancoXmlBindingUtil.getTextContent(
-                        argElementExtends, "package");
-                if (myPackage != null) {
-                    superClass = myPackage + "." + superClass;
-                }
-            }
-        }
-        structure.setSuperClass(superClass);
-
-        if (BlancoXmlBindingUtil
-                .getTextContent(argElementCommon, "description") != null) {
-            structure.setDescription(BlancoXmlBindingUtil
-                    .getTextContent(argElementCommon, "description"));
-        }
-
-        /*
-         * 入力シートが Java 以外の場合にも対応します．
-         * 現時点では PHP のみです．
-         */
-        String telegramGetRequestId = BlancoXmlBindingUtil.getTextContent(argElementCommon, "telegramGetRequestId");
-        String telegramGetResponseId = BlancoXmlBindingUtil.getTextContent(argElementCommon, "telegramGetResponseId");
-        String telegramPutRequestId = BlancoXmlBindingUtil.getTextContent(argElementCommon, "telegramPutRequestId");
-        String telegramPutResponseId = BlancoXmlBindingUtil.getTextContent(argElementCommon, "telegramPutResponseId");
-        String telegramPostRequestId = BlancoXmlBindingUtil.getTextContent(argElementCommon, "telegramPostRequestId");
-        String telegramPostResponseId = BlancoXmlBindingUtil.getTextContent(argElementCommon, "telegramPostResponseId");
-        String telegramDeleteRequestId = BlancoXmlBindingUtil.getTextContent(argElementCommon, "telegramDeleteRequestId");
-        String telegramDeleteResponseId = BlancoXmlBindingUtil.getTextContent(argElementCommon, "telegramDeleteResponseId");
-        switch (fSheetLang) {
-            case BlancoCgSupportedLang.PHP:
-                telegramGetRequestId = adjustClassNamePhp2Java(telegramGetRequestId, null);
-                telegramGetResponseId = adjustClassNamePhp2Java(telegramGetResponseId, null);
-                telegramPutRequestId = adjustClassNamePhp2Java(telegramPutRequestId, null);
-                telegramPutResponseId = adjustClassNamePhp2Java(telegramPutResponseId, null);
-                telegramPostRequestId = adjustClassNamePhp2Java(telegramPostRequestId, null);
-                telegramPostResponseId = adjustClassNamePhp2Java(telegramPostResponseId, null);
-                telegramDeleteRequestId = adjustClassNamePhp2Java(telegramDeleteRequestId, null);
-                telegramDeleteResponseId = adjustClassNamePhp2Java(telegramDeleteResponseId, null);
-                break;
-            /* 対応言語を増やす場合はここに case を追記します */
-        }
-        structure.setGetRequestId(telegramGetRequestId);
-        structure.setGetResponseId(telegramGetResponseId);
-        structure.setPutRequestId(telegramPutRequestId);
-        structure.setPutResponseId(telegramPutResponseId);
-        structure.setPostRequestId(telegramPostRequestId);
-        structure.setPostResponseId(telegramPostResponseId);
-        structure.setDeleteRequestId(telegramDeleteRequestId);
-        structure.setDeleteResponseId(telegramDeleteResponseId);
-
-        structure.setLocation(BlancoXmlBindingUtil.getTextContent(argElementCommon, "location"));
-
-        structure.setNamespace(BlancoXmlBindingUtil.getTextContent(
-                argElementCommon, "namespace"));
-
-        String strNoAuthenticationRequired = BlancoXmlBindingUtil.getTextContent(
-                argElementCommon, "noAuthentication");
-        // System.out.println("#### noAuth = " + strNoAuthenticationRequired);
-        structure.setNoAuthentication("YES".equalsIgnoreCase(strNoAuthenticationRequired));
-
-        return structure;
-    }
-
-    private void processTelegram(final File argDirectoryTarget, BlancoXmlElement elementRoot, BlancoRestGeneratorTsTelegram[][] argListTelegrams) {
-
-        // sheet(Excelシート)のリストを取得します。
-        final List<BlancoXmlElement> listSheet = BlancoXmlBindingUtil
-                .getElementsByTagName(elementRoot, "sheet");
-        final int sizeListSheet = listSheet.size();
-        for (int index = 0; index < sizeListSheet; index++) {
-            // おのおののシートを処理します。
-            final BlancoXmlElement elementSheet = (BlancoXmlElement) listSheet
-                    .get(index);
-
-            // 共通情報を取得します。
-            final BlancoXmlElement elementCommon = BlancoXmlBindingUtil
-                    .getElement(elementSheet, fBundle
-                            .getMeta2xmlTelegramCommon());
-            if (elementCommon == null) {
-                // commonが無い場合には、このシートの処理をスキップします。
-                // System.out.println("BlancoRestXmlSourceFile#process !!! NO COMMON !!!");
-                continue;
-            }
-
-            final String name = BlancoXmlBindingUtil.getTextContent(
-                    elementCommon, "name");
-
-            if (BlancoStringUtil.null2Blank(name).trim().length() == 0) {
-                // nameが空の場合には処理をスキップします。
-                // System.out.println("BlancoRestXmlSourceFile#process !!! NO NAME !!!");
-                continue;
-            }
-
-            System.out.println("/* tueda */ BlancoRestXmlSourceFile#process name = " + name);
-
-            // 継承情報を取得します
-            final BlancoXmlElement elementExtends = BlancoXmlBindingUtil
-                    .getElement(elementSheet, fBundle.getMeta2xmlTelegramExtends());
-
-
-            // 一覧情報を取得します。
-            final BlancoXmlElement elementList = BlancoXmlBindingUtil
-                    .getElement(elementSheet, fBundle.getMeta2xmlTeregramList());
-
-            // シートから詳細な情報を取得します。
-            final BlancoRestGeneratorTsTelegram processTelegram = parseTelegramSheet(
-                    elementCommon, elementExtends, elementList);
-
-            // 電文をHTTPメソッド×IN-OUTの2次元配列に格納する
-            if (processTelegram != null) {
-                // メタ情報の解析結果をもとにソースコード自動生成を実行します。
-                process(processTelegram, argDirectoryTarget);
-
-                //System.out.println("/* KINOKO DEBUG */ METHOD: " + processTelegram.getTelegramMethod());
-                //System.out.println("/* KINOKO DEBUG */ TYPE: " + processTelegram.getTelegramType());
-                if("GET".equals(processTelegram.getTelegramMethod())) {
-                    if ("Input".equals(processTelegram.getTelegramType())) {
-                        argListTelegrams[HTTP_METHOD_GET][TELEGRAM_INPUT] = processTelegram;
-                    }
-                    if ("Output".equals(processTelegram.getTelegramType())) {
-                        argListTelegrams[HTTP_METHOD_GET][TELEGRAM_OUTPUT] = processTelegram;
-                    }
-                } else if("POST".equals(processTelegram.getTelegramMethod())) {
-                    if ("Input".equals(processTelegram.getTelegramType())) {
-                        argListTelegrams[HTTP_METHOD_POST][TELEGRAM_INPUT] = processTelegram;
-                    }
-                    if ("Output".equals(processTelegram.getTelegramType())) {
-                        argListTelegrams[HTTP_METHOD_POST][TELEGRAM_OUTPUT] = processTelegram;
-                    }
-                } else if("PUT".equals(processTelegram.getTelegramMethod())) {
-                    if ("Input".equals(processTelegram.getTelegramType())) {
-                        argListTelegrams[HTTP_METHOD_PUT][TELEGRAM_INPUT] = processTelegram;
-                    }
-                    if ("Output".equals(processTelegram.getTelegramType())) {
-                        argListTelegrams[HTTP_METHOD_PUT][TELEGRAM_OUTPUT] = processTelegram;
-                    }
-                } else if("DELETE".equals(processTelegram.getTelegramMethod())) {
-                    if ("Input".equals(processTelegram.getTelegramType())) {
-                        argListTelegrams[HTTP_METHOD_DELETE][TELEGRAM_INPUT] = processTelegram;
-                    }
-                    if ("Output".equals(processTelegram.getTelegramType())) {
-                        argListTelegrams[HTTP_METHOD_DELETE][TELEGRAM_OUTPUT] = processTelegram;
-                    }
-                }
+        // まず電文を生成します。
+        Set<String> methodKeys = argProcessStructure.getListTelegrams().keySet(); // parse 時点で check しているので null はないはず
+        for (String methodKey : methodKeys) {
+            HashMap<String, BlancoRestGeneratorTsTelegramStructure> kindMap =
+                    argProcessStructure.getListTelegrams().get(methodKey);
+            Set<String> kindKeys = kindMap.keySet(); // parse 時点で check しているので null はないはず
+            for (String kindKey : kindKeys) {
+                generateTelegram(kindMap.get(kindKey), argDirectoryTarget);
             }
         }
 
-        /**
-         *  InputとOutputが対になっているかのチェックを行う
-         *  対になっていない場合、メッセージを出力した後両方にnullを入れる
-         */
-        for(int i = 0; i < 4; i++) {
-            if((argListTelegrams[i][TELEGRAM_INPUT] == null) ^ (argListTelegrams[i][TELEGRAM_OUTPUT] == null)) {
-                argListTelegrams[i][TELEGRAM_INPUT] = null;
-                argListTelegrams[i][TELEGRAM_OUTPUT] = null;
-                System.out.println("/* KINOKO */ 電文のINPUTとOUTPUTが揃っていません");
-            }
-        }
+        // 次に電文処理を生成します。
+        generateTelegramProcess(argProcessStructure, argDirectoryTarget);
     }
 
     /**
-     * sheetエレメントを展開します。
-     *
-     * @param argElementCommon
-     *            現在処理しているCommonノード。
-     * @param argElementList
-     *            現在処理しているListノード。
-     * @return 収集されたメタ情報構造データ。
-     */
-    private BlancoRestGeneratorTsTelegram parseTelegramSheet(
-            final BlancoXmlElement argElementCommon,
-            final BlancoXmlElement argElementExtends,
-            final BlancoXmlElement argElementList) {
-
-        final BlancoRestGeneratorTsTelegram processTelegram = new BlancoRestGeneratorTsTelegram();
-        processTelegram.setName(BlancoXmlBindingUtil.getTextContent(
-                argElementCommon, "name"));
-        processTelegram.setPackage(BlancoXmlBindingUtil.getTextContent(
-                argElementCommon, "package"));
-
-        if (BlancoStringUtil.null2Blank(processTelegram.getPackage()).trim()
-                .length() == 0) {
-            throw new IllegalArgumentException(fBundle
-                    .getXml2sourceFileErr001(processTelegram.getName()));
-        }
-
-        if (BlancoXmlBindingUtil
-                .getTextContent(argElementCommon, "description") != null) {
-            processTelegram.setDescription(BlancoXmlBindingUtil
-                    .getTextContent(argElementCommon, "description"));
-        }
-
-        processTelegram.setNamespace(BlancoXmlBindingUtil.getTextContent(
-                argElementCommon, "namespace"));
-
-        processTelegram.setTelegramType(BlancoXmlBindingUtil.getTextContent(
-                argElementCommon, "type"));
-
-        processTelegram.setTelegramMethod(BlancoXmlBindingUtil.getTextContent(
-                argElementCommon, "telegramMethod"));
-
-        String superClass = null;
-
-        if (argElementExtends != null) {
-            superClass = BlancoXmlBindingUtil.getTextContent(
-                    argElementExtends, "superClass");
-            if (superClass != null) {
-                String myPackage = BlancoXmlBindingUtil.getTextContent(
-                        argElementExtends, "package");
-                if (myPackage != null) {
-                    superClass = myPackage + "." + superClass;
-                }
-            }
-        }
-
-        if (superClass == null) {
-            // 従来通りの親クラスの継承
-            superClass = BlancoXmlBindingUtil.getTextContent(
-                    argElementCommon, "superClass");
-            /*
-             * 入力シートが Java 以外の場合にも対応します．
-             * 現時点では PHP のみです．
-             */
-            switch (fSheetLang) {
-                case BlancoCgSupportedLang.PHP:
-                    superClass = adjustClassNamePhp2Java(superClass, null);
-                    break;
-            /* 対応言語を増やす場合はここに case を追記します */
-            }
-        }
-
-        processTelegram.setTelegramSuperClass(superClass);
-
-        if (argElementList == null) {
-            return null;
-        }
-
-        // 一覧の内容を取得します。
-        final List<BlancoXmlElement> listField = BlancoXmlBindingUtil
-                .getElementsByTagName(argElementList, "field");
-        for (int indexField = 0; indexField < listField.size(); indexField++) {
-            final Object nodeField = listField.get(indexField);
-
-            if (nodeField instanceof BlancoXmlElement == false) {
-                // System.out.println("BlancoRestXml2SourceFile#parseTelegramSheet: NO FIELD !!!");
-                continue;
-            }
-
-            final BlancoXmlElement elementField = (BlancoXmlElement) nodeField;
-            BlancoRestGeneratorTsTelegramField field = new BlancoRestGeneratorTsTelegramField();
-            field
-                    .setNo(BlancoXmlBindingUtil.getTextContent(elementField,
-                            "no"));
-
-            field.setName(BlancoXmlBindingUtil.getTextContent(elementField,
-                    "fieldName"));
-            if (BlancoStringUtil.null2Blank(field.getName()).length() == 0) {
-                continue;
-            }
-
-//            System.out.println("BlancoRestXml2SourceFile#parseTelegramSheet: name = " + field.getName());
-
-            // 既に同じ内容が登録されていないかどうかのチェック。
-            for (int indexPast = 0; indexPast < processTelegram.getListField()
-                    .size(); indexPast++) {
-                final BlancoRestGeneratorTsTelegramField fieldPast = processTelegram
-                        .getListField().get(indexPast);
-                if (fieldPast.getName().equals(field.getName())) {
-                    throw new IllegalArgumentException(
-                            fBundle.getXml2sourceFileErr003(processTelegram
-                                    .getName(), field.getName()));
-                }
-            }
-
-            /*
-             * Java 以外のプログラミング言語用に定義された Excel シートに対応
-             * 現時点では PHP のみに対応します
-            */
-            String fieldType = BlancoXmlBindingUtil.getTextContent(elementField,
-                    "fieldType");
-            if (BlancoStringUtil.null2Blank(fieldType).length() == 0) {
-                // ここで異常終了。
-                continue;
-            }
-
-            String fieldGeneric = BlancoXmlBindingUtil.getTextContent(elementField,
-                    "fieldGeneric");
-            if (BlancoStringUtil.null2Blank(fieldGeneric).length() != 0) {
-                fieldGeneric = adjustClassNamePhp2Java(fieldGeneric, null);
-            }
-
-            switch (fSheetLang) {
-                case BlancoCgSupportedLang.PHP:
-                    fieldType = adjustClassNamePhp2Java(fieldType, fieldGeneric);
-                    break;
-            }
-            field.setFieldType(fieldType);
-
-            field.setDescription(BlancoXmlBindingUtil.getTextContent(
-                    elementField, "description"));
-
-            String strFieldRequired = BlancoXmlBindingUtil.getTextContent(
-                    elementField, "fieldRequired");
-            field.setFieldRequired("YES".equalsIgnoreCase(strFieldRequired));
-
-            field.setDefault(BlancoXmlBindingUtil.getTextContent(
-                    elementField, "default"));
-
-            try {
-                String strMinLength = BlancoXmlBindingUtil.getTextContent(
-                        elementField, "minLength");
-                field.setMinLength(Integer.parseInt(strMinLength));
-
-                String strMaxLength = BlancoXmlBindingUtil.getTextContent(
-                        elementField, "maxLength");
-                field.setMaxLength(Integer.parseInt(strMaxLength));
-            } catch (NumberFormatException e) {
-                // 値がセットされていなかったり数値でなかった場合は無視
-            }
-
-            field.setMinInclusive(BlancoXmlBindingUtil.getTextContent(
-                    elementField, "minInclusive"));
-            field.setMaxInclusive(BlancoXmlBindingUtil.getTextContent(
-                    elementField, "maxInclusive"));
-
-            field.setPattern(BlancoXmlBindingUtil.getTextContent(
-                    elementField, "pattern"));
-
-            field.setFieldBiko(BlancoXmlBindingUtil.getTextContent(
-                    elementField, "fieldBiko"));
-
-            processTelegram.getListField().add(field);
-        }
-
-        return processTelegram;
-    }
-
-    /**
-     * 収集された情報を元に、電文処理のソースコードを自動生成します。
-     *
-     * @param argStructure
-     *            メタファイルから収集できた処理構造データ。
+     * 電文処理クラスを生成します。
+     * @param argProcessStructure
      * @param argDirectoryTarget
-     *            ソースコードの出力先フォルダ。
      */
-    public void process(
-            final BlancoRestGeneratorTsTelegramProcess argStructure,
-            final BlancoRestGeneratorTsTelegram[][] argListTelegrams,
+    private void generateTelegramProcess(
+            final BlancoRestGeneratorTsTelegramProcessStructure argProcessStructure,
             final File argDirectoryTarget) {
 
-        // Excelシートで指定された出力先形式を採用します。
-        final File fileBlancoMain = argDirectoryTarget;
+
+        /*
+         * 出力ディレクトリはant taskのtargetStyel引数で
+         * 指定された書式で出力されます。
+         * 従来と互換性を保つために、指定がない場合は blanco/main
+         * となります。
+         * by tueda, 2019/08/30
+         */
+        String strTarget = argDirectoryTarget
+                .getAbsolutePath(); // advanced
+        if (!this.isTargetStyleAdvanced()) {
+            strTarget += "/main"; // legacy
+        }
+        final File fileBlancoMain = new File(strTarget);
+
+        /* tueda DEBUG */
+        if (this.isVerbose()) {
+            System.out.println("/* tueda */ generateTelegramProcess argDirectoryTarget : " + argDirectoryTarget.getAbsolutePath());
+        }
 
         fCgFactory = BlancoCgObjectFactory.getInstance();
-        fCgSourceFile = fCgFactory.createSourceFile(argStructure
+        fCgSourceFile = fCgFactory.createSourceFile(argProcessStructure
                 .getPackage(), "このソースコードは blanco Frameworkによって自動生成されています。");
         fCgSourceFile.setEncoding(fEncoding);
-        fCgClass = fCgFactory.createClass(BlancoRestGeneratorTsConstants.PREFIX_ABSTRACT + argStructure.getName(),
-                BlancoStringUtil.null2Blank(argStructure
+        // クラスを作成
+        fCgClass = fCgFactory.createClass(BlancoRestGeneratorTsConstants.PREFIX_ABSTRACT + argProcessStructure.getName(),
+                BlancoStringUtil.null2Blank(argProcessStructure
                         .getDescription()));
-        // ApiBase クラスを継承
-        BlancoCgType fCgType = new BlancoCgType();
-        String superClass = argStructure.getSuperClass();
-        if (superClass == null) {
-            superClass = BlancoRestGeneratorTsConstants.BASE_CLASS;
-        }
-        fCgType.setName(superClass);
-        fCgClass.setExtendClassList(new ArrayList<BlancoCgType>());
-        fCgClass.getExtendClassList().add(fCgType);
-
-        // abstrac フラグをセット
-        fCgClass.setAbstract(true);
-
         fCgSourceFile.getClassList().add(fCgClass);
-
-        if (argStructure.getDescription() != null) {
-            fCgSourceFile.setDescription(argStructure
-                    .getDescription());
+        // 電文処理クラスは常に public abstract
+        fCgClass.setAccess("public");
+        fCgClass.setAbstract(true);
+        // 継承
+        if (BlancoStringUtil.null2Blank(argProcessStructure.getExtends())
+                .length() > 0) {
+            fCgClass.getExtendClassList().add(
+                    fCgFactory.createType(argProcessStructure.getExtends()));
         }
+        // 実装
+        for (int index = 0; index < argProcessStructure.getImplementsList()
+                .size(); index++) {
+            final String impl = (String) argProcessStructure.getImplementsList()
+                    .get(index);
+            fCgClass.getImplementInterfaceList().add(
+                    fCgFactory.createType(impl));
+        }
+        // クラスのJavaDocを設定します。
+        fCgClass.setDescription(argProcessStructure.getDescription());
 
-        final String methodName[][] = new String[4][2];
-        methodName[HTTP_METHOD_GET][TELEGRAM_INPUT] = BlancoRestGeneratorTsConstants.API_GET_REQUESTID_METHOD;
-        methodName[HTTP_METHOD_GET][TELEGRAM_OUTPUT] = BlancoRestGeneratorTsConstants.API_GET_RESPONSEID_METHOD;
-        methodName[HTTP_METHOD_POST][TELEGRAM_INPUT] = BlancoRestGeneratorTsConstants.API_POST_REQUESTID_METHOD;
-        methodName[HTTP_METHOD_POST][TELEGRAM_OUTPUT] = BlancoRestGeneratorTsConstants.API_POST_RESPONSEID_METHOD;
-        methodName[HTTP_METHOD_PUT][TELEGRAM_INPUT] = BlancoRestGeneratorTsConstants.API_PUT_REQUESTID_METHOD;
-        methodName[HTTP_METHOD_PUT][TELEGRAM_OUTPUT] = BlancoRestGeneratorTsConstants.API_PUT_RESPONSEID_METHOD;
-        methodName[HTTP_METHOD_DELETE][TELEGRAM_INPUT] = BlancoRestGeneratorTsConstants.API_DELETE_REQUESTID_METHOD;
-        methodName[HTTP_METHOD_DELETE][TELEGRAM_OUTPUT] = BlancoRestGeneratorTsConstants.API_DELETE_RESPONSEID_METHOD;
-
-        final String requestIdName[] = new String[4];
-        requestIdName[HTTP_METHOD_GET] = argStructure.getGetRequestId();
-        requestIdName[HTTP_METHOD_POST] = argStructure.getPostRequestId();
-        requestIdName[HTTP_METHOD_PUT] = argStructure.getPutRequestId();
-        requestIdName[HTTP_METHOD_DELETE] = argStructure.getDeleteRequestId();
-
-        final String responseIdName[] = new String[4];
-        responseIdName[HTTP_METHOD_GET] = argStructure.getGetResponseId();
-        responseIdName[HTTP_METHOD_POST] = argStructure.getPostResponseId();
-        responseIdName[HTTP_METHOD_PUT] = argStructure.getPutResponseId();
-        responseIdName[HTTP_METHOD_DELETE] = argStructure.getDeleteResponseId();
-
-        /*デバッグのためのDUMP*/
-//        System.out.println("========");
-//        for(int i = 0; i < 4; i++) {
-//            if(argListTelegrams[i][0] != null) {
-//                System.out.println("/* KINOKO DEBUG */ METHOD: " + argListTelegrams[i][0].getTelegramMethod());
-//                System.out.println("/* KINOKO DEBUG */ TYPE: " + argListTelegrams[i][0].getTelegramType());
-//            }
-//            if(argListTelegrams[i][1] != null) {
-//                System.out.println("/* KINOKO DEBUG */ METHOD: " + argListTelegrams[i][1].getTelegramMethod());
-//                System.out.println("/* KINOKO DEBUG */ TYPE: " + argListTelegrams[i][1].getTelegramType());
-//            }
-//        }
-
-        /* ここからはAPIメソッドごとの生成 */
-        for(int i = 0; i < 4; i++) {
-
-            String defaultApiRequestId = null;
-            String defaultApiResponseId = null;
-            switch (i) {
-                case 0:
-                    defaultApiRequestId = BlancoRestGeneratorTsConstants.VALUEOBJECT_PACKAGE + "." + BlancoRestGeneratorTsConstants.DEFAULT_API_GET_REQUESTID;
-                    defaultApiResponseId = BlancoRestGeneratorTsConstants.VALUEOBJECT_PACKAGE + "." + BlancoRestGeneratorTsConstants.DEFAULT_API_GET_RESPONSEID;
-                    break;
-                case 1:
-                    defaultApiRequestId = BlancoRestGeneratorTsConstants.VALUEOBJECT_PACKAGE + "." + BlancoRestGeneratorTsConstants.DEFAULT_API_POST_REQUESTID;
-                    defaultApiResponseId = BlancoRestGeneratorTsConstants.VALUEOBJECT_PACKAGE + "." + BlancoRestGeneratorTsConstants.DEFAULT_API_POST_RESPONSEID;
-                    break;
-                case 2:
-                    defaultApiRequestId = BlancoRestGeneratorTsConstants.VALUEOBJECT_PACKAGE + "." + BlancoRestGeneratorTsConstants.DEFAULT_API_PUT_REQUESTID;
-                    defaultApiResponseId = BlancoRestGeneratorTsConstants.VALUEOBJECT_PACKAGE + "." + BlancoRestGeneratorTsConstants.DEFAULT_API_PUT_RESPONSEID;
-                    break;
-                case 3:
-                    defaultApiRequestId = BlancoRestGeneratorTsConstants.VALUEOBJECT_PACKAGE + "." + BlancoRestGeneratorTsConstants.DEFAULT_API_DELETE_REQUESTID;
-                    defaultApiResponseId = BlancoRestGeneratorTsConstants.VALUEOBJECT_PACKAGE + "." + BlancoRestGeneratorTsConstants.DEFAULT_API_DELETE_RESPONSEID;
-                    break;
-            }
-
-            if ((argListTelegrams[i][TELEGRAM_INPUT] != null) && (argListTelegrams[i][TELEGRAM_OUTPUT] != null)) {
-                //System.out.println("(process)### method = " + output.getTelegramMethod());
-                // API実装クラスで実装させる abstract method の定義
-                createAbstractMethod(requestIdName[i], responseIdName[i], argListTelegrams[i]);
-                // base class からの abstract method の実装
-                createExecuteMethod(requestIdName[i], responseIdName[i],
-                        defaultApiRequestId, defaultApiResponseId,
-                        argListTelegrams[i]);
-            } else {
-
-                createExecuteMethodNotImplemented(requestIdName[i], responseIdName[i], defaultApiRequestId, defaultApiResponseId);
+        /* クラスのannotation を設定します */
+        List annotationList = argProcessStructure.getAnnotationList();
+        if (annotationList != null && annotationList.size() > 0) {
+            fCgClass.getAnnotationList().addAll(argProcessStructure.getAnnotationList());
+            /* tueda DEBUG */
+            if (this.isVerbose()) {
+                System.out.println("/* tueda */ generateTelegramProcess : class annotation = " + argProcessStructure.getAnnotationList().get(0));
             }
         }
-        /* getter, setterがまとまるように、process, executeとは別にfor文を回す
-         * 単に見た目の問題
-         */
-        for(int i = 0; i < 4; i++) {
-            // abstractなメソッドは定義されているかにかかわらずメソッドを記述する
-            // RequestId 名を取得する メソッド
-            createRequestIdMethod(methodName[i][TELEGRAM_INPUT], requestIdName[i], argStructure.getPackage());
-            // ResponseId 名を取得する メソッド
-            createResponseIdMethod(methodName[i][TELEGRAM_OUTPUT], responseIdName[i], argStructure.getPackage());
+
+        /* TypeScript では import の代わりに header を設定します */
+        for (int index = 0; index < argProcessStructure.getHeaderList()
+                .size(); index++) {
+            final String header = (String) argProcessStructure.getHeaderList()
+                    .get(index);
+            fCgSourceFile.getHeaderList().add(header);
         }
+
+        // サービスメソッドを生成します。
+        createServiceMethods(argProcessStructure);
 
         // isAuthenticationRequired メソッドの上書き
-        overrideAuthenticationRequired(argStructure);
+        overrideAuthenticationRequired(argProcessStructure);
 
-        // required 文を出力しない ... 将来的には xls で指定するように？
-         //fCgSourceFile.setIsImport(false);
 
-        BlancoCgTransformerFactory.getSourceTransformer(fTargetLang).transform(
+        // 収集された情報を元に実際のソースコードを自動生成。
+        BlancoCgTransformerFactory.getTsSourceTransformer().transform(
                 fCgSourceFile, fileBlancoMain);
     }
 
-    private void createAbstractMethod(String requestId, String responseId, BlancoRestGeneratorTsTelegram[]  argListTelegrams) {
+    /**
+     * Serviceメソッドを実装します。
+     *
+     * @param argProcessStructure
+     */
+    private void createServiceMethods(
+            final BlancoRestGeneratorTsTelegramProcessStructure argProcessStructure
+    ) {
 
-        // Initializer の定義
-//        final BlancoCgMethod cgInitializerMethod = fCgFactory.createMethod(
-//                BlancoRestConstants.API_INITIALIZER_METHOD, fBundle.getXml2sourceFileInitializerDescription());
-//        fCgClass.getMethodList().add(cgInitializerMethod);
-//        cgInitializerMethod.setAccess("protected");
-//        cgInitializerMethod.setAbstract(true);
-        // ApiBase で固定的に定義
+        List<String> httpMethods = new ArrayList<>();
+        httpMethods.add(BlancoRestGeneratorTsConstants.HTTP_METHOD_GET);
+        httpMethods.add(BlancoRestGeneratorTsConstants.HTTP_METHOD_POST);
+        httpMethods.add(BlancoRestGeneratorTsConstants.HTTP_METHOD_PUT);
+        httpMethods.add(BlancoRestGeneratorTsConstants.HTTP_METHOD_DELETE);
+        List<String> telegramKind = new ArrayList<>();
+        telegramKind.add(BlancoRestGeneratorTsConstants.TELEGRAM_INPUT);
+        telegramKind.add(BlancoRestGeneratorTsConstants.TELEGRAM_OUTPUT);
+
+        for (String method : httpMethods) {
+            HashMap<String, BlancoRestGeneratorTsTelegramStructure> telegrams = argProcessStructure.getListTelegrams().get(method);
+            if (telegrams == null) {
+                /* このメソッドは未対応 */
+                createExecuteMethodNotImplemented(method);
+            } else {
+                createAbstractProcessMethod(telegrams);
+                createExecuteMethod(telegrams, method);
+            }
+        }
+    }
+
+    private void createAbstractProcessMethod(HashMap<String, BlancoRestGeneratorTsTelegramStructure> argTelegrams) {
 
         // Processor の定義
         final BlancoCgMethod cgProcessorMethod = fCgFactory.createMethod(
                 BlancoRestGeneratorTsConstants.API_PROCESS_METHOD, fBundle.getXml2sourceFileProcessorDescription());
-
         fCgClass.getMethodList().add(cgProcessorMethod);
         cgProcessorMethod.setAccess("protected");
         cgProcessorMethod.setAbstract(true);
 
+        String requestId = argTelegrams.get(BlancoRestGeneratorTsConstants.TELEGRAM_INPUT).getName();
+        String responseId = argTelegrams.get(BlancoRestGeneratorTsConstants.TELEGRAM_OUTPUT).getName();
 
-        /*
-         * Java 版では引数の型は厳密に指定します．
-         */
-//        for (BlancoRestTelegram telegram : argListTelegrams) {
-////            System.out.println("### type = " + telegram.getTelegramType());
-//            if ("Input".equals(telegram.getTelegramType())) {
-//                requestId = telegram.getTelegramSuperClass();
-//            }
-//            if ("Output".equals(telegram.getTelegramType())) {
-//                responseId = telegram.getTelegramSuperClass();
-//            }
-//        }
-
-        BlancoRestGeneratorTsTelegram input = argListTelegrams[TELEGRAM_INPUT];
-        BlancoRestGeneratorTsTelegram output = argListTelegrams[TELEGRAM_OUTPUT];
-        //System.out.println("### type = " + input.getTelegramType());
-//        System.out.println("(createAbstractMethod)### method = " + output.getTelegramMethod());
-
-        String requestSubId = requestId;
-        requestId = input.getPackage() + "." + requestId;
-        String responseSubId = responseId;
-        responseId = output.getPackage() + "." + responseId;
         cgProcessorMethod.getParameterList().add(
-                fCgFactory.createParameter("arg" + requestSubId, requestId,
+                fCgFactory.createParameter("arg" + requestId, requestId,
                         fBundle.getXml2sourceFileProsessorArgLangdoc()));
+
         cgProcessorMethod.setReturn(fCgFactory.createReturn(responseId,
                 fBundle.getXml2sourceFileProsessorReturnLangdoc()));
 
-        /*
-         * デフォルトの例外（BlancoRestException）を throws に加える
-         */
-        BlancoCgType blancoCgType = new BlancoCgType();
-        blancoCgType.setName(BlancoRestGeneratorTsConstants.DEFAULT_EXCEPTION);
-        blancoCgType.setDescription(fBundle.getXml2sourceFileDefaultExceptionTypeLangdoc());
-
-        BlancoCgException blancoCgException = new BlancoCgException();
-        blancoCgException.setType(blancoCgType);
-        blancoCgException.setDescription(fBundle.getXml2sourceFileDefaultExceptionLangdoc());
-
-        ArrayList<BlancoCgException> arrayBlancoCgException = new ArrayList<>();
-        arrayBlancoCgException.add(blancoCgException);
-
-        cgProcessorMethod.setThrowList(arrayBlancoCgException);
     }
 
-    private void createExecuteMethod(String requestId, String responseId,
-                                     String defaultApiResquestId,
-                                     String defaultApiResponseId,
-                                     BlancoRestGeneratorTsTelegram[]  argListTelegrams) {
+    private void createExecuteMethod(
+            HashMap<String, BlancoRestGeneratorTsTelegramStructure> argTelegrams,
+            String method) {
+
         final BlancoCgMethod cgExecutorMethod = fCgFactory.createMethod(
                 BlancoRestGeneratorTsConstants.BASE_EXECUTOR_METHOD, fBundle.getXml2sourceFileExecutorDescription());
         fCgClass.getMethodList().add(cgExecutorMethod);
         cgExecutorMethod.setAccess("protected");
-        final List<String> ListLine = cgExecutorMethod.getLineList();
 
         /*
-         * 型チェックを通す為にSuperClassがある場合はそれを使います
+         * 型チェックを通す為にデフォルトの電文親クラスを使います
          */
-
+        String requestSuperId = this.getDefaultRequestTelegramId(method);
+        String responseSuperId = this.getDefaultResponseTelegramId(method);
         /*
-         * Java 版では引数の型は厳密に指定します．
+         * 本来の電文クラス
          */
-//        for (BlancoRestTelegram telegram : argListTelegrams) {
-////            System.out.println("### type = " + telegram.getTelegramType());
-//            if ("Input".equals(telegram.getTelegramType())) {
-//                requestId = telegram.getTelegramSuperClass();
-//            }
-//            if ("Output".equals(telegram.getTelegramType())) {
-//                responseId = telegram.getTelegramSuperClass();
-//            }
-//        }
+        String requestId = argTelegrams.get(BlancoRestGeneratorTsConstants.TELEGRAM_INPUT).getName();
+        String responseId = argTelegrams.get(BlancoRestGeneratorTsConstants.TELEGRAM_OUTPUT).getName();
 
-        BlancoRestGeneratorTsTelegram input = argListTelegrams[TELEGRAM_INPUT];
-        BlancoRestGeneratorTsTelegram output = argListTelegrams[TELEGRAM_OUTPUT];
-        //System.out.println("### type = " + input.getTelegramType());
-//        System.out.println("(createExecuteMethod)### method = " + output.getTelegramMethod());
-
-        String requestSubId = requestId;
-        String requestCastId = /*input.getPackage() + "." + */requestId;
-        // requestId = input.getTelegramSuperClass();
-        /* ApiBaseのabstract methodで電文の親クラスを指定したので、ここでもそうする */
-        requestId = defaultApiResquestId;
-        String responseSubId = responseId;
-//        responseId = output.getPackage() + "." + responseId;
-        // responseId = output.getTelegramSuperClass();
-        responseId = defaultApiResponseId;
+        //        System.out.println("### requestId = " + requestId);
         cgExecutorMethod.getParameterList().add(
-                fCgFactory.createParameter("arg" + requestSubId, requestId,
+                fCgFactory.createParameter("arg" + requestSuperId, requestSuperId,
                         fBundle
                                 .getXml2sourceFileExecutorArgLangdoc()));
-        cgExecutorMethod.setReturn(fCgFactory.createReturn(responseId,
+
+        cgExecutorMethod.setReturn(fCgFactory.createReturn(responseSuperId,
                 fBundle.getXml2sourceFileExecutorReturnLangdoc()));
 
-        /*
-         * デフォルトの例外（BlancoRestException）を throws に加える
-         */
-        BlancoCgType blancoCgType = new BlancoCgType();
-        blancoCgType.setName(BlancoRestGeneratorTsConstants.DEFAULT_EXCEPTION);
-        blancoCgType.setDescription(fBundle.getXml2sourceFileDefaultExceptionTypeLangdoc());
-
-        BlancoCgException blancoCgException = new BlancoCgException();
-        blancoCgException.setType(blancoCgType);
-        blancoCgException.setDescription(fBundle.getXml2sourceFileDefaultExceptionLangdoc());
-
-        ArrayList<BlancoCgException> arrayBlancoCgException = new ArrayList<>();
-        arrayBlancoCgException.add(blancoCgException);
-
-        cgExecutorMethod.setThrowList(arrayBlancoCgException);
-
         // メソッドの実装
-        ListLine.add(
-                responseId + " " + BlancoCgLineUtil.getVariablePrefix(fTargetLang) + "ret" + responseSubId + " = "
+        final List<String> listLine = cgExecutorMethod.getLineList();
+
+        listLine.add(
+                responseSuperId + " " +
+                BlancoCgLineUtil.getVariablePrefix(fTargetLang) + "ret" + responseId + " = "
                         + BlancoCgLineUtil.getVariablePrefix(fTargetLang) + "this." + BlancoRestGeneratorTsConstants.API_PROCESS_METHOD
-                        + "( " +  "("+requestCastId+ ")" +  BlancoCgLineUtil.getVariablePrefix(fTargetLang) + "arg" + requestSubId + " )"
+                        + "( "  +  "("+ requestId + ")" + BlancoCgLineUtil.getVariablePrefix(fTargetLang) + "arg" + requestSuperId + " )"
                         + BlancoCgLineUtil.getTerminator(fTargetLang));
 
-        ListLine.add("\n");
-        ListLine.add("return "
-                + BlancoCgLineUtil.getVariablePrefix(fTargetLang) + "ret" + responseSubId
+        listLine.add("\n");
+        listLine.add("return "
+                + BlancoCgLineUtil.getVariablePrefix(fTargetLang) + "ret" + responseId
                 + BlancoCgLineUtil.getTerminator(fTargetLang));
-
     }
 
-    private void createExecuteMethodNotImplemented(String requestId, String responseId, String defaultApiResquestId, String defaultApiResponseId) {
+    /**
+     * 非対応なメソッドが呼ばれた場合用のexecuteメソッドです。
+     *
+     * @param method
+     */
+    private void createExecuteMethodNotImplemented(String method) {
         final BlancoCgMethod cgExecutorMethod = fCgFactory.createMethod(
                 BlancoRestGeneratorTsConstants.BASE_EXECUTOR_METHOD, fBundle.getXml2sourceFileExecutorDescription());
         fCgClass.getMethodList().add(cgExecutorMethod);
@@ -855,14 +365,8 @@ public class BlancoRestGeneratorTsXml2SourceFile {
         final List<String> ListLine = cgExecutorMethod.getLineList();
 
         // 電文定義がないので，デフォルトの電文名を指定しておく
-        String requestSubId = requestId;
-        String requestCastId = /*input.getPackage() + "." + */requestId;
-        /* ApiBaseのabstract methodで電文の親クラスを指定したので、ここでもそうする */
-        requestId = defaultApiResquestId;
-
-        String responseSubId = responseId;
-//        responseId = output.getPackage() + "." + responseId;
-        responseId = defaultApiResponseId;
+        String requestId = this.getDefaultRequestTelegramId(method);
+        String responseId = this.getDefaultResponseTelegramId(method);
 
         /* Excel sheet に電文定義がない場合にここにくるので、その場合は電文処理シートの定義を使う */
         cgExecutorMethod.getParameterList().add(
@@ -873,41 +377,20 @@ public class BlancoRestGeneratorTsXml2SourceFile {
                 fBundle.getXml2sourceFileExecutorReturnLangdoc()));
 
         /*
-         * デフォルトの例外（BlancoRestException）を throws に加える
+         * TypeScript では例外は Error を継承する必要がある。
+         * ここではそのまま Error を投げる。
          */
-        BlancoCgType blancoCgType = new BlancoCgType();
-        blancoCgType.setName(BlancoRestGeneratorTsConstants.DEFAULT_EXCEPTION);
-        blancoCgType.setDescription(fBundle.getXml2sourceFileDefaultExceptionTypeLangdoc());
-
-        BlancoCgException blancoCgException = new BlancoCgException();
-        blancoCgException.setType(blancoCgType);
-        blancoCgException.setDescription(fBundle.getXml2sourceFileDefaultExceptionLangdoc());
-
-        ArrayList<BlancoCgException> arrayBlancoCgException = new ArrayList<>();
-        arrayBlancoCgException.add(blancoCgException);
-
-        cgExecutorMethod.setThrowList(arrayBlancoCgException);
-
-        // メソッドの実装
         //throw new BlancoRestException("GetMethod is not implemented in this api");
+        // メソッドの実装
         ListLine.add(
                 "throw new " + BlancoRestGeneratorTsConstants.DEFAULT_EXCEPTION + "( " + BlancoCgLineUtil.getStringLiteralEnclosure(fTargetLang) +
-                        fBundle.getBlancorestErrorMsg05(requestCastId) + BlancoCgLineUtil.getStringLiteralEnclosure(fTargetLang)  +")" + BlancoCgLineUtil.getTerminator(fTargetLang));
-
-//        ListLine.add(
-//                responseId + " " + BlancoCgLineUtil.getVariablePrefix(fTargetLang) + "ret" + responseSubId + " = "
-//                        + BlancoCgLineUtil.getVariablePrefix(fTargetLang) + "this." + BlancoRestConstants.API_PROCESS_METHOD
-//                        + "( " +  "("+requestCastId+ ")" +  BlancoCgLineUtil.getVariablePrefix(fTargetLang) + "arg" + requestSubId + " )"
-//                        + BlancoCgLineUtil.getTerminator(fTargetLang));
-
-//        ListLine.add("\n");
-//        ListLine.add("return "
-//                + BlancoCgLineUtil.getVariablePrefix(fTargetLang) + "ret" + responseSubId
-//                + BlancoCgLineUtil.getTerminator(fTargetLang));
+                        fBundle.getBlancorestErrorMsg05(method) + BlancoCgLineUtil.getStringLiteralEnclosure(fTargetLang)  +")" + BlancoCgLineUtil.getTerminator(fTargetLang));
 
     }
 
-    private void overrideAuthenticationRequired(BlancoRestGeneratorTsTelegramProcess argStructure) {
+
+
+    private void overrideAuthenticationRequired(BlancoRestGeneratorTsTelegramProcessStructure argStructure) {
         String methodName = BlancoRestGeneratorTsConstants.API_AUTHENTICATION_REQUIRED;
 
         final BlancoCgMethod cgAuthenticationRequiredMethod = fCgFactory.createMethod(
@@ -928,6 +411,52 @@ public class BlancoRestGeneratorTsXml2SourceFile {
 
         listLine.add("return " + retval
                 + BlancoCgLineUtil.getTerminator(fTargetLang));
+    }
+
+    /**
+     * メソッド毎の電文の親クラスを返します。
+     * @param method
+     * @return
+     */
+    private String getDefaultRequestTelegramId(String method) {
+        String telegramId = null;
+
+        if (BlancoRestGeneratorTsConstants.HTTP_METHOD_GET.endsWith(method)) {
+            telegramId = BlancoRestGeneratorTsConstants.DEFAULT_API_GET_REQUESTID;
+        } else if (BlancoRestGeneratorTsConstants.HTTP_METHOD_POST.endsWith(method)) {
+            telegramId = BlancoRestGeneratorTsConstants.DEFAULT_API_POST_REQUESTID;
+        } else if (BlancoRestGeneratorTsConstants.HTTP_METHOD_PUT.endsWith(method)) {
+            telegramId = BlancoRestGeneratorTsConstants.DEFAULT_API_PUT_REQUESTID;
+        } else if (BlancoRestGeneratorTsConstants.HTTP_METHOD_DELETE.endsWith(method)) {
+            telegramId = BlancoRestGeneratorTsConstants.DEFAULT_API_DELETE_REQUESTID;
+        } else {
+            throw new IllegalArgumentException("!!! NO SUCH METHOD !!! " + method);
+        }
+
+        return telegramId;
+    }
+
+    /**
+     * メソッド毎の電文の親クラスを返します。
+     * @param method
+     * @return
+     */
+    private String getDefaultResponseTelegramId(String method) {
+        String telegramId = null;
+
+        if (BlancoRestGeneratorTsConstants.HTTP_METHOD_GET.endsWith(method)) {
+            telegramId = BlancoRestGeneratorTsConstants.DEFAULT_API_GET_RESPONSEID;
+        } else if (BlancoRestGeneratorTsConstants.HTTP_METHOD_POST.endsWith(method)) {
+            telegramId = BlancoRestGeneratorTsConstants.DEFAULT_API_POST_RESPONSEID;
+        } else if (BlancoRestGeneratorTsConstants.HTTP_METHOD_PUT.endsWith(method)) {
+            telegramId = BlancoRestGeneratorTsConstants.DEFAULT_API_PUT_RESPONSEID;
+        } else if (BlancoRestGeneratorTsConstants.HTTP_METHOD_DELETE.endsWith(method)) {
+            telegramId = BlancoRestGeneratorTsConstants.DEFAULT_API_DELETE_RESPONSEID;
+        } else {
+            throw new IllegalArgumentException("!!! NO SUCH METHOD !!! " + method);
+        }
+
+        return telegramId;
     }
 
     private void createRequestIdMethod(String methodName, String requestIdName, String packageName) {
@@ -985,205 +514,308 @@ public class BlancoRestGeneratorTsXml2SourceFile {
     }
 
     /**
-     * 収集された情報を元に、ソースコードを自動生成します。
+     * 電文クラスを生成します。
      *
-     * @param argStructure
-     *            メタファイルから収集できた処理構造データ。
+     * @param argTelegramStructure
      * @param argDirectoryTarget
-     *            ソースコードの出力先フォルダ。
      */
-    public void process(
-            final BlancoRestGeneratorTsTelegram argStructure,
+    private void generateTelegram(
+            final BlancoRestGeneratorTsTelegramStructure argTelegramStructure,
             final File argDirectoryTarget) {
 
-        // Excel定義書で指定された出力先を採用します。
-        final File fileBlancoMain = argDirectoryTarget;
+        /*
+         * 出力ディレクトリはant taskのtargetStyel引数で
+         * 指定された書式で出力されます。
+         * 従来と互換性を保つために、指定がない場合は blanco/main
+         * となります。
+         * by tueda, 2019/08/30
+         */
+        String strTarget = argDirectoryTarget
+                .getAbsolutePath(); // advanced
+        if (!this.isTargetStyleAdvanced()) {
+            strTarget += "/main"; // legacy
+        }
+        final File fileBlancoMain = new File(strTarget);
+
+        /* tueda DEBUG */
+        if (this.isVerbose()) {
+            System.out.println("/* tueda */ generateTelegram argDirectoryTarget : " + argDirectoryTarget.getAbsolutePath());
+        }
 
         fCgFactory = BlancoCgObjectFactory.getInstance();
-        fCgSourceFile = fCgFactory.createSourceFile(argStructure
+        fCgSourceFile = fCgFactory.createSourceFile(argTelegramStructure
                 .getPackage(), "このソースコードは blanco Frameworkによって自動生成されています。");
         fCgSourceFile.setEncoding(fEncoding);
-        fCgClass = fCgFactory.createClass(argStructure.getName(),
-                BlancoStringUtil.null2Blank(argStructure
+        // クラスを作成
+        fCgClass = fCgFactory.createClass(BlancoRestGeneratorTsConstants.PREFIX_ABSTRACT + argTelegramStructure.getName(),
+                BlancoStringUtil.null2Blank(argTelegramStructure
                         .getDescription()));
+        fCgSourceFile.getClassList().add(fCgClass);
+        // 電文処理クラスは常に public
+        fCgClass.setAccess("public");
+        // 継承
+        if (BlancoStringUtil.null2Blank(argTelegramStructure.getExtends())
+                .length() > 0) {
+            fCgClass.getExtendClassList().add(
+                    fCgFactory.createType(argTelegramStructure.getExtends()));
+        }
+        // 実装
+        for (int index = 0; index < argTelegramStructure.getImplementsList()
+                .size(); index++) {
+            final String impl = (String) argTelegramStructure.getImplementsList()
+                    .get(index);
+            fCgClass.getImplementInterfaceList().add(
+                    fCgFactory.createType(impl));
+        }
+        // クラスのJavaDocを設定します。
+        fCgClass.setDescription(argTelegramStructure.getDescription());
 
-        // ApiTelegram クラスを継承
-        String telegramBase = argStructure.getTelegramSuperClass();
-        if (telegramBase != null) {
+        /* クラスのannotation を設定します */
+        List annotationList = argTelegramStructure.getAnnotationList();
+        if (annotationList != null && annotationList.size() > 0) {
+            fCgClass.getAnnotationList().addAll(argTelegramStructure.getAnnotationList());
+            /* tueda DEBUG */
+            if (this.isVerbose()) {
+                System.out.println("/* tueda */ generateTelegramProcess : class annotation = " + argTelegramStructure.getAnnotationList().get(0));
+            }
+        }
 
-            /* search the superclass from valueobject parsed list  */
-            BlancoValueObjectClassStructure objectClassStructure =
-                    BlancoRestGeneratorTsObjectsInfo.objects.get(telegramBase);
+        /* TypeScript では import の代わりに header を設定します */
+        for (int index = 0; index < argTelegramStructure.getHeaderList()
+                .size(); index++) {
+            final String header = (String) argTelegramStructure.getHeaderList()
+                    .get(index);
+            fCgSourceFile.getHeaderList().add(header);
+        }
 
-            String packageName = null;
+        // 電文定義・一覧
+        for (int indexField = 0; indexField < argTelegramStructure.getListField()
+                .size(); indexField++) {
+            // おのおののフィールドを処理します。
+            final BlancoRestGeneratorTsTelegramFieldStructure fieldStructure =
+                    argTelegramStructure.getListField().get(indexField);
 
-            if (objectClassStructure == null) {
-                /* search from blancoRest default valueobjects */
-                try {
-                    String tmpBase = BlancoRestGeneratorTsConstants.VALUEOBJECT_PACKAGE + "." + telegramBase;
-                    Class.forName(tmpBase);
-                    telegramBase = tmpBase;
-                } catch (ClassNotFoundException e) {
-                    System.out.println("/* tueda */ " + telegramBase + " is NOT FOUND.");
-                }
-
-            } else if ((packageName = objectClassStructure.getPackage()) != null) {
-                telegramBase = packageName + "." + telegramBase;
+            // 必須項目が未設定の場合には例外処理を実施します。
+            if (fieldStructure.getName() == null) {
+                throw new IllegalArgumentException(fBundle
+                        .getXml2sourceFileErr004(argTelegramStructure.getName()));
+            }
+            if (fieldStructure.getType() == null) {
+                throw new IllegalArgumentException(fBundle.getXml2sourceFileErr003(
+                        argTelegramStructure.getName(), fieldStructure.getName()));
             }
 
-            BlancoCgType fCgType = new BlancoCgType();
-            fCgType.setName(telegramBase);
+            // フィールドの生成。
+            buildField(argTelegramStructure, fieldStructure);
 
-            fCgClass.setExtendClassList(new ArrayList<BlancoCgType>());
-            fCgClass.getExtendClassList().add(fCgType);
+            // セッターメソッドの生成。
+            buildMethodSet(fieldStructure);
 
+            // ゲッターメソッドの生成。
+            buildMethodGet(fieldStructure);
+
+            // Type文字列を返すメソッドの生成
+            buildMethodType(fieldStructure);
+
+            // Generic文字列を返すメソッドの生成
+            buildMethodGeneric(fieldStructure);
+
+            // validation は後日実装予定
         }
 
-        fCgSourceFile.getClassList().add(fCgClass);
-
-        if (argStructure.getDescription() != null) {
-            fCgSourceFile.setDescription(argStructure
-                    .getDescription());
-        }
-
-        expandValueObject(argStructure);
-
-        // required 文を出力しない ... 将来的には xls で指定するように？
-        //fCgSourceFile.setIsImport(false);
-
-        BlancoCgTransformerFactory.getSourceTransformer(fTargetLang).transform(
+        // 収集された情報を元に実際のソースコードを自動生成。
+        BlancoCgTransformerFactory.getTsSourceTransformer().transform(
                 fCgSourceFile, fileBlancoMain);
     }
 
     /**
-     * バリューオブジェクトを展開します。
-     *
-     * @param argProcessStructure
-     *            メタファイルから収集できた処理構造データ。
+     * クラスにフィールドを生成します。
+     * @param argClassStructure
+     *            クラス情報。
+     * @param argFieldStructure
      */
-    private void expandValueObject(
-            final BlancoRestGeneratorTsTelegram argProcessStructure) {
+    private void buildField(
+            final BlancoRestGeneratorTsTelegramStructure argClassStructure,
+            final BlancoRestGeneratorTsTelegramFieldStructure argFieldStructure) {
 
-        for (int indexField = 0; indexField < argProcessStructure
-                .getListField().size(); indexField++) {
-            final BlancoRestGeneratorTsTelegramField fieldLook = argProcessStructure
-                    .getListField().get(indexField);
+        /*
+         * フィールド名は常に変形する
+         */
+        String fieldName = "f" + this.getFieldNameAdjustered(argFieldStructure);
+        final BlancoCgField field = fCgFactory.createField(fieldName,
+                argFieldStructure.getType(), null);
 
-            expandField(argProcessStructure, fieldLook);
+        fCgClass.getFieldList().add(field);
 
-            expandMethodSet(argProcessStructure, fieldLook);
-
-            expandMethodGet(argProcessStructure, fieldLook);
-
-            expandMethodType(argProcessStructure, fieldLook);
+        /*
+         * Generic に対応します。blancoCg 側では <> が付いている前提かつ
+         * package部をtrimするので、ここで設定しないと正しく設定されません。
+         */
+        String generic = argFieldStructure.getGeneric();
+        if (generic != null && generic.length() > 0) {
+            field.getType().setGenerics(generic);
         }
 
-        expandMethodToString(argProcessStructure);
+        if (this.isVerbose()) {
+            System.out.println("!!! type = " + argFieldStructure.getType());
+            System.out.println("!!! generic = " + field.getType().getGenerics());
+        }
+
+        field.setAccess("private");
+        /*
+         * 当面、final には対応しません。
+         */
+        field.setFinal(false);
+
+        // nullable に対応します。
+        Boolean isNullable = argFieldStructure.getNullable();
+        if (isNullable != null && isNullable) {
+            field.setNotnull(false);
+        } else {
+            field.setNotnull(true);
+        }
+
+        // フィールドのJavaDocを設定します。
+        field.setDescription(argFieldStructure.getDescription());
+        for (String line : argFieldStructure.getDescriptionList()) {
+            field.getLangDoc().getDescriptionList().add(line);
+        }
+
+        /*
+         * TypeScript ではプロパティのデフォルト値は原則必須
+         */
+        if (!isNullable) {
+            String defaultRawValue = argFieldStructure.getDefault();
+            if (defaultRawValue == null ||defaultRawValue.length() <= 0) {
+                throw new IllegalArgumentException(fBundle
+                        .getXml2sourceFileErr009(argClassStructure.getName(), argFieldStructure.getName()));
+            }
+            // フィールドのデフォルト値を設定します。
+            field.getLangDoc().getDescriptionList().add(
+                    BlancoCgSourceUtil.escapeStringAsLangDoc(BlancoCgSupportedLang.KOTLIN, fBundle.getXml2sourceFileFieldDefault(argFieldStructure
+                            .getDefault())));
+            // 当面の間、デフォルト値の変形は常にoff。定義書上の値をそのまま採用。
+            field.setDefault(argFieldStructure.getDefault());
+        }
+
+        /* メソッドの annotation を設定します */
+        List annotationList = argFieldStructure.getAnnotationList();
+        if (annotationList != null && annotationList.size() > 0) {
+            field.getAnnotationList().addAll(annotationList);
+            if (this.isVerbose()) {
+                System.out.println("/* tueda */ method annotation = " + field.getAnnotationList().get(0));
+            }
+        }
     }
 
     /**
-     * フィールドを展開します。
+     * setメソッドを生成します。
      *
-     * @param argProcessStructure
+     * @param argFieldStructure
+     *            フィールド情報。
      */
-    private void expandField(
-            final BlancoRestGeneratorTsTelegram argProcessStructure,
-            final BlancoRestGeneratorTsTelegramField fieldLook) {
-        String fieldName = fieldLook.getName();
-        if (fNameAdjust) {
-            fieldName = BlancoNameAdjuster.toClassName(fieldName);
+    private void buildMethodSet(
+            final BlancoRestGeneratorTsTelegramFieldStructure argFieldStructure) {
+        // おのおののフィールドに対するセッターメソッドを生成します。
+        final BlancoCgMethod method = fCgFactory.createMethod(argFieldStructure.getName(),
+                fBundle.getXml2sourceFileSetLangdoc01(argFieldStructure
+                        .getName()));
+        fCgClass.getMethodList().add(method);
+
+        method.setAccess("set");
+
+        // メソッドの JavaDoc設定。
+        if (argFieldStructure.getDescription() != null) {
+            method.getLangDoc().getDescriptionList().add(
+                    fBundle.getXml2sourceFileSetLangdoc02(argFieldStructure
+                            .getDescription()));
+        }
+        for (String line : argFieldStructure.getDescriptionList()) {
+            method.getLangDoc().getDescriptionList().add(line);
         }
 
-        switch (fSheetLang) {
-            case BlancoCgSupportedLang.PHP:
-                if (fieldLook.getFieldType() == "java.lang.Integer") fieldLook.setFieldType("java.lang.Long");
-                break;
-            /* 対応言語を増やす場合はここに case を追記します */
-        }
-
-        final BlancoCgField cgField = fCgFactory.createField("f" + fieldName,
-                fieldLook.getFieldType(), "");
-        fCgClass.getFieldList().add(cgField);
-        cgField.setAccess("private");
-
-        cgField.setDescription(fBundle.getXml2sourceFileFieldName(fieldLook
-                .getName()));
-        cgField.getLangDoc().getDescriptionList().add(
-                fBundle.getXml2sourceFileFieldType(fieldLook.getFieldType()));
-        if (BlancoStringUtil.null2Blank(fieldLook.getDescription()).length() > 0) {
-            cgField.getLangDoc().getDescriptionList().add(
-                    fieldLook.getDescription());
-        }
-    }
-
-    /**
-     * setメソッドを展開します。
-     *
-     * @param argProcessStructure
-     */
-    private void expandMethodSet(
-            final BlancoRestGeneratorTsTelegram argProcessStructure,
-            final BlancoRestGeneratorTsTelegramField fieldLook) {
-        String fieldName = fieldLook.getName();
-        if (fNameAdjust) {
-            fieldName = BlancoNameAdjuster.toClassName(fieldName);
-        }
-
-        final BlancoCgMethod cgMethod = fCgFactory.createMethod("set"
-                + fieldName, fBundle.getXml2sourceFileSetLangdoc01(fieldLook
-                .getName()));
-        fCgClass.getMethodList().add(cgMethod);
-        cgMethod.setAccess("public");
-        cgMethod.getLangDoc().getDescriptionList().add(
-                fBundle.getXml2sourceFileSetLangdoc02(fieldLook.getFieldType()));
-
-        if (BlancoStringUtil.null2Blank(fieldLook.getDescription()).length() > 0) {
-            cgMethod.getLangDoc().getDescriptionList().add(
-                    fieldLook.getDescription());
-        }
-
-        cgMethod.getParameterList().add(
-                fCgFactory.createParameter("arg" + fieldName, fieldLook
-                        .getFieldType(), fBundle
-                        .getXml2sourceFileSetArgLangdoc(fieldLook.getName())));
+        method.getParameterList().add(
+                fCgFactory.createParameter("arg"
+                                + getFieldNameAdjustered(argFieldStructure),
+                        argFieldStructure.getType(),
+                        fBundle.getXml2sourceFileSetArgLangdoc(argFieldStructure
+                                .getName())));
 
         // メソッドの実装
-        final List<String> listLine = cgMethod.getLineList();
-
-        listLine.add(BlancoCgLineUtil.getVariablePrefix(fTargetLang)
-                + "this.f" + fieldName + " = "
-                + BlancoCgLineUtil.getVariablePrefix(fTargetLang) + "arg"
-                + fieldName + BlancoCgLineUtil.getTerminator(fTargetLang));
+        method.getLineList().add(
+                "this.f"
+                        + getFieldNameAdjustered(argFieldStructure)
+                        + " = "
+                        + "arg"
+                        + getFieldNameAdjustered(argFieldStructure) + ";");
     }
 
     /**
-     * getメソッドを展開します。
+     * getメソッドを生成します。
      *
-     * @param argProcessStructure
+     * @param argFieldStructure
+     *            フィールド情報。
      */
-    private void expandMethodGet(
-            final BlancoRestGeneratorTsTelegram argProcessStructure,
-            final BlancoRestGeneratorTsTelegramField fieldLook) {
-        String fieldName = fieldLook.getName();
-        if (fNameAdjust) {
-            fieldName = BlancoNameAdjuster.toClassName(fieldName);
+    private void buildMethodGet(
+            final BlancoRestGeneratorTsTelegramFieldStructure argFieldStructure) {
+        // おのおののフィールドに対するゲッターメソッドを生成します。
+        final BlancoCgMethod method = fCgFactory.createMethod(argFieldStructure.getName(),
+                fBundle.getXml2sourceFileGetLangdoc01(argFieldStructure
+                        .getName()));
+        fCgClass.getMethodList().add(method);
+
+        method.setAccess("get");
+
+        // メソッドの JavaDoc設定。
+        if (argFieldStructure.getDescription() != null) {
+            method.getLangDoc().getDescriptionList().add(
+                    fBundle.getXml2sourceFileGetLangdoc02(argFieldStructure
+                            .getDescription()));
+        }
+        for (String line : argFieldStructure.getDescriptionList()) {
+            method.getLangDoc().getDescriptionList().add(line);
+        }
+        if (argFieldStructure.getDefault() != null) {
+            method.getLangDoc().getDescriptionList().add(
+                    BlancoCgSourceUtil.escapeStringAsLangDoc(BlancoCgSupportedLang.JAVA, fBundle.getXml2sourceFileGetArgLangdoc(argFieldStructure
+                            .getDefault())));
         }
 
-        final BlancoCgMethod cgMethod = fCgFactory.createMethod("get"
-                + fieldName, fBundle.getXml2sourceFileGetLangdoc01(fieldLook
+        method.setReturn(fCgFactory.createReturn(argFieldStructure.getType(),
+                fBundle.getXml2sourceFileGetReturnLangdoc(argFieldStructure.getName())));
+
+        // メソッドの実装
+        method.getLineList().add(
+                "return this.f"
+                        + this.getFieldNameAdjustered(argFieldStructure) + ";");
+    }
+
+    /**
+     * typeメソッドを展開します
+     *
+     * @param argFieldStructure
+     */
+    private void buildMethodType(
+            final BlancoRestGeneratorTsTelegramFieldStructure argFieldStructure) {
+        // 常にフィールド名を調整
+        String fieldName = getFieldNameAdjustered(argFieldStructure);
+
+        final BlancoCgMethod cgMethod = fCgFactory.createMethod("type"
+                + fieldName, fBundle.getXml2sourceFileGetLangdoc01(argFieldStructure
                 .getName()));
         fCgClass.getMethodList().add(cgMethod);
         cgMethod.setAccess("public");
+        cgMethod.setStatic(true);
 
         cgMethod.getLangDoc().getDescriptionList().add(
-                fBundle.getXml2sourceFileGetLangdoc02(fieldLook.getFieldType()));
+                fBundle.getXml2sourceFileTypeLangdoc02(argFieldStructure.getType()));
 
-        cgMethod.setReturn(fCgFactory.createReturn(fieldLook.getFieldType(), fBundle
-                .getXml2sourceFileGetReturnLangdoc(fieldLook.getName())));
+        cgMethod.setReturn(fCgFactory.createReturn(argFieldStructure.getType(), fBundle
+                .getXml2sourceFileTypeReturnLangdoc(argFieldStructure.getName())));
 
-        if (BlancoStringUtil.null2Blank(fieldLook.getDescription()).length() > 0) {
+        if (BlancoStringUtil.null2Blank(argFieldStructure.getDescription()).length() > 0) {
             cgMethod.getLangDoc().getDescriptionList().add(
-                    fieldLook.getDescription());
+                    argFieldStructure.getDescription());
         }
 
         // メソッドの実装
@@ -1191,221 +823,59 @@ public class BlancoRestGeneratorTsXml2SourceFile {
 
         listLine
                 .add("return "
-                        + BlancoCgLineUtil.getVariablePrefix(fTargetLang)
-                        + "this." + "f" + fieldName
+                        + "\"" + argFieldStructure.getType() + "\""
                         + BlancoCgLineUtil.getTerminator(fTargetLang));
     }
 
     /**
-     * typeメソッドを展開します
-     *
-     * @param argProcessStructure
-     * @param fieldLook
+     * Genericメソッドを展開します。
+     * @param argFieldStructure
      */
-    private void expandMethodType(
-            final BlancoRestGeneratorTsTelegram argProcessStructure,
-            final BlancoRestGeneratorTsTelegramField fieldLook) {
-        String fieldName = fieldLook.getName();
-        if (fNameAdjust) {
-            fieldName = BlancoNameAdjuster.toClassName(fieldName);
+    private void buildMethodGeneric(
+            final BlancoRestGeneratorTsTelegramFieldStructure argFieldStructure) {
+        String fieldName = getFieldNameAdjustered(argFieldStructure);
+        String fieldGeneric = argFieldStructure.getGeneric();
+
+        if (BlancoStringUtil.null2Blank(fieldGeneric).length() == 0) {
+            return;
         }
 
-        final BlancoCgMethod cgMethod = fCgFactory.createMethod("type"
-                + fieldName, fBundle.getXml2sourceFileGetLangdoc01(fieldLook
+        final BlancoCgMethod cgMethod = fCgFactory.createMethod("generic"
+                + fieldName, fBundle.getXml2sourceFileGetLangdoc01(argFieldStructure
                 .getName()));
         fCgClass.getMethodList().add(cgMethod);
         cgMethod.setAccess("public");
         cgMethod.setStatic(true);
 
         cgMethod.getLangDoc().getDescriptionList().add(
-                fBundle.getXml2sourceFileTypeLangdoc02("java.lang.String"));
+                fBundle.getXml2sourceFileTypeLangdoc02(fieldGeneric));
 
-        cgMethod.setReturn(fCgFactory.createReturn("java.lang.String", fBundle
-                .getXml2sourceFileTypeReturnLangdoc(fieldLook.getName())));
+        cgMethod.setReturn(fCgFactory.createReturn(fieldGeneric, fBundle
+                .getXml2sourceFileTypeReturnLangdoc(argFieldStructure.getName())));
 
-        if (BlancoStringUtil.null2Blank(fieldLook.getDescription()).length() > 0) {
+        if (BlancoStringUtil.null2Blank(argFieldStructure.getDescription()).length() > 0) {
             cgMethod.getLangDoc().getDescriptionList().add(
-                    fieldLook.getDescription());
+                    argFieldStructure.getDescription());
         }
 
         // メソッドの実装
         final List<String> listLine = cgMethod.getLineList();
 
         listLine
-                .add("return " +
-                        BlancoCgLineUtil.getStringLiteralEnclosure(BlancoCgSupportedLang.JAVA) +
-                                fieldLook.getFieldType() +
-                                BlancoCgLineUtil.getStringLiteralEnclosure(BlancoCgSupportedLang.JAVA) +
-                                BlancoCgLineUtil.getTerminator(fTargetLang));
+                .add("return "
+                        + "\"" + argFieldStructure.getGeneric() + "\""
+                        + BlancoCgLineUtil.getTerminator(fTargetLang));
     }
 
     /**
-     * toStringメソッドを展開します。
+     * 調整済みのフィールド名を取得します。
      *
-     * @param argProcessStructure
+     * @param argFieldStructure
+     *            フィールド情報。
+     * @return 調整後のフィールド名。
      */
-    private void expandMethodToString(
-            final BlancoRestGeneratorTsTelegram argProcessStructure) {
-        final BlancoCgMethod method = fCgFactory.createMethod("toString",
-                "このバリューオブジェクトの文字列表現を取得します。");
-        fCgClass.getMethodList().add(method);
-
-        method.getLangDoc().getDescriptionList().add(
-                "オブジェクトのシャロー範囲でしかtoStringされない点に注意して利用してください。");
-        method
-                .setReturn(fCgFactory.createReturn("java.lang.String",
-                        "バリューオブジェクトの文字列表現。"));
-
-        List<String> annotators = new ArrayList<>();
-        annotators.add("Override");
-        method.setAnnotationList(annotators);
-
-        final List<String> listLine = method.getLineList();
-
-        listLine.add(BlancoCgLineUtil.getVariableDeclaration(fTargetLang,
-                "buf", "java.lang.String", BlancoCgLineUtil
-                        .getStringLiteralEnclosure(fTargetLang)
-                        + BlancoCgLineUtil
-                        .getStringLiteralEnclosure(fTargetLang))
-                + BlancoCgLineUtil.getTerminator(fTargetLang));
-
-        listLine.add(BlancoCgLineUtil.getVariablePrefix(fTargetLang) + "buf = "
-                + BlancoCgLineUtil.getVariablePrefix(fTargetLang) + "buf "
-                + BlancoCgLineUtil.getStringConcatenationOperator(fTargetLang)
-                + " " + BlancoCgLineUtil.getStringLiteralEnclosure(fTargetLang)
-                + argProcessStructure.getPackage() + "."
-                + argProcessStructure.getName() + "["
-                + BlancoCgLineUtil.getStringLiteralEnclosure(fTargetLang)
-                + BlancoCgLineUtil.getTerminator(fTargetLang));
-        for (int indexField = 0; indexField < argProcessStructure
-                .getListField().size(); indexField++) {
-            final BlancoRestGeneratorTsTelegramField fieldLook = argProcessStructure
-                    .getListField().get(indexField);
-
-            String fieldName = fieldLook.getName();
-            if (fNameAdjust) {
-                fieldName = BlancoNameAdjuster.toClassName(fieldName);
-            }
-
-            if (fieldLook.getFieldType().equals("array") == false) {
-                String strLine = BlancoCgLineUtil
-                        .getVariablePrefix(fTargetLang)
-                        + "buf = "
-                        + BlancoCgLineUtil.getVariablePrefix(fTargetLang)
-                        + "buf "
-                        + BlancoCgLineUtil
-                                .getStringConcatenationOperator(fTargetLang)
-                        + " "
-                        + BlancoCgLineUtil
-                                .getStringLiteralEnclosure(fTargetLang)
-                        + (indexField == 0 ? "" : ",")
-                        + fieldLook.getName()
-                        + "="
-                        + BlancoCgLineUtil
-                                .getStringLiteralEnclosure(fTargetLang)
-                        + " "
-                        + BlancoCgLineUtil
-                                .getStringConcatenationOperator(fTargetLang)
-                        + " ";
-                if (fieldLook.getFieldType().equals("java.lang.String")) {
-                    strLine += BlancoCgLineUtil.getVariablePrefix(fTargetLang)
-                            + "this.f" + fieldName;
-                } else if (fieldLook.getFieldType().equals("boolean")) {
-                    strLine += "("
-                            + BlancoCgLineUtil.getVariablePrefix(fTargetLang)
-                            + "this.f" + fieldName + " ? 'true' : 'false')";
-                } else {
-                    strLine += " "
-                            + BlancoCgLineUtil.getVariablePrefix(fTargetLang)
-                            + "this.f" + fieldName;
-                }
-                strLine += BlancoCgLineUtil.getTerminator(fTargetLang);
-                listLine.add(strLine);
-            } else {
-                listLine.add("// TODO 配列は未対応です。");
-            }
-        }
-
-        listLine.add(BlancoCgLineUtil.getVariablePrefix(fTargetLang) + "buf = "
-                + BlancoCgLineUtil.getVariablePrefix(fTargetLang) + "buf "
-                + BlancoCgLineUtil.getStringConcatenationOperator(fTargetLang)
-                + " " + BlancoCgLineUtil.getStringLiteralEnclosure(fTargetLang)
-                + "]" + BlancoCgLineUtil.getStringLiteralEnclosure(fTargetLang)
-                + BlancoCgLineUtil.getTerminator(fTargetLang));
-        listLine.add("return "
-                + BlancoCgLineUtil.getVariablePrefix(fTargetLang) + "buf"
-                + BlancoCgLineUtil.getTerminator(fTargetLang));
-    }
-
-    /**
-     * PHP 用に作成されたExcelシートに定義されたクラス名にパッケージ名を付加します
-     * @param phpType
-     * @param generics
-     * @return
-     */
-    private String adjustClassNamePhp2Java(String phpType, String generics) {
-                /*
-                 * 型の取得．ここで Java 風の型名に変えておく
-                 */
-
-        System.out.println("/* tueda */ adjustClassNamePhp2Java: " + phpType);
-        String javaType = phpType;
-        if ("boolean".equalsIgnoreCase(phpType)) {
-            javaType = "java.lang.Boolean";
-        } else
-        if ("integer".equalsIgnoreCase(phpType)) {
-            javaType = "java.lang.Integer";
-        } else
-        if ("double".equalsIgnoreCase(phpType)) {
-            javaType = "java.lang.Double";
-        } else
-        if ("float".equalsIgnoreCase(phpType)) {
-            javaType = "java.lang.Double";
-        } else
-        if ("string".equalsIgnoreCase(phpType)) {
-            javaType = "java.lang.String";
-        } else
-        if ("array".equalsIgnoreCase(phpType)) {
-            if (generics == null) {
-                javaType = "java.util.ArrayList<?>";
-            } else {
-                javaType = "java.util.ArrayList<" + generics + ">";
-            }
-        } else
-        if ("object".equalsIgnoreCase(phpType)) {
-            javaType = "java.lang.Object";
-        } else {
-                    /* この名前の package を探す */
-            BlancoValueObjectClassStructure structure = BlancoRestGeneratorTsObjectsInfo.objects.get(phpType);
-            if (structure != null) {
-                String packageName = structure.getPackage();
-                if (packageName != null) {
-                    javaType = packageName + "." + phpType;
-                } else {
-                /* search from blancoRest default valueobjects */
-                    try {
-                        String tmpBase = BlancoRestGeneratorTsConstants.VALUEOBJECT_PACKAGE + "." + phpType;
-                        Class.forName(tmpBase);
-                        javaType = tmpBase;
-                    } catch (ClassNotFoundException e) {
-                        System.out.println("/* tueda */ " + phpType + " is NOT FOUND 2.");
-                    }
-                }
-            } else {
-                /* search from blancoRest default valueobjects */
-                try {
-                    String tmpBase = BlancoRestGeneratorTsConstants.VALUEOBJECT_PACKAGE + "." + phpType;
-                    Class.forName(tmpBase);
-                    javaType = tmpBase;
-                } catch (ClassNotFoundException e) {
-                    System.out.println("/* tueda */ " + phpType + " is NOT FOUND 3.");
-                }
-            }
-                    /* その他はそのまま記述する */
-            System.out.println("/* tueda */ Unknown php type: " + javaType);
-        }
-        System.out.println("/* tueda */ adjustClassNamePhp2Java: " + javaType);
-
-        return javaType;
+    private String getFieldNameAdjustered(
+            final BlancoRestGeneratorTsTelegramFieldStructure argFieldStructure) {
+        return BlancoNameAdjuster.toClassName(argFieldStructure.getName());
     }
 }

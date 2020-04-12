@@ -101,9 +101,9 @@ public class BlancoRestGeneratorTsProcessImpl implements
                 final BlancoRestGeneratorTsXml2SourceFile xml2source = new BlancoRestGeneratorTsXml2SourceFile();
                 xml2source.setEncoding(input.getEncoding());
                 xml2source.setSheetLang(new BlancoCgSupportedLang().convertToInt(input.getSheetType()));
+                xml2source.setTargetStyleAdvanced(isTargetStyleAdvanced);
                 xml2source.setVerbose(input.getVerbose());
-                xml2source.process(fileMeta2[index], "true".equals(input
-                        .getNameAdjust()), new File(strTarget));
+                xml2source.process(fileMeta2[index], new File(strTarget));
             }
         } catch (IOException ex) {
             throw new IllegalArgumentException(ex.toString());

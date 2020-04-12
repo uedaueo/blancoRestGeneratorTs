@@ -1,9 +1,11 @@
 package blanco.restgeneratorts.valueobject;
 
+import java.util.List;
+
 /**
  * BlancoRestGeneratorTsのなかで利用されるValueObjectです。
  */
-public class BlancoRestGeneratorTsTelegramField {
+public class BlancoRestGeneratorTsTelegramFieldStructure {
     /**
      * 項目番号。省略可能です。
      *
@@ -26,30 +28,55 @@ public class BlancoRestGeneratorTsTelegramField {
     private String fDescription;
 
     /**
+     * フィールドの補助説明です。文字参照エンコード済みの値を格納してください。
+     *
+     * フィールド: [descriptionList]。
+     * デフォルト: [new java.util.ArrayList&lt;java.lang.String&gt;()]。
+     */
+    private List<java.lang.String> fDescriptionList = new java.util.ArrayList<java.lang.String>();
+
+    /**
      * 型名をパッケージ名のフル修飾付で指定します。必須項目です。
      *
-     * フィールド: [fieldType]。
+     * フィールド: [type]。
      */
-    private String fFieldType;
+    private String fType;
 
     /**
      * 型が期待する総称型の具体的な型名を指定します．
      *
-     * フィールド: [fieldGeneric]。
+     * フィールド: [generic]。
      */
-    private String fFieldGeneric;
+    private String fGeneric;
+
+    /**
+     * アノテーション文字列です（＠は除く）
+     *
+     * フィールド: [annotationList]。
+     * デフォルト: [new java.util.ArrayList&lt;java.lang.String&gt;()]。
+     */
+    private List<java.lang.String> fAnnotationList = new java.util.ArrayList<java.lang.String>();
 
     /**
      * 必須項目の場合はtrue
      *
-     * フィールド: [fieldRequired]。
+     * フィールド: [required]。
      */
-    private Boolean fFieldRequired;
+    private Boolean fRequired;
 
     /**
+     * デフォルト値
+     *
      * フィールド: [default]。
      */
     private String fDefault;
+
+    /**
+     * 必須項目の場合はtrue
+     *
+     * フィールド: [nullable]。
+     */
+    private Boolean fNullable;
 
     /**
      * 長さmin
@@ -160,73 +187,121 @@ public class BlancoRestGeneratorTsTelegramField {
     }
 
     /**
-     * フィールド [fieldType] の値を設定します。
+     * フィールド [descriptionList] の値を設定します。
+     *
+     * フィールドの説明: [フィールドの補助説明です。文字参照エンコード済みの値を格納してください。]。
+     *
+     * @param argDescriptionList フィールド[descriptionList]に設定する値。
+     */
+    public void setDescriptionList(final List<java.lang.String> argDescriptionList) {
+        fDescriptionList = argDescriptionList;
+    }
+
+    /**
+     * フィールド [descriptionList] の値を取得します。
+     *
+     * フィールドの説明: [フィールドの補助説明です。文字参照エンコード済みの値を格納してください。]。
+     * デフォルト: [new java.util.ArrayList&lt;java.lang.String&gt;()]。
+     *
+     * @return フィールド[descriptionList]から取得した値。
+     */
+    public List<java.lang.String> getDescriptionList() {
+        return fDescriptionList;
+    }
+
+    /**
+     * フィールド [type] の値を設定します。
      *
      * フィールドの説明: [型名をパッケージ名のフル修飾付で指定します。必須項目です。]。
      *
-     * @param argFieldType フィールド[fieldType]に設定する値。
+     * @param argType フィールド[type]に設定する値。
      */
-    public void setFieldType(final String argFieldType) {
-        fFieldType = argFieldType;
+    public void setType(final String argType) {
+        fType = argType;
     }
 
     /**
-     * フィールド [fieldType] の値を取得します。
+     * フィールド [type] の値を取得します。
      *
      * フィールドの説明: [型名をパッケージ名のフル修飾付で指定します。必須項目です。]。
      *
-     * @return フィールド[fieldType]から取得した値。
+     * @return フィールド[type]から取得した値。
      */
-    public String getFieldType() {
-        return fFieldType;
+    public String getType() {
+        return fType;
     }
 
     /**
-     * フィールド [fieldGeneric] の値を設定します。
+     * フィールド [generic] の値を設定します。
      *
      * フィールドの説明: [型が期待する総称型の具体的な型名を指定します．]。
      *
-     * @param argFieldGeneric フィールド[fieldGeneric]に設定する値。
+     * @param argGeneric フィールド[generic]に設定する値。
      */
-    public void setFieldGeneric(final String argFieldGeneric) {
-        fFieldGeneric = argFieldGeneric;
+    public void setGeneric(final String argGeneric) {
+        fGeneric = argGeneric;
     }
 
     /**
-     * フィールド [fieldGeneric] の値を取得します。
+     * フィールド [generic] の値を取得します。
      *
      * フィールドの説明: [型が期待する総称型の具体的な型名を指定します．]。
      *
-     * @return フィールド[fieldGeneric]から取得した値。
+     * @return フィールド[generic]から取得した値。
      */
-    public String getFieldGeneric() {
-        return fFieldGeneric;
+    public String getGeneric() {
+        return fGeneric;
     }
 
     /**
-     * フィールド [fieldRequired] の値を設定します。
+     * フィールド [annotationList] の値を設定します。
      *
-     * フィールドの説明: [必須項目の場合はtrue]。
+     * フィールドの説明: [アノテーション文字列です（＠は除く）]。
      *
-     * @param argFieldRequired フィールド[fieldRequired]に設定する値。
+     * @param argAnnotationList フィールド[annotationList]に設定する値。
      */
-    public void setFieldRequired(final Boolean argFieldRequired) {
-        fFieldRequired = argFieldRequired;
+    public void setAnnotationList(final List<java.lang.String> argAnnotationList) {
+        fAnnotationList = argAnnotationList;
     }
 
     /**
-     * フィールド [fieldRequired] の値を取得します。
+     * フィールド [annotationList] の値を取得します。
+     *
+     * フィールドの説明: [アノテーション文字列です（＠は除く）]。
+     * デフォルト: [new java.util.ArrayList&lt;java.lang.String&gt;()]。
+     *
+     * @return フィールド[annotationList]から取得した値。
+     */
+    public List<java.lang.String> getAnnotationList() {
+        return fAnnotationList;
+    }
+
+    /**
+     * フィールド [required] の値を設定します。
      *
      * フィールドの説明: [必須項目の場合はtrue]。
      *
-     * @return フィールド[fieldRequired]から取得した値。
+     * @param argRequired フィールド[required]に設定する値。
      */
-    public Boolean getFieldRequired() {
-        return fFieldRequired;
+    public void setRequired(final Boolean argRequired) {
+        fRequired = argRequired;
+    }
+
+    /**
+     * フィールド [required] の値を取得します。
+     *
+     * フィールドの説明: [必須項目の場合はtrue]。
+     *
+     * @return フィールド[required]から取得した値。
+     */
+    public Boolean getRequired() {
+        return fRequired;
     }
 
     /**
      * フィールド [default] の値を設定します。
+     *
+     * フィールドの説明: [デフォルト値]。
      *
      * @param argDefault フィールド[default]に設定する値。
      */
@@ -237,10 +312,34 @@ public class BlancoRestGeneratorTsTelegramField {
     /**
      * フィールド [default] の値を取得します。
      *
+     * フィールドの説明: [デフォルト値]。
+     *
      * @return フィールド[default]から取得した値。
      */
     public String getDefault() {
         return fDefault;
+    }
+
+    /**
+     * フィールド [nullable] の値を設定します。
+     *
+     * フィールドの説明: [必須項目の場合はtrue]。
+     *
+     * @param argNullable フィールド[nullable]に設定する値。
+     */
+    public void setNullable(final Boolean argNullable) {
+        fNullable = argNullable;
+    }
+
+    /**
+     * フィールド [nullable] の値を取得します。
+     *
+     * フィールドの説明: [必須項目の場合はtrue]。
+     *
+     * @return フィールド[nullable]から取得した値。
+     */
+    public Boolean getNullable() {
+        return fNullable;
     }
 
     /**
@@ -389,14 +488,17 @@ public class BlancoRestGeneratorTsTelegramField {
     @Override
     public String toString() {
         final StringBuffer buf = new StringBuffer();
-        buf.append("blanco.restgeneratorts.valueobject.BlancoRestGeneratorTsTelegramField[");
+        buf.append("blanco.restgeneratorts.valueobject.BlancoRestGeneratorTsTelegramFieldStructure[");
         buf.append("no=" + fNo);
         buf.append(",name=" + fName);
         buf.append(",description=" + fDescription);
-        buf.append(",fieldType=" + fFieldType);
-        buf.append(",fieldGeneric=" + fFieldGeneric);
-        buf.append(",fieldRequired=" + fFieldRequired);
+        buf.append(",descriptionList=" + fDescriptionList);
+        buf.append(",type=" + fType);
+        buf.append(",generic=" + fGeneric);
+        buf.append(",annotationList=" + fAnnotationList);
+        buf.append(",required=" + fRequired);
         buf.append(",default=" + fDefault);
+        buf.append(",nullable=" + fNullable);
         buf.append(",minLength=" + fMinLength);
         buf.append(",maxLength=" + fMaxLength);
         buf.append(",minInclusive=" + fMinInclusive);
@@ -418,9 +520,9 @@ public class BlancoRestGeneratorTsTelegramField {
      *
      * @param target target value object.
      */
-    public void copyTo(final BlancoRestGeneratorTsTelegramField target) {
+    public void copyTo(final BlancoRestGeneratorTsTelegramFieldStructure target) {
         if (target == null) {
-            throw new IllegalArgumentException("Bug: BlancoRestGeneratorTsTelegramField#copyTo(target): argument 'target' is null");
+            throw new IllegalArgumentException("Bug: BlancoRestGeneratorTsTelegramFieldStructure#copyTo(target): argument 'target' is null");
         }
 
         // No needs to copy parent class.
@@ -434,18 +536,43 @@ public class BlancoRestGeneratorTsTelegramField {
         // Name: fDescription
         // Type: java.lang.String
         target.fDescription = this.fDescription;
-        // Name: fFieldType
+        // Name: fDescriptionList
+        // Type: java.util.List
+        if (this.fDescriptionList != null) {
+            final java.util.Iterator<java.lang.String> iterator = this.fDescriptionList.iterator();
+            for (; iterator.hasNext();) {
+                java.lang.String loopSource = iterator.next();
+                java.lang.String loopTarget = null;
+                loopTarget = loopSource;
+                target.fDescriptionList.add(loopTarget);
+            }
+        }
+        // Name: fType
         // Type: java.lang.String
-        target.fFieldType = this.fFieldType;
-        // Name: fFieldGeneric
+        target.fType = this.fType;
+        // Name: fGeneric
         // Type: java.lang.String
-        target.fFieldGeneric = this.fFieldGeneric;
-        // Name: fFieldRequired
+        target.fGeneric = this.fGeneric;
+        // Name: fAnnotationList
+        // Type: java.util.List
+        if (this.fAnnotationList != null) {
+            final java.util.Iterator<java.lang.String> iterator = this.fAnnotationList.iterator();
+            for (; iterator.hasNext();) {
+                java.lang.String loopSource = iterator.next();
+                java.lang.String loopTarget = null;
+                loopTarget = loopSource;
+                target.fAnnotationList.add(loopTarget);
+            }
+        }
+        // Name: fRequired
         // Type: java.lang.Boolean
-        target.fFieldRequired = this.fFieldRequired;
+        target.fRequired = this.fRequired;
         // Name: fDefault
         // Type: java.lang.String
         target.fDefault = this.fDefault;
+        // Name: fNullable
+        // Type: java.lang.Boolean
+        target.fNullable = this.fNullable;
         // Name: fMinLength
         // Type: java.lang.Integer
         target.fMinLength = this.fMinLength;
