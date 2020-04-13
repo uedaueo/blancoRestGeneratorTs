@@ -1,6 +1,5 @@
 package blanco.restgeneratorts;
 
-import blanco.commons.util.BlancoNameAdjuster;
 import blanco.commons.util.BlancoNameUtil;
 import blanco.commons.util.BlancoStringUtil;
 import blanco.restgeneratorts.resourcebundle.BlancoRestGeneratorTsResourceBundle;
@@ -61,7 +60,8 @@ public class BlancoRestGeneratorTsXmlParser {
         }
 
         // まず電文の一覧を取得します。
-        Map<String, BlancoRestGeneratorTsTelegramStructure> telegramStructureMap = parseTelegrams(elementRoot);
+        Map<String, BlancoRestGeneratorTsTelegramStructure> telegramStructureMap =
+                parseTelegrams(elementRoot);
 
         if (telegramStructureMap.isEmpty()) {
             if (this.isVerbose()) {
@@ -147,7 +147,7 @@ public class BlancoRestGeneratorTsXmlParser {
         }
 
         if (this.isVerbose()) {
-            System.out.println("/* tueda */ BlancoRestXmlSourceFile#process name = " + name);
+            System.out.println("/* tueda */ XmlParser#parseTelegramSheet name = " + name);
         }
 
         // 電文定義・共通
@@ -343,6 +343,7 @@ public class BlancoRestGeneratorTsXmlParser {
 
         final List<BlancoXmlElement> listChildNodes = BlancoXmlBindingUtil
                 .getElementsByTagName(argElementListRoot, "field");
+
         for (int index = 0; index < listChildNodes.size(); index++) {
             final BlancoXmlElement elementList = listChildNodes.get(index);
             final BlancoRestGeneratorTsTelegramFieldStructure fieldStructure = new BlancoRestGeneratorTsTelegramFieldStructure();
@@ -350,9 +351,13 @@ public class BlancoRestGeneratorTsXmlParser {
             fieldStructure.setNo(BlancoXmlBindingUtil.getTextContent(
                     elementList, "no"));
             fieldStructure.setName(BlancoXmlBindingUtil.getTextContent(
-                    elementList, "name"));
+                    elementList, "fieldName"));
+
+//            System.out.println("*** field name = " + fieldStructure.getName());
+
             if (fieldStructure.getName() == null
                     || fieldStructure.getName().trim().length() == 0) {
+//                System.out.println("*** NO NAME SKIP!!! ");
                 continue;
             }
 
@@ -360,7 +365,7 @@ public class BlancoRestGeneratorTsXmlParser {
              * 型の取得。定義書にはphp風な型が定義されている前提。
              * ここで TypeScript 風の型名に変えておく
              */
-            String phpType = BlancoXmlBindingUtil.getTextContent(elementList, "type");
+            String phpType = BlancoXmlBindingUtil.getTextContent(elementList, "fieldType");
             String targetType = phpType;
             if ("boolean".equalsIgnoreCase(phpType)) {
                 targetType = "boolean";
@@ -418,7 +423,7 @@ public class BlancoRestGeneratorTsXmlParser {
             fieldStructure.setType(targetType);
 
             /* Generic に対応 */
-            String phpGeneric = BlancoXmlBindingUtil.getTextContent(elementList, "generic");
+            String phpGeneric = BlancoXmlBindingUtil.getTextContent(elementList, "fieldGeneric");
             if (BlancoStringUtil.null2Blank(phpGeneric).length() != 0) {
                 String targetGeneric = phpGeneric;
                 if ("boolean".equalsIgnoreCase(phpGeneric)) {
@@ -492,7 +497,7 @@ public class BlancoRestGeneratorTsXmlParser {
                     .getTextContent(elementList, "nullable")));
             // 説明
             fieldStructure.setDescription(BlancoXmlBindingUtil
-                    .getTextContent(elementList, "description"));
+                    .getTextContent(elementList, "fieldDescription"));
             final String[] lines = BlancoNameUtil.splitString(
                     fieldStructure.getDescription(), '\n');
             for (int indexLine = 0; indexLine < lines.length; indexLine++) {

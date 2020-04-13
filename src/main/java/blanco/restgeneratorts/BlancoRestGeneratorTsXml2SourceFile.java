@@ -547,7 +547,7 @@ public class BlancoRestGeneratorTsXml2SourceFile {
                 .getPackage(), "このソースコードは blanco Frameworkによって自動生成されています。");
         fCgSourceFile.setEncoding(fEncoding);
         // クラスを作成
-        fCgClass = fCgFactory.createClass(BlancoRestGeneratorTsConstants.PREFIX_ABSTRACT + argTelegramStructure.getName(),
+        fCgClass = fCgFactory.createClass(argTelegramStructure.getName(),
                 BlancoStringUtil.null2Blank(argTelegramStructure
                         .getDescription()));
         fCgSourceFile.getClassList().add(fCgClass);
@@ -588,6 +588,10 @@ public class BlancoRestGeneratorTsXml2SourceFile {
             fCgSourceFile.getHeaderList().add(header);
         }
 
+        if (this.isVerbose()) {
+            System.out.println("/* tueda */ Start create properties : " + argTelegramStructure.getName());
+        }
+
         // 電文定義・一覧
         for (int indexField = 0; indexField < argTelegramStructure.getListField()
                 .size(); indexField++) {
@@ -603,6 +607,10 @@ public class BlancoRestGeneratorTsXml2SourceFile {
             if (fieldStructure.getType() == null) {
                 throw new IllegalArgumentException(fBundle.getXml2sourceFileErr003(
                         argTelegramStructure.getName(), fieldStructure.getName()));
+            }
+
+            if (this.isVerbose()) {
+                System.out.println("/* tueda */ property : " + fieldStructure.getName());
             }
 
             // フィールドの生成。
@@ -684,26 +692,27 @@ public class BlancoRestGeneratorTsXml2SourceFile {
         /*
          * TypeScript ではプロパティのデフォルト値は原則必須
          */
-        if (!isNullable) {
-            String defaultRawValue = argFieldStructure.getDefault();
-            if (defaultRawValue == null ||defaultRawValue.length() <= 0) {
+        String defaultRawValue = argFieldStructure.getDefault();
+        if ((defaultRawValue == null ||defaultRawValue.length() <= 0)) {
+            if (!isNullable) {
                 throw new IllegalArgumentException(fBundle
                         .getXml2sourceFileErr009(argClassStructure.getName(), argFieldStructure.getName()));
             }
+        } else {
             // フィールドのデフォルト値を設定します。
             field.getLangDoc().getDescriptionList().add(
-                    BlancoCgSourceUtil.escapeStringAsLangDoc(BlancoCgSupportedLang.KOTLIN, fBundle.getXml2sourceFileFieldDefault(argFieldStructure
+                    BlancoCgSourceUtil.escapeStringAsLangDoc(BlancoCgSupportedLang.TS, fBundle.getXml2sourceFileFieldDefault(argFieldStructure
                             .getDefault())));
             // 当面の間、デフォルト値の変形は常にoff。定義書上の値をそのまま採用。
             field.setDefault(argFieldStructure.getDefault());
-        }
 
-        /* メソッドの annotation を設定します */
-        List annotationList = argFieldStructure.getAnnotationList();
-        if (annotationList != null && annotationList.size() > 0) {
-            field.getAnnotationList().addAll(annotationList);
-            if (this.isVerbose()) {
-                System.out.println("/* tueda */ method annotation = " + field.getAnnotationList().get(0));
+            /* メソッドの annotation を設定します */
+            List annotationList = argFieldStructure.getAnnotationList();
+            if (annotationList != null && annotationList.size() > 0) {
+                field.getAnnotationList().addAll(annotationList);
+                if (this.isVerbose()) {
+                    System.out.println("/* tueda */ method annotation = " + field.getAnnotationList().get(0));
+                }
             }
         }
     }
@@ -734,12 +743,16 @@ public class BlancoRestGeneratorTsXml2SourceFile {
             method.getLangDoc().getDescriptionList().add(line);
         }
 
-        method.getParameterList().add(
-                fCgFactory.createParameter("arg"
-                                + getFieldNameAdjustered(argFieldStructure),
-                        argFieldStructure.getType(),
-                        fBundle.getXml2sourceFileSetArgLangdoc(argFieldStructure
-                                .getName())));
+        BlancoCgParameter param = fCgFactory.createParameter("arg"
+                        + getFieldNameAdjustered(argFieldStructure),
+                argFieldStructure.getType(),
+                fBundle.getXml2sourceFileSetArgLangdoc(argFieldStructure
+                        .getName()));
+        String generic = argFieldStructure.getGeneric();
+        if (generic != null && generic.length() > 0) {
+            param.getType().setGenerics(generic);
+        }
+        method.getParameterList().add(param);
 
         // メソッドの実装
         method.getLineList().add(
@@ -783,6 +796,10 @@ public class BlancoRestGeneratorTsXml2SourceFile {
 
         method.setReturn(fCgFactory.createReturn(argFieldStructure.getType(),
                 fBundle.getXml2sourceFileGetReturnLangdoc(argFieldStructure.getName())));
+        String generic = argFieldStructure.getGeneric();
+        if (generic != null && generic.length() > 0) {
+            method.getReturn().getType().setGenerics(generic);
+        }
 
         // メソッドの実装
         method.getLineList().add(
@@ -810,7 +827,7 @@ public class BlancoRestGeneratorTsXml2SourceFile {
         cgMethod.getLangDoc().getDescriptionList().add(
                 fBundle.getXml2sourceFileTypeLangdoc02(argFieldStructure.getType()));
 
-        cgMethod.setReturn(fCgFactory.createReturn(argFieldStructure.getType(), fBundle
+        cgMethod.setReturn(fCgFactory.createReturn("string", fBundle
                 .getXml2sourceFileTypeReturnLangdoc(argFieldStructure.getName())));
 
         if (BlancoStringUtil.null2Blank(argFieldStructure.getDescription()).length() > 0) {
@@ -850,7 +867,7 @@ public class BlancoRestGeneratorTsXml2SourceFile {
         cgMethod.getLangDoc().getDescriptionList().add(
                 fBundle.getXml2sourceFileTypeLangdoc02(fieldGeneric));
 
-        cgMethod.setReturn(fCgFactory.createReturn(fieldGeneric, fBundle
+        cgMethod.setReturn(fCgFactory.createReturn("string", fBundle
                 .getXml2sourceFileTypeReturnLangdoc(argFieldStructure.getName())));
 
         if (BlancoStringUtil.null2Blank(argFieldStructure.getDescription()).length() > 0) {
