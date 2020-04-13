@@ -938,13 +938,15 @@ public class BlancoRestGeneratorTsXmlParser {
                     telegrams.put(kindKey, telegramStructure);
                 }
             }
+            if (telegrams.size() == 0) {
+                continue;
+            }
             if (telegrams.size() != 2) {
                 /* In と Out が揃っていない */
                 return false;
-            } else {
-                processStructure.getListTelegrams().put(methodKey, telegrams);
-                found = true;
             }
+            processStructure.getListTelegrams().put(methodKey, telegrams);
+            found = true;
         }
 
         return found;
