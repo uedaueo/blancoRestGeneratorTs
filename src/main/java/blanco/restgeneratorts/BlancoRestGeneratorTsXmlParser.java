@@ -973,7 +973,12 @@ public class BlancoRestGeneratorTsXmlParser {
                 argPackageName.length() != 0 &&
                 argPackageName.equals(argTelegramPackage) != true) {
             String classNameCanon = argPackageName.replace('.', '/') + "/" + argClassName;
-            importFrom = "@" + argBasedir + "/" + classNameCanon;
+
+            String basedir = "";
+            if (argBasedir != null) {
+                basedir = argBasedir;
+            }
+            importFrom = "@" + basedir + "/" + classNameCanon;
         }
 
         List<String> importClassList = argImportHeaderList.get(importFrom);
