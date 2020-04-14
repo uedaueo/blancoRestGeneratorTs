@@ -12,7 +12,7 @@ package blanco.restgeneratorts.task;
 import blanco.cg.BlancoCgSupportedLang;
 import blanco.restgeneratorts.BlancoRestGeneratorTsConstants;
 import blanco.restgeneratorts.BlancoRestGeneratorTsMeta2Xml;
-import blanco.restgeneratorts.BlancoRestGeneratorTsObjectsInfo;
+import blanco.restgeneratorts.BlancoRestGeneratorTsUtil;
 import blanco.restgeneratorts.BlancoRestGeneratorTsXml2SourceFile;
 import blanco.restgeneratorts.resourcebundle.BlancoRestGeneratorTsResourceBundle;
 import blanco.restgeneratorts.task.valueobject.BlancoRestGeneratorTsProcessInput;
@@ -67,14 +67,14 @@ public class BlancoRestGeneratorTsProcessImpl implements
             }
             /* style が free だったらtargetdirをそのまま使う */
             if (input.getVerbose()) {
-                System.out.println("/* tueda */ TARGETDIR = " + strTarget);
+                System.out.println("BlancoRestGeneratorTsProcessImpl#process TARGETDIR = " + strTarget);
             }
 
             /*
              * validator を作る時に使うために，
              * ValueObject で既に定義されている（はずの）オブジェクトを取得しておく
              */
-            final BlancoRestGeneratorTsObjectsInfo objectsInfo = new BlancoRestGeneratorTsObjectsInfo();
+            final BlancoRestGeneratorTsUtil objectsInfo = new BlancoRestGeneratorTsUtil();
             objectsInfo.setEncoding(input.getEncoding());
             objectsInfo.setVerbose(input.getVerbose());
             objectsInfo.process(input);

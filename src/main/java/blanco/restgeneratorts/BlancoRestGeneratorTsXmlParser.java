@@ -147,7 +147,7 @@ public class BlancoRestGeneratorTsXmlParser {
         }
 
         if (this.isVerbose()) {
-            System.out.println("/* tueda */ XmlParser#parseTelegramSheet name = " + name);
+            System.out.println("BlancoRestGeneratorTsXmlParser#parseTelegramSheet name = " + name);
         }
 
         // 電文定義・共通
@@ -177,8 +177,8 @@ public class BlancoRestGeneratorTsXmlParser {
         final List<BlancoXmlElement> headerElementList = BlancoXmlBindingUtil
                 .getElementsByTagName(argElementSheet,
                         fBundle.getMeta2xmlTelegramHeader());
-        if (headerElementList != null && headerElementList.size() != 0) {
-            List<String> headerList = this.parseHeaderList(headerElementList, argImportHeaderList);
+        List<String> headerList = this.parseHeaderList(headerElementList, argImportHeaderList);
+        if (headerList != null && headerList.size() > 0) {
             telegramStructure.getHeaderList().addAll(headerList);
         }
 
@@ -260,7 +260,7 @@ public class BlancoRestGeneratorTsXmlParser {
          * このクラスのパッケージ名を探す
          */
         String packageName = null;
-        BlancoValueObjectTsClassStructure voStructure = BlancoRestGeneratorTsObjectsInfo.objects.get(superClassId);
+        BlancoValueObjectTsClassStructure voStructure = BlancoRestGeneratorTsUtil.objects.get(superClassId);
         if (voStructure != null) {
             packageName = voStructure.getPackage();
         }
@@ -269,7 +269,7 @@ public class BlancoRestGeneratorTsXmlParser {
             superClassIdCanon = packageName + "." + superClassId;
         }
         if (isVerbose()) {
-            System.out.println("/* tueda */ Extends : " + superClassIdCanon);
+            System.out.println("Extends : " + superClassIdCanon);
         }
         argTelegramStructure.setExtends(superClassIdCanon);
 
@@ -320,7 +320,7 @@ public class BlancoRestGeneratorTsXmlParser {
                     /*
                      * このクラスのパッケージ名を探す
                      */
-                    BlancoValueObjectTsClassStructure voStructure = BlancoRestGeneratorTsObjectsInfo.objects.get(className);
+                    BlancoValueObjectTsClassStructure voStructure = BlancoRestGeneratorTsUtil.objects.get(className);
                     if (voStructure != null) {
                         packageName = voStructure.getPackage();
                     }
@@ -392,7 +392,7 @@ public class BlancoRestGeneratorTsXmlParser {
                 targetType = "any";
             } else {
                 /* この名前の package を探す */
-                BlancoValueObjectTsClassStructure voStructure = BlancoRestGeneratorTsObjectsInfo.objects.get(phpType);
+                BlancoValueObjectTsClassStructure voStructure = BlancoRestGeneratorTsUtil.objects.get(phpType);
                 String packageName = null;
                 if (voStructure != null) {
                     packageName = voStructure.getPackage();
@@ -410,7 +410,7 @@ public class BlancoRestGeneratorTsXmlParser {
                 }
 
                 /* その他はそのまま記述する */
-                System.out.println("/* tueda */ Unknown php type: " + targetType);
+//                System.out.println("/* tueda */ Unknown php type: " + targetType);
 
                 /*
                  * TypeScript 用 import 情報の作成
@@ -451,7 +451,7 @@ public class BlancoRestGeneratorTsXmlParser {
                         targetGeneric = "any";
                     } else {
                         /* この名前の package を探す */
-                        BlancoValueObjectTsClassStructure voStructure = BlancoRestGeneratorTsObjectsInfo.objects.get(phpGeneric);
+                        BlancoValueObjectTsClassStructure voStructure = BlancoRestGeneratorTsUtil.objects.get(phpGeneric);
                         String packageName = null;
                         if (voStructure != null) {
                             packageName = voStructure.getPackage();
@@ -469,7 +469,7 @@ public class BlancoRestGeneratorTsXmlParser {
                         }
 
                         /* その他はそのまま記述する */
-                        System.out.println("/* tueda */ Unknown php type: " + targetGeneric);
+//                        System.out.println("/* tueda */ Unknown php type: " + targetGeneric);
 
                         /*
                          * TypeScript 用 import 情報の作成
@@ -563,6 +563,9 @@ public class BlancoRestGeneratorTsXmlParser {
      * @return
      */
     private List<String> parseHeaderList(final List<BlancoXmlElement> argHeaderElementList, final Map<String, List<String>> argImportHeaderList) {
+        if (this.isVerbose()) {
+            System.out.println("BlancoRestGeneratorTsXmlParser#parseHeaderList: Start parseHeaderList.");
+        }
 
         List<String> headerList = new ArrayList<>();
 
@@ -570,7 +573,7 @@ public class BlancoRestGeneratorTsXmlParser {
          * header の一覧作成
          * まず、定義書に書かれたものをそのまま出力します。
          */
-        if (argHeaderElementList != null && argHeaderElementList.size() != 0) {
+        if (argHeaderElementList != null && argHeaderElementList.size() > 0) {
             final BlancoXmlElement elementHeaderRoot = argHeaderElementList.get(0);
             final List<BlancoXmlElement> listHeaderChildNodes = BlancoXmlBindingUtil
                     .getElementsByTagName(elementHeaderRoot, "header");
@@ -581,7 +584,7 @@ public class BlancoRestGeneratorTsXmlParser {
                 final String headerName = BlancoXmlBindingUtil
                         .getTextContent(elementList, "name");
                 if (this.isVerbose()) {
-                    System.out.println("/* tueda */ header = " + headerName);
+                    System.out.println("BlancoRestGeneratorTsXmlParser#parseHeaderList header = " + headerName);
                 }
                 if (headerName == null || headerName.trim().length() == 0) {
                     continue;
@@ -599,22 +602,27 @@ public class BlancoRestGeneratorTsXmlParser {
          *  * 定義シートでは Java/kotlin 式の package 表記でディレクトリを表現
          * TODO: 定義シート上にファイルの配置ディレクトリを定義できるようにすべし？
          */
-        Set<String> fromList = argImportHeaderList.keySet();
-        for (String strFrom : fromList) {
-            StringBuffer sb = new StringBuffer();
-            sb.append("import { ");
-            List<String> classNameList = argImportHeaderList.get(strFrom);
-            int count = 0;
-            for (String className : classNameList) {
-                if (count > 0) {
-                    sb.append(", ");
+        if (argImportHeaderList != null && argImportHeaderList.size() > 0) {
+            Set<String> fromList = argImportHeaderList.keySet();
+            for (String strFrom : fromList) {
+                StringBuffer sb = new StringBuffer();
+                sb.append("import { ");
+                List<String> classNameList = argImportHeaderList.get(strFrom);
+                int count = 0;
+                for (String className : classNameList) {
+                    if (count > 0) {
+                        sb.append(", ");
+                    }
+                    sb.append(className);
+                    count++;
                 }
-                sb.append(className);
-                count++;
-            }
-            if (count > 0) {
-                sb.append(" } from \"" + strFrom + "\"");
-                headerList.add(sb.toString());
+                if (count > 0) {
+                    sb.append(" } from \"" + strFrom + "\"");
+                    if (this.isVerbose()) {
+                        System.out.println("BlancoRestGeneratorTsXmlParser#parseHeaderList import = " + sb.toString());
+                    }
+                    headerList.add(sb.toString());
+                }
             }
         }
 
@@ -696,7 +704,7 @@ public class BlancoRestGeneratorTsXmlParser {
         }
 
         if (this.isVerbose()) {
-            System.out.println("parseProcessSheet name = " + name);
+            System.out.println("BlancoRestGeneratorTsXmlParser#parseProcessSheet name = " + name);
         }
 
         // 電文処理定義・共通
@@ -725,7 +733,7 @@ public class BlancoRestGeneratorTsXmlParser {
          * 電文IDは以下のルールで決定されます。
          * <電文処理ID> + <Method> + <Request|Response>
          */
-        if (!this.linkTelegramToProcess(processStructure.getName(), argTelegramStructureMap, processStructure)) {
+        if (!this.linkTelegramToProcess(processStructure.getName(), argTelegramStructureMap, processStructure, argImportHeaderList)) {
             /* 電文が未定義またはInとOutが揃っていない */
             System.out.println("!!! Invalid Telegram !!! for " + processStructure.getName());
             return null;
@@ -735,8 +743,8 @@ public class BlancoRestGeneratorTsXmlParser {
         final List<BlancoXmlElement> headerElementList = BlancoXmlBindingUtil
                 .getElementsByTagName(argElementSheet,
                         fBundle.getMeta2xmlProcessHeader());
-        if (headerElementList != null && headerElementList.size() != 0) {
-            List<String> headerList = this.parseHeaderList(headerElementList, argImportHeaderList);
+        List<String> headerList = this.parseHeaderList(headerElementList, argImportHeaderList);
+        if (headerList != null && headerList.size() > 0) {
             processStructure.getHeaderList().addAll(headerList);
         }
 
@@ -824,7 +832,7 @@ public class BlancoRestGeneratorTsXmlParser {
                 /*
                  * このクラスのパッケージ名を探す
                  */
-                BlancoValueObjectTsClassStructure voStructure = BlancoRestGeneratorTsObjectsInfo.objects.get(className);
+                BlancoValueObjectTsClassStructure voStructure = BlancoRestGeneratorTsUtil.objects.get(className);
                 if (voStructure != null) {
                     packageName = voStructure.getPackage();
                 }
@@ -833,7 +841,7 @@ public class BlancoRestGeneratorTsXmlParser {
                 classNameCanon = packageName + "." + className;
             }
             if (isVerbose()) {
-                System.out.println("/* tueda */ Extends : " + classNameCanon);
+                System.out.println("Extends : " + classNameCanon);
             }
             argProcessStructure.setExtends(classNameCanon);
 
@@ -887,7 +895,7 @@ public class BlancoRestGeneratorTsXmlParser {
                     /*
                      * このクラスのパッケージ名を探す
                      */
-                    BlancoValueObjectTsClassStructure voStructure = BlancoRestGeneratorTsObjectsInfo.objects.get(className);
+                    BlancoValueObjectTsClassStructure voStructure = BlancoRestGeneratorTsUtil.objects.get(className);
                     if (voStructure != null) {
                         packageName = voStructure.getPackage();
                     }
@@ -902,15 +910,16 @@ public class BlancoRestGeneratorTsXmlParser {
      * 電文IDは以下のルールで決定されます。
      * <電文処理ID> + <Method> + <Request|Response>
      *
-     * @param processId
-     * @param telegramStructureMap
-     * @param processStructure
+     * @param argProcessId
+     * @param argTelegramStructureMap
+     * @param argProcessStructure
      * @return
      */
     private boolean linkTelegramToProcess(
-            final String processId,
-            final Map<String, BlancoRestGeneratorTsTelegramStructure> telegramStructureMap,
-            final BlancoRestGeneratorTsTelegramProcessStructure processStructure
+            final String argProcessId,
+            final Map<String, BlancoRestGeneratorTsTelegramStructure> argTelegramStructureMap,
+            final BlancoRestGeneratorTsTelegramProcessStructure argProcessStructure,
+            final Map<String, List<String>> argImportHeaderList
             ) {
         boolean found = false;
 
@@ -930,14 +939,37 @@ public class BlancoRestGeneratorTsXmlParser {
             HashMap<String, BlancoRestGeneratorTsTelegramStructure> telegrams = new HashMap<>();
             for (String kindKey : kindKeys) {
                 String kind = telegramKind.get(kindKey);
-                String telegramId = processId + method + kind;
+                String telegramId = argProcessId + method + kind;
 
                 BlancoRestGeneratorTsTelegramStructure telegramStructure =
-                        telegramStructureMap.get(telegramId);
+                        argTelegramStructureMap.get(telegramId);
                 if (telegramStructure != null) {
                     telegrams.put(kindKey, telegramStructure);
                 }
             }
+
+            if (argProcessStructure.getCreateImportList()) {
+                /*
+                 * デフォルト電文クラスのimport情報を生成する
+                 */
+                // 要求
+                String defaultTelegramId = BlancoRestGeneratorTsUtil.getDefaultRequestTelegramId(method);
+                String defaultTelegramPackage = null;
+                BlancoValueObjectTsClassStructure voStructure = BlancoRestGeneratorTsUtil.objects.get(defaultTelegramId);
+                if (voStructure != null) {
+                    defaultTelegramPackage = voStructure.getPackage();
+                }
+                this.makeImportHeaderList(defaultTelegramPackage, defaultTelegramId, argImportHeaderList, argProcessStructure.getBasedir(), argProcessStructure.getPackage());
+                // 応答
+                defaultTelegramId = BlancoRestGeneratorTsUtil.getDefaultResponseTelegramId(method);
+                defaultTelegramPackage = null;
+                voStructure = BlancoRestGeneratorTsUtil.objects.get(defaultTelegramId);
+                if (voStructure != null) {
+                    defaultTelegramPackage = voStructure.getPackage();
+                }
+                this.makeImportHeaderList(defaultTelegramPackage, defaultTelegramId, argImportHeaderList, argProcessStructure.getBasedir(), argProcessStructure.getPackage());
+            }
+
             if (telegrams.size() == 0) {
                 continue;
             }
@@ -945,8 +977,19 @@ public class BlancoRestGeneratorTsXmlParser {
                 /* In と Out が揃っていない */
                 return false;
             }
-            processStructure.getListTelegrams().put(methodKey, telegrams);
+            argProcessStructure.getListTelegrams().put(methodKey, telegrams);
             found = true;
+
+            /*
+             * TypeScript 用 import 情報の作成
+             */
+            if (argProcessStructure.getCreateImportList()) {
+                Set<String> kinds = telegrams.keySet();
+                for (String kind : kinds) {
+                    BlancoRestGeneratorTsTelegramStructure telegram = telegrams.get(kind);
+                    this.makeImportHeaderList(telegram.getPackage(), telegram.getName(), argImportHeaderList, argProcessStructure.getBasedir(), argProcessStructure.getPackage());
+                }
+            }
         }
 
         return found;
@@ -967,7 +1010,7 @@ public class BlancoRestGeneratorTsXmlParser {
             final String argBasedir,
             final String argTelegramPackage) {
         if (argClassName == null || argClassName.length() == 0) {
-            System.out.println("/* tueda */ className is not specified. SKIP.");
+            System.out.println("BlancoRestGeneratorTsXmlParser#makeImportHeaderList className is not specified. SKIP.");
             return;
         }
         String importFrom = "./" + argClassName;
@@ -998,7 +1041,7 @@ public class BlancoRestGeneratorTsXmlParser {
         if (!isMatch) {
             importClassList.add(argClassName);
             if (this.isVerbose()) {
-                System.out.println("/* tueda */ new import { " + argClassName + " } from \"" + importFrom + "\"");
+                System.out.println("BlancoRestGeneratorTsXmlParser#makeImportHeaderList: new import { " + argClassName + " } from \"" + importFrom + "\"");
             }
         }
     }

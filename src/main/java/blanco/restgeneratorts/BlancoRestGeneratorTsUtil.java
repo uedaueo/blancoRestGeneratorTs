@@ -16,7 +16,7 @@ import java.util.Map;
  *
  * Created by tueda on 15/07/05.
  */
-public class BlancoRestGeneratorTsObjectsInfo {
+public class BlancoRestGeneratorTsUtil {
     /**
      * ValueObject 用リソースバンドルへのアクセスオブジェクト。
      */
@@ -59,6 +59,9 @@ public class BlancoRestGeneratorTsObjectsInfo {
     public static HashMap<String, BlancoValueObjectTsClassStructure> objects = new HashMap<>();
 
     public void process(final BlancoRestGeneratorTsProcessInput input) throws IOException {
+        if (this.isVerbose()) {
+            System.out.println("BlancoRestGeneratorTsObjectsInfo : process start !");
+        }
 
         // XML化された中間ファイルから情報を読み込む
         final File[] fileMeta3 = new File(input.getTmpdir()
@@ -78,21 +81,78 @@ public class BlancoRestGeneratorTsObjectsInfo {
             }
 
             BlancoValueObjectTsXmlParser parser = new BlancoValueObjectTsXmlParser();
-            parser.setVerbose(this.isVerbose());
+//            parser.setVerbose(this.isVerbose());
             final BlancoValueObjectTsClassStructure[] structures = parser.parse(fileMeta3[index]);
 
             if (structures != null ) {
                 for (int index2 = 0; index2 < structures.length; index2++) {
                     BlancoValueObjectTsClassStructure structure = structures[index2];
                     if (structure != null) {
+                        if (this.isVerbose()) {
+                            System.out.println("objectInfo: " + structure.getName());
+                        }
                         objects.put(structure.getName(), structure);
                     } else {
-                        System.out.println("/* tueda */ BlancoRestObjextsInfo a structure is NULL!!!");
+                        System.out.println("BlancoRestGeneratorTsObjectsInfo: a structure is NULL!!!");
                     }
                 }
             } else {
-                System.out.println("/* tueda */ BlancoRestObjextsInfo strstrac is NULL!!!");
+                System.out.println("BlancoRestGeneratorTsObjectsInfo: structures are NULL!!!");
             }
         }
+    }
+
+    /**
+     * メソッド毎の電文の親クラスを返します。
+     * @param method
+     * @return
+     */
+    static public String getDefaultRequestTelegramId(String method) {
+        String telegramId = null;
+
+        if (method == null) {
+            throw new IllegalArgumentException("!!! METHOD CANNOT BE NULL !!! " + method);
+        }
+
+        if (BlancoRestGeneratorTsConstants.HTTP_METHOD_GET.endsWith(method.toUpperCase())) {
+            telegramId = BlancoRestGeneratorTsConstants.DEFAULT_API_GET_REQUESTID;
+        } else if (BlancoRestGeneratorTsConstants.HTTP_METHOD_POST.endsWith(method.toUpperCase())) {
+            telegramId = BlancoRestGeneratorTsConstants.DEFAULT_API_POST_REQUESTID;
+        } else if (BlancoRestGeneratorTsConstants.HTTP_METHOD_PUT.endsWith(method.toUpperCase())) {
+            telegramId = BlancoRestGeneratorTsConstants.DEFAULT_API_PUT_REQUESTID;
+        } else if (BlancoRestGeneratorTsConstants.HTTP_METHOD_DELETE.endsWith(method.toUpperCase())) {
+            telegramId = BlancoRestGeneratorTsConstants.DEFAULT_API_DELETE_REQUESTID;
+        } else {
+            throw new IllegalArgumentException("!!! NO SUCH METHOD !!! " + method);
+        }
+
+        return telegramId;
+    }
+
+    /**
+     * メソッド毎の電文の親クラスを返します。
+     * @param method
+     * @return
+     */
+    static public String getDefaultResponseTelegramId(String method) {
+        String telegramId = null;
+
+        if (method == null) {
+            throw new IllegalArgumentException("!!! METHOD CANNOT BE NULL !!! " + method);
+        }
+
+        if (BlancoRestGeneratorTsConstants.HTTP_METHOD_GET.endsWith(method.toUpperCase())) {
+            telegramId = BlancoRestGeneratorTsConstants.DEFAULT_API_GET_RESPONSEID;
+        } else if (BlancoRestGeneratorTsConstants.HTTP_METHOD_POST.endsWith(method.toUpperCase())) {
+            telegramId = BlancoRestGeneratorTsConstants.DEFAULT_API_POST_RESPONSEID;
+        } else if (BlancoRestGeneratorTsConstants.HTTP_METHOD_PUT.endsWith(method.toUpperCase())) {
+            telegramId = BlancoRestGeneratorTsConstants.DEFAULT_API_PUT_RESPONSEID;
+        } else if (BlancoRestGeneratorTsConstants.HTTP_METHOD_DELETE.endsWith(method.toUpperCase())) {
+            telegramId = BlancoRestGeneratorTsConstants.DEFAULT_API_DELETE_RESPONSEID;
+        } else {
+            throw new IllegalArgumentException("!!! NO SUCH METHOD !!! " + method);
+        }
+
+        return telegramId;
     }
 }

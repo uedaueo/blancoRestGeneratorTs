@@ -194,7 +194,7 @@ public class BlancoRestGeneratorTsXml2SourceFile {
 
         /* tueda DEBUG */
         if (this.isVerbose()) {
-            System.out.println("/* tueda */ generateTelegramProcess argDirectoryTarget : " + argDirectoryTarget.getAbsolutePath());
+            System.out.println("BlancoRestGenerateTsXml2SourceFile#generateTelegramProcess SATRT with argDirectoryTarget : " + argDirectoryTarget.getAbsolutePath());
         }
 
         fCgFactory = BlancoCgObjectFactory.getInstance();
@@ -232,7 +232,7 @@ public class BlancoRestGeneratorTsXml2SourceFile {
             fCgClass.getAnnotationList().addAll(argProcessStructure.getAnnotationList());
             /* tueda DEBUG */
             if (this.isVerbose()) {
-                System.out.println("/* tueda */ generateTelegramProcess : class annotation = " + argProcessStructure.getAnnotationList().get(0));
+                System.out.println("generateTelegramProcess : class annotation = " + argProcessStructure.getAnnotationList().get(0));
             }
         }
 
@@ -319,8 +319,8 @@ public class BlancoRestGeneratorTsXml2SourceFile {
         /*
          * 型チェックを通す為にデフォルトの電文親クラスを使います
          */
-        String requestSuperId = this.getDefaultRequestTelegramId(method);
-        String responseSuperId = this.getDefaultResponseTelegramId(method);
+        String requestSuperId = BlancoRestGeneratorTsUtil.getDefaultRequestTelegramId(method);
+        String responseSuperId = BlancoRestGeneratorTsUtil.getDefaultResponseTelegramId(method);
         /*
          * 本来の電文クラス
          */
@@ -365,8 +365,8 @@ public class BlancoRestGeneratorTsXml2SourceFile {
         final List<String> ListLine = cgExecutorMethod.getLineList();
 
         // 電文定義がないので，デフォルトの電文名を指定しておく
-        String requestId = this.getDefaultRequestTelegramId(method);
-        String responseId = this.getDefaultResponseTelegramId(method);
+        String requestId = BlancoRestGeneratorTsUtil.getDefaultRequestTelegramId(method);
+        String responseId = BlancoRestGeneratorTsUtil.getDefaultResponseTelegramId(method);
 
         /* Excel sheet に電文定義がない場合にここにくるので、その場合は電文処理シートの定義を使う */
         cgExecutorMethod.getParameterList().add(
@@ -411,52 +411,6 @@ public class BlancoRestGeneratorTsXml2SourceFile {
 
         listLine.add("return " + retval
                 + BlancoCgLineUtil.getTerminator(fTargetLang));
-    }
-
-    /**
-     * メソッド毎の電文の親クラスを返します。
-     * @param method
-     * @return
-     */
-    private String getDefaultRequestTelegramId(String method) {
-        String telegramId = null;
-
-        if (BlancoRestGeneratorTsConstants.HTTP_METHOD_GET.endsWith(method)) {
-            telegramId = BlancoRestGeneratorTsConstants.DEFAULT_API_GET_REQUESTID;
-        } else if (BlancoRestGeneratorTsConstants.HTTP_METHOD_POST.endsWith(method)) {
-            telegramId = BlancoRestGeneratorTsConstants.DEFAULT_API_POST_REQUESTID;
-        } else if (BlancoRestGeneratorTsConstants.HTTP_METHOD_PUT.endsWith(method)) {
-            telegramId = BlancoRestGeneratorTsConstants.DEFAULT_API_PUT_REQUESTID;
-        } else if (BlancoRestGeneratorTsConstants.HTTP_METHOD_DELETE.endsWith(method)) {
-            telegramId = BlancoRestGeneratorTsConstants.DEFAULT_API_DELETE_REQUESTID;
-        } else {
-            throw new IllegalArgumentException("!!! NO SUCH METHOD !!! " + method);
-        }
-
-        return telegramId;
-    }
-
-    /**
-     * メソッド毎の電文の親クラスを返します。
-     * @param method
-     * @return
-     */
-    private String getDefaultResponseTelegramId(String method) {
-        String telegramId = null;
-
-        if (BlancoRestGeneratorTsConstants.HTTP_METHOD_GET.endsWith(method)) {
-            telegramId = BlancoRestGeneratorTsConstants.DEFAULT_API_GET_RESPONSEID;
-        } else if (BlancoRestGeneratorTsConstants.HTTP_METHOD_POST.endsWith(method)) {
-            telegramId = BlancoRestGeneratorTsConstants.DEFAULT_API_POST_RESPONSEID;
-        } else if (BlancoRestGeneratorTsConstants.HTTP_METHOD_PUT.endsWith(method)) {
-            telegramId = BlancoRestGeneratorTsConstants.DEFAULT_API_PUT_RESPONSEID;
-        } else if (BlancoRestGeneratorTsConstants.HTTP_METHOD_DELETE.endsWith(method)) {
-            telegramId = BlancoRestGeneratorTsConstants.DEFAULT_API_DELETE_RESPONSEID;
-        } else {
-            throw new IllegalArgumentException("!!! NO SUCH METHOD !!! " + method);
-        }
-
-        return telegramId;
     }
 
     private void createRequestIdMethod(String methodName, String requestIdName, String packageName) {
@@ -539,7 +493,7 @@ public class BlancoRestGeneratorTsXml2SourceFile {
 
         /* tueda DEBUG */
         if (this.isVerbose()) {
-            System.out.println("/* tueda */ generateTelegram argDirectoryTarget : " + argDirectoryTarget.getAbsolutePath());
+            System.out.println("BlancoRestGeneratorTsXml2SourceFile#generateTelegram SATR with argDirectoryTarget : " + argDirectoryTarget.getAbsolutePath());
         }
 
         fCgFactory = BlancoCgObjectFactory.getInstance();
@@ -576,7 +530,7 @@ public class BlancoRestGeneratorTsXml2SourceFile {
             fCgClass.getAnnotationList().addAll(argTelegramStructure.getAnnotationList());
             /* tueda DEBUG */
             if (this.isVerbose()) {
-                System.out.println("/* tueda */ generateTelegramProcess : class annotation = " + argTelegramStructure.getAnnotationList().get(0));
+                System.out.println("BlancoRestGeneratorTsXml2SourceFile#generateTelegram : class annotation = " + argTelegramStructure.getAnnotationList().get(0));
             }
         }
 
@@ -589,7 +543,7 @@ public class BlancoRestGeneratorTsXml2SourceFile {
         }
 
         if (this.isVerbose()) {
-            System.out.println("/* tueda */ Start create properties : " + argTelegramStructure.getName());
+            System.out.println("BlancoRestGeneratorTsXml2SourceFile: Start create properties : " + argTelegramStructure.getName());
         }
 
         // 電文定義・一覧
@@ -610,7 +564,7 @@ public class BlancoRestGeneratorTsXml2SourceFile {
             }
 
             if (this.isVerbose()) {
-                System.out.println("/* tueda */ property : " + fieldStructure.getName());
+                System.out.println("property : " + fieldStructure.getName());
             }
 
             // フィールドの生成。
@@ -711,7 +665,7 @@ public class BlancoRestGeneratorTsXml2SourceFile {
             if (annotationList != null && annotationList.size() > 0) {
                 field.getAnnotationList().addAll(annotationList);
                 if (this.isVerbose()) {
-                    System.out.println("/* tueda */ method annotation = " + field.getAnnotationList().get(0));
+                    System.out.println("method annotation = " + field.getAnnotationList().get(0));
                 }
             }
         }
