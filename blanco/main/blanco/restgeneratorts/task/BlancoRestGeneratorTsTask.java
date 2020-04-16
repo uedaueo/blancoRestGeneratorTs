@@ -69,6 +69,11 @@ public class BlancoRestGeneratorTsTask extends Task {
     protected boolean fIsFieldTargetStyleProcessed = false;
 
     /**
+     * フィールド [client] に値がセットされたかどうか。
+     */
+    protected boolean fIsFieldClientProcessed = false;
+
+    /**
      * verboseモードで動作させるかどうか。
      *
      * @param arg verboseモードで動作させるかどうか。
@@ -294,6 +299,32 @@ public class BlancoRestGeneratorTsTask extends Task {
     }
 
     /**
+     * Antタスクの[client]アトリビュートのセッターメソッド。
+     *
+     * 項目番号: 9<br>
+     * trueの場合はサーバ用のメソッドを生成しません。<br>
+     *
+     * @param arg セットしたい値
+     */
+    public void setClient(final boolean arg) {
+        fInput.setClient(arg);
+        fIsFieldClientProcessed = true;
+    }
+
+    /**
+     * Antタスクの[client]アトリビュートのゲッターメソッド。
+     *
+     * 項目番号: 9<br>
+     * trueの場合はサーバ用のメソッドを生成しません。<br>
+     * デフォルト値[false]が設定されています。Apache Antタスク上でアトリビュートの指定が無い場合には、デフォルト値が設定されます。<br>
+     *
+     * @return このフィールドの値
+     */
+    public boolean getClient() {
+        return fInput.getClient();
+    }
+
+    /**
      * Antタスクのメイン処理。Apache Antから このメソッドが呼び出されます。
      *
      * @throws BuildException タスクとしての例外が発生した場合。
@@ -317,6 +348,7 @@ public class BlancoRestGeneratorTsTask extends Task {
             System.out.println("- xmlrootelement:[" + getXmlrootelement() + "]");
             System.out.println("- sheetType:[" + getSheetType() + "]");
             System.out.println("- targetStyle:[" + getTargetStyle() + "]");
+            System.out.println("- client:[" + getClient() + "]");
         }
 
         try {

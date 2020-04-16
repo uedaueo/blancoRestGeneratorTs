@@ -75,6 +75,14 @@ public class BlancoRestGeneratorTsProcessInput {
     private String fTargetStyle = "blanco";
 
     /**
+     * trueの場合はサーバ用のメソッドを生成しません。
+     *
+     * フィールド: [client]。
+     * デフォルト: [false]。
+     */
+    private boolean fClient = false;
+
+    /**
      * フィールド [verbose] の値を設定します。
      *
      * フィールドの説明: [verboseモードで動作させるかどうか。]。
@@ -280,6 +288,29 @@ public class BlancoRestGeneratorTsProcessInput {
     }
 
     /**
+     * フィールド [client] の値を設定します。
+     *
+     * フィールドの説明: [trueの場合はサーバ用のメソッドを生成しません。]。
+     *
+     * @param argClient フィールド[client]に設定する値。
+     */
+    public void setClient(final boolean argClient) {
+        fClient = argClient;
+    }
+
+    /**
+     * フィールド [client] の値を取得します。
+     *
+     * フィールドの説明: [trueの場合はサーバ用のメソッドを生成しません。]。
+     * デフォルト: [false]。
+     *
+     * @return フィールド[client]から取得した値。
+     */
+    public boolean getClient() {
+        return fClient;
+    }
+
+    /**
      * このバリューオブジェクトの文字列表現を取得します。
      *
      * <P>使用上の注意</P>
@@ -303,6 +334,7 @@ public class BlancoRestGeneratorTsProcessInput {
         buf.append(",xmlrootelement=" + fXmlrootelement);
         buf.append(",sheetType=" + fSheetType);
         buf.append(",targetStyle=" + fTargetStyle);
+        buf.append(",client=" + fClient);
         buf.append("]");
         return buf.toString();
     }
@@ -352,5 +384,8 @@ public class BlancoRestGeneratorTsProcessInput {
         // Name: fTargetStyle
         // Type: java.lang.String
         target.fTargetStyle = this.fTargetStyle;
+        // Name: fClient
+        // Type: boolean
+        target.fClient = this.fClient;
     }
 }

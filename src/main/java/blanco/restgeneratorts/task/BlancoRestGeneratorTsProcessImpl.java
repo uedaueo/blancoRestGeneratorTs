@@ -103,6 +103,7 @@ public class BlancoRestGeneratorTsProcessImpl implements
                 xml2source.setSheetLang(new BlancoCgSupportedLang().convertToInt(input.getSheetType()));
                 xml2source.setTargetStyleAdvanced(isTargetStyleAdvanced);
                 xml2source.setVerbose(input.getVerbose());
+                xml2source.setCreateServiceMethod(!input.getClient());
                 xml2source.process(fileMeta2[index], new File(strTarget));
             }
         } catch (IOException ex) {

@@ -57,6 +57,7 @@ public class BlancoRestGeneratorTsTest {
         inputRestGenerator.setTargetdir("sample/blanco");
         inputRestGenerator.setTargetStyle("maven");
         inputRestGenerator.setNameAdjust(true);
+        inputRestGenerator.setClient(true);
         inputRestGenerator.setVerbose(true);
 
         BlancoRestGeneratorTsProcessImpl imple = new BlancoRestGeneratorTsProcessImpl();

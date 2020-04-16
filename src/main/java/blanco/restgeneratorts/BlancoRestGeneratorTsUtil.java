@@ -82,6 +82,12 @@ public class BlancoRestGeneratorTsUtil {
 
             BlancoValueObjectTsXmlParser parser = new BlancoValueObjectTsXmlParser();
 //            parser.setVerbose(this.isVerbose());
+            /*
+             * まず始めにすべてのシートを検索して，クラス名とpackage名のリストを作ります．
+             * php形式の定義書では，クラスを指定する際にpackage名が指定されていないからです．
+             */
+            BlancoValueObjectTsXmlParser.classList =
+                    BlancoValueObjectTsXmlParser.createClassListFromSheets(fileMeta3);
             final BlancoValueObjectTsClassStructure[] structures = parser.parse(fileMeta3[index]);
 
             if (structures != null ) {

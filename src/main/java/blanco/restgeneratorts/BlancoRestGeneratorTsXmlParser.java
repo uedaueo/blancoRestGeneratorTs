@@ -31,6 +31,13 @@ public class BlancoRestGeneratorTsXmlParser {
         return fVerbose;
     }
 
+    private boolean fCreateServiceMethod = false;
+    public void setCreateServiceMethod(boolean argCreateServiceMethod) {
+        this.fCreateServiceMethod = argCreateServiceMethod;
+    }
+    public boolean isCreateServiceMethod() {
+        return fCreateServiceMethod;
+    }
 
     /**
      * 中間XMLファイルのXMLドキュメントをパースして、バリューオブジェクト情報の配列を取得します。
@@ -948,7 +955,7 @@ public class BlancoRestGeneratorTsXmlParser {
                 }
             }
 
-            if (argProcessStructure.getCreateImportList()) {
+            if (argProcessStructure.getCreateImportList() && this.isCreateServiceMethod()) {
                 /*
                  * デフォルト電文クラスのimport情報を生成する
                  */
@@ -983,7 +990,7 @@ public class BlancoRestGeneratorTsXmlParser {
             /*
              * TypeScript 用 import 情報の作成
              */
-            if (argProcessStructure.getCreateImportList()) {
+            if (argProcessStructure.getCreateImportList() && this.isCreateServiceMethod()) {
                 Set<String> kinds = telegrams.keySet();
                 for (String kind : kinds) {
                     BlancoRestGeneratorTsTelegramStructure telegram = telegrams.get(kind);

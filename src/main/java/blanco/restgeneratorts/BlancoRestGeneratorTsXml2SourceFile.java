@@ -45,6 +45,14 @@ public class BlancoRestGeneratorTsXml2SourceFile {
         return fVerbose;
     }
 
+    private boolean fCreateServiceMethod = false;
+    public void setCreateServiceMethod(boolean argCreateServiceMethod) {
+        this.fCreateServiceMethod = argCreateServiceMethod;
+    }
+    public boolean isCreateServiceMethod() {
+        return fCreateServiceMethod;
+    }
+
     /**
      * このプロダクトのリソースバンドルへのアクセスオブジェクト。
      */
@@ -136,6 +144,7 @@ public class BlancoRestGeneratorTsXml2SourceFile {
 
         BlancoRestGeneratorTsXmlParser parser = new BlancoRestGeneratorTsXmlParser();
         parser.setVerbose(this.isVerbose());
+        parser.setCreateServiceMethod(this.isCreateServiceMethod());
         BlancoRestGeneratorTsTelegramProcessStructure[] processStructures =
                 parser.parse(argMetaXmlSourceFile);
 
@@ -245,7 +254,13 @@ public class BlancoRestGeneratorTsXml2SourceFile {
         }
 
         // サービスメソッドを生成します。
-        createServiceMethods(argProcessStructure);
+        if (this.isCreateServiceMethod()) {
+            createServiceMethods(argProcessStructure);
+        } else {
+            if (this.isVerbose()) {
+                System.out.println("BlancoRestGeneratorTsXml2SourceFile#generateTelegramProcess: SKIP SERVICE METHOD!");
+            }
+        }
 
         // isAuthenticationRequired メソッドの上書き
         overrideAuthenticationRequired(argProcessStructure);
