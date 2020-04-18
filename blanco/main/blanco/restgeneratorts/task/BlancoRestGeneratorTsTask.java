@@ -54,6 +54,11 @@ public class BlancoRestGeneratorTsTask extends Task {
     protected boolean fIsFieldEncodingProcessed = false;
 
     /**
+     * フィールド [tabs] に値がセットされたかどうか。
+     */
+    protected boolean fIsFieldTabsProcessed = false;
+
+    /**
      * フィールド [xmlrootelement] に値がセットされたかどうか。
      */
     protected boolean fIsFieldXmlrootelementProcessed = false;
@@ -221,6 +226,36 @@ public class BlancoRestGeneratorTsTask extends Task {
     }
 
     /**
+     * Antタスクの[tabs]アトリビュートのセッターメソッド。
+     *
+     * 項目番号: 6<br>
+     * タブをwhite spaceいくつで置き換えるか、という値です。<br>
+     *
+     * @param arg セットしたい値
+     */
+    public void setTabs(final String arg) {
+        try {
+            fInput.setTabs(Integer.parseInt(arg));
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Antタスクの[tabs]アトリビュートに与えられた値の数値解析に失敗しました。" + e.toString());
+        }
+        fIsFieldTabsProcessed = true;
+    }
+
+    /**
+     * Antタスクの[tabs]アトリビュートのゲッターメソッド。
+     *
+     * 項目番号: 6<br>
+     * タブをwhite spaceいくつで置き換えるか、という値です。<br>
+     * デフォルト値[4]が設定されています。Apache Antタスク上でアトリビュートの指定が無い場合には、デフォルト値が設定されます。<br>
+     *
+     * @return このフィールドの値
+     */
+    public String getTabs() {
+        return String.valueOf(fInput.getTabs());
+    }
+
+    /**
      * Antタスクの[xmlrootelement]アトリビュートのセッターメソッド。
      *
      * 項目番号: 6<br>
@@ -345,6 +380,7 @@ public class BlancoRestGeneratorTsTask extends Task {
             System.out.println("- tmpdir:[" + getTmpdir() + "]");
             System.out.println("- nameAdjust:[" + getNameAdjust() + "]");
             System.out.println("- encoding:[" + getEncoding() + "]");
+            System.out.println("- tabs:[" + getTabs() + "]");
             System.out.println("- xmlrootelement:[" + getXmlrootelement() + "]");
             System.out.println("- sheetType:[" + getSheetType() + "]");
             System.out.println("- targetStyle:[" + getTargetStyle() + "]");

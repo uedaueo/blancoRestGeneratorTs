@@ -45,6 +45,14 @@ public class BlancoRestGeneratorTsXml2SourceFile {
         return fVerbose;
     }
 
+    private int fTabs = 4;
+    public int getTabs() {
+        return fTabs;
+    }
+    public void setTabs(int fTabs) {
+        this.fTabs = fTabs;
+    }
+
     private boolean fCreateServiceMethod = false;
     public void setCreateServiceMethod(boolean argCreateServiceMethod) {
         this.fCreateServiceMethod = argCreateServiceMethod;
@@ -210,6 +218,7 @@ public class BlancoRestGeneratorTsXml2SourceFile {
         fCgSourceFile = fCgFactory.createSourceFile(argProcessStructure
                 .getPackage(), "このソースコードは blanco Frameworkによって自動生成されています。");
         fCgSourceFile.setEncoding(fEncoding);
+        fCgSourceFile.setTabs(this.getTabs());
         // クラスを作成
         fCgClass = fCgFactory.createClass(BlancoRestGeneratorTsConstants.PREFIX_ABSTRACT + argProcessStructure.getName(),
                 BlancoStringUtil.null2Blank(argProcessStructure
@@ -515,6 +524,7 @@ public class BlancoRestGeneratorTsXml2SourceFile {
         fCgSourceFile = fCgFactory.createSourceFile(argTelegramStructure
                 .getPackage(), "このソースコードは blanco Frameworkによって自動生成されています。");
         fCgSourceFile.setEncoding(fEncoding);
+        fCgSourceFile.setTabs(this.getTabs());
         // クラスを作成
         fCgClass = fCgFactory.createClass(argTelegramStructure.getName(),
                 BlancoStringUtil.null2Blank(argTelegramStructure
@@ -717,6 +727,10 @@ public class BlancoRestGeneratorTsXml2SourceFile {
                 argFieldStructure.getType(),
                 fBundle.getXml2sourceFileSetArgLangdoc(argFieldStructure
                         .getName()));
+        if (!argFieldStructure.getNullable()) {
+            param.setNotnull(true);
+        }
+
         String generic = argFieldStructure.getGeneric();
         if (generic != null && generic.length() > 0) {
             param.getType().setGenerics(generic);
@@ -745,6 +759,10 @@ public class BlancoRestGeneratorTsXml2SourceFile {
                 fBundle.getXml2sourceFileGetLangdoc01(argFieldStructure
                         .getName()));
         fCgClass.getMethodList().add(method);
+
+        if (!argFieldStructure.getNullable()) {
+            method.setNotnull(true);
+        }
 
         method.setAccess("get");
 
@@ -807,9 +825,15 @@ public class BlancoRestGeneratorTsXml2SourceFile {
         // メソッドの実装
         final List<String> listLine = cgMethod.getLineList();
 
+        /*
+         * TypeScript では、package が付与されている場合は外す
+         */
+        String methodType = BlancoRestGeneratorTsUtil
+                .getSimpleClassName(argFieldStructure.getType());
+
         listLine
                 .add("return "
-                        + "\"" + argFieldStructure.getType() + "\""
+                        + "\"" + methodType + "\""
                         + BlancoCgLineUtil.getTerminator(fTargetLang));
     }
 
@@ -847,9 +871,15 @@ public class BlancoRestGeneratorTsXml2SourceFile {
         // メソッドの実装
         final List<String> listLine = cgMethod.getLineList();
 
+        /*
+         * TypeScript では、package が付与されている場合は外す
+         */
+        String genericType = BlancoRestGeneratorTsUtil
+                .getSimpleClassName(argFieldStructure.getGeneric());
+
         listLine
                 .add("return "
-                        + "\"" + argFieldStructure.getGeneric() + "\""
+                        + "\"" + genericType + "\""
                         + BlancoCgLineUtil.getTerminator(fTargetLang));
     }
 

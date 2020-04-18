@@ -38,6 +38,7 @@ public class BlancoRestGeneratorTsTest {
         inputValueObject.setTargetdir("sample/blanco");
         inputValueObject.setTargetStyle("maven");
         inputValueObject.setVerbose(true);
+        inputValueObject.setTabs(2);
 
         BlancoValueObjectTsProcessImpl impleValueObject = new BlancoValueObjectTsProcessImpl();
         try {
@@ -59,6 +60,7 @@ public class BlancoRestGeneratorTsTest {
         inputRestGenerator.setNameAdjust(true);
         inputRestGenerator.setClient(true);
         inputRestGenerator.setVerbose(true);
+        inputRestGenerator.setTabs(2);
 
         BlancoRestGeneratorTsProcessImpl imple = new BlancoRestGeneratorTsProcessImpl();
         imple.execute(inputRestGenerator);

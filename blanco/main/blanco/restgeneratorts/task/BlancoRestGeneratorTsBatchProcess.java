@@ -63,6 +63,13 @@ public class BlancoRestGeneratorTsBatchProcess {
                 input.setNameAdjust(Boolean.valueOf(arg.substring(12)).booleanValue());
             } else if (arg.startsWith("-encoding=")) {
                 input.setEncoding(arg.substring(10));
+            } else if (arg.startsWith("-tabs=")) {
+                try {
+                    input.setTabs(Integer.parseInt(arg.substring(6)));
+                } catch (NumberFormatException e) {
+                    System.out.println("BlancoRestGeneratorTsBatchProcess: 処理開始失敗。入力パラメータ[input]のフィールド[tabs]を数値(int)としてパースを試みましたが失敗しました。: " + e.toString());
+                    System.exit(END_ILLEGAL_ARGUMENT_EXCEPTION);
+                }
             } else if (arg.startsWith("-xmlrootelement=")) {
                 input.setXmlrootelement(Boolean.valueOf(arg.substring(16)).booleanValue());
             } else if (arg.startsWith("-sheetType=")) {
@@ -164,7 +171,7 @@ public class BlancoRestGeneratorTsBatchProcess {
      */
     public static final void usage() {
         System.out.println("BlancoRestGeneratorTsBatchProcess: Usage:");
-        System.out.println("  java blanco.restgeneratorts.task.BlancoRestGeneratorTsBatchProcess -verbose=値1 -metadir=値2 -targetdir=値3 -tmpdir=値4 -nameAdjust=値5 -encoding=値6 -xmlrootelement=値7 -sheetType=値8 -targetStyle=値9 -client=値10");
+        System.out.println("  java blanco.restgeneratorts.task.BlancoRestGeneratorTsBatchProcess -verbose=値1 -metadir=値2 -targetdir=値3 -tmpdir=値4 -nameAdjust=値5 -encoding=値6 -tabs=値7 -xmlrootelement=値8 -sheetType=値9 -targetStyle=値10 -client=値11");
         System.out.println("    -verbose");
         System.out.println("      説明[verboseモードで動作させるかどうか。]");
         System.out.println("      型[真偽]");
@@ -188,6 +195,10 @@ public class BlancoRestGeneratorTsBatchProcess {
         System.out.println("    -encoding");
         System.out.println("      説明[自動生成するソースファイルの文字エンコーディングを指定します。]");
         System.out.println("      型[文字列]");
+        System.out.println("    -tabs");
+        System.out.println("      説明[タブをwhite spaceいくつで置き換えるか、という値です。]");
+        System.out.println("      型[数値(int)]");
+        System.out.println("      デフォルト値[4]");
         System.out.println("    -xmlrootelement");
         System.out.println("      説明[XML ルート要素のアノテーションを出力するかどうか。JDK 1.6 以降が必要。]");
         System.out.println("      型[真偽]");

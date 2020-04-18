@@ -321,8 +321,8 @@ public class BlancoRestGeneratorTsXmlParser {
              * TypeScript 用 import 情報の作成
              */
             if (argTelegramStructure.getCreateImportList()) {
-                String packageName = this.getPackageName(interfaceName);
-                String className = this.getSimpleClassName(interfaceName);
+                String packageName = BlancoRestGeneratorTsUtil.getPackageName(interfaceName);
+                String className = BlancoRestGeneratorTsUtil.getSimpleClassName(interfaceName);
                 if (packageName.length() == 0) {
                     /*
                      * このクラスのパッケージ名を探す
@@ -406,9 +406,9 @@ public class BlancoRestGeneratorTsXmlParser {
                 }
                 if (packageName == null) {
                     // package 名の分離を試みる
-                    String simpleName = this.getSimpleClassName(phpType);
+                    String simpleName = BlancoRestGeneratorTsUtil.getSimpleClassName(phpType);
                     if (simpleName != null && !simpleName.equals(phpType)) {
-                        packageName = this.getPackageName(phpType);
+                        packageName = BlancoRestGeneratorTsUtil.getPackageName(phpType);
                         phpType = simpleName;
                     }
                 }
@@ -465,9 +465,9 @@ public class BlancoRestGeneratorTsXmlParser {
                         }
                         if (packageName == null) {
                             // package 名の分離を試みる
-                            String simpleName = this.getSimpleClassName(phpGeneric);
+                            String simpleName = BlancoRestGeneratorTsUtil.getSimpleClassName(phpGeneric);
                             if (simpleName != null && !simpleName.equals(phpGeneric)) {
-                                packageName = this.getPackageName(phpGeneric);
+                                packageName = BlancoRestGeneratorTsUtil.getPackageName(phpGeneric);
                                 phpGeneric = simpleName;
                             }
                         }
@@ -896,8 +896,8 @@ public class BlancoRestGeneratorTsXmlParser {
              * TypeScript 用 import 情報の作成
              */
             if (argProcessStructure.getCreateImportList()) {
-                String packageName = this.getPackageName(interfaceName);
-                String className = this.getSimpleClassName(interfaceName);
+                String packageName = BlancoRestGeneratorTsUtil.getPackageName(interfaceName);
+                String className = BlancoRestGeneratorTsUtil.getSimpleClassName(interfaceName);
                 if (packageName.length() == 0) {
                     /*
                      * このクラスのパッケージ名を探す
@@ -1051,45 +1051,5 @@ public class BlancoRestGeneratorTsXmlParser {
                 System.out.println("BlancoRestGeneratorTsXmlParser#makeImportHeaderList: new import { " + argClassName + " } from \"" + importFrom + "\"");
             }
         }
-    }
-
-    /**
-     * Make canonical classname into Simple.
-     *
-     * @param argClassNameCanon
-     * @return simpleName
-     */
-    private String getSimpleClassName(final String argClassNameCanon) {
-        if (argClassNameCanon == null) {
-            return "";
-        }
-
-        String simpleName = "";
-        final int findLastDot = argClassNameCanon.lastIndexOf('.');
-        if (findLastDot == -1) {
-            simpleName = argClassNameCanon;
-        } else if (findLastDot != argClassNameCanon.length() - 1) {
-            simpleName = argClassNameCanon.substring(findLastDot + 1);
-        }
-        return simpleName;
-    }
-
-    /**
-     * Make canonical classname into packageName
-     *
-     * @param argClassNameCanon
-     * @return
-     */
-    private String getPackageName(final String argClassNameCanon) {
-        if (argClassNameCanon == null) {
-            return "";
-        }
-
-        String simpleName = "";
-        final int findLastDot = argClassNameCanon.lastIndexOf('.');
-        if (findLastDot > 0) {
-            simpleName = argClassNameCanon.substring(0, findLastDot);
-        }
-        return simpleName;
     }
 }
