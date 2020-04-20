@@ -5,7 +5,7 @@
 	<groupId>blanco.restgeneratorts</groupId>
 	<artifactId>blanco-restgeneratorts</artifactId>
 	<packaging>jar</packaging>
-	<version>0.1.6</version>
+	<version>0.1.7</version>
 	<name>blanco-restgeneratorts</name>
 	<url>https://igapyon.github.io/blancofw-maven2</url>
 
@@ -270,11 +270,11 @@
 						<phase>generate-test-sources</phase>
 						<configuration>
 							<target>
-								<taskdef name="blancovalueobject" classname="blanco.valueobject.task.BlancoValueObjectTask" classpathref="maven.runtime.classpath">
+								<taskdef name="blancovalueobjectts" classname="blanco.valueobjectts.task.BlancoValueObjectTsTask" classpathref="maven.runtime.classpath">
 								</taskdef>
 								<taskdef name="blancorestgeneratorts" classname="blanco.restgeneratorts.task.BlancoRestGeneratorTsTask" classpathref="maven.runtime.classpath">
 								</taskdef>
-								<blancovalueobject metadir="meta/objects" encoding="${project.build.sourceEncoding}" sheetType="php" tmpdir="tmpTest" targetdir="sample/blanco" targetStyle="maven" verbose="true" />
+								<blancovalueobjectts metadir="meta/telegrams" encoding="${project.build.sourceEncoding}" sheetType="php" tmpdir="tmpTest" targetdir="sample/blanco" targetStyle="maven" verbose="true" />
 								<blancorestgeneratorts metadir="meta/api" encoding="${project.build.sourceEncoding}" sheetType="php" tmpdir="tmpTest" targetdir="sample/blanco" targetStyle="maven" verbose="true" />
 							</target>
 						</configuration>

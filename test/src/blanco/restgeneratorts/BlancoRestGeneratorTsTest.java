@@ -31,7 +31,7 @@ public class BlancoRestGeneratorTsTest {
          * まず ValueObject を生成します。
          */
         BlancoValueObjectTsProcessInput inputValueObject = new BlancoValueObjectTsProcessInput();
-        inputValueObject.setMetadir("meta/objects");
+        inputValueObject.setMetadir("meta/telegrams");
         inputValueObject.setEncoding("UTF-8");
         inputValueObject.setSheetType("php");
         inputValueObject.setTmpdir("tmpTest");

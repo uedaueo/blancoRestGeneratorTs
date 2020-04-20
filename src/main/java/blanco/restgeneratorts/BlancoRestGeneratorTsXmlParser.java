@@ -1030,7 +1030,7 @@ public class BlancoRestGeneratorTsXmlParser {
             if (argBasedir != null) {
                 basedir = argBasedir;
             }
-            importFrom = "@" + basedir + "/" + classNameCanon;
+            importFrom = basedir + "/" + classNameCanon;
         }
 
         List<String> importClassList = argImportHeaderList.get(importFrom);
