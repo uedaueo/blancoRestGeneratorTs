@@ -32,7 +32,7 @@
                     <value>配置ディレクトリ</value>
                 </propertykey>
                 <propertykey name="annotation" waitX="2">
-                    <value>アノテーション</value>
+                    <value>デコレーション</value>
                 </propertykey>
                 <propertykey name="createImportList" waitX="2">
                     <value>import文の自動生成</value>
