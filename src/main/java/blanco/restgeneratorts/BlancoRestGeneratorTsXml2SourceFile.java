@@ -211,7 +211,7 @@ public class BlancoRestGeneratorTsXml2SourceFile {
 
         /* tueda DEBUG */
         if (this.isVerbose()) {
-            System.out.println("BlancoRestGenerateTsXml2SourceFile#generateTelegramProcess SATRT with argDirectoryTarget : " + argDirectoryTarget.getAbsolutePath());
+            System.out.println("BlancoRestGenerateTsXml2SourceFile#generateTelegramProcess START with argDirectoryTarget : " + argDirectoryTarget.getAbsolutePath());
         }
 
         fCgFactory = BlancoCgObjectFactory.getInstance();
@@ -274,6 +274,8 @@ public class BlancoRestGeneratorTsXml2SourceFile {
         // isAuthenticationRequired メソッドの上書き
         overrideAuthenticationRequired(argProcessStructure);
 
+        // ロケーションとWEBサービスIDからURIを生成します。
+        createLocationUrl(argProcessStructure);
 
         // 収集された情報を元に実際のソースコードを自動生成。
         BlancoCgTransformerFactory.getTsSourceTransformer().transform(
@@ -435,6 +437,66 @@ public class BlancoRestGeneratorTsXml2SourceFile {
 
         listLine.add("return " + retval
                 + BlancoCgLineUtil.getTerminator(fTargetLang));
+    }
+
+    private void createLocationUrl(BlancoRestGeneratorTsTelegramProcessStructure argStructure) {
+        // ロケーションURIを作成
+        String locationUri = argStructure.getLocation() + "/" + argStructure.getServiceId();
+
+        final String fieldName = "_locationURI";
+        final BlancoCgField field = fCgFactory.createField(fieldName,
+                "String", null);
+
+        fCgClass.getFieldList().add(field);
+        field.setAccess("private");
+        field.setNotnull(true);
+        field.getLangDoc().getDescriptionList().add(
+                BlancoCgSourceUtil.escapeStringAsLangDoc(BlancoCgSupportedLang.TS, fBundle.getXml2sourceFileFieldDefault(
+                        locationUri)));
+        field.setDefault("\"" + locationUri +"\"");
+
+        // セッターメソッドを生成
+        final BlancoCgMethod setterMethod = fCgFactory.createMethod(BlancoNameAdjuster.toParameterName(fieldName),
+                fBundle.getXml2sourceFileSetLangdoc01(fieldName));
+        fCgClass.getMethodList().add(setterMethod);
+
+        setterMethod.setAccess("set");
+
+        // セッターメソッドのJavaDoc設定
+        setterMethod.getLangDoc().getDescriptionList().add(
+                fBundle.getXml2sourceFileSetLangdoc02("string"));
+
+        // セッターメソッドのparam設定
+        BlancoCgParameter param = fCgFactory.createParameter("arg"
+                        + BlancoNameAdjuster.toClassName(fieldName),
+                "String",
+                fBundle.getXml2sourceFileSetArgLangdoc(fieldName));
+        param.setNotnull(true);
+
+        setterMethod.getParameterList().add(param);
+
+        // セッターメソッドの実装
+        setterMethod.getLineList().add("this." + fieldName + " = "
+                + "arg" + BlancoNameAdjuster.toClassName(fieldName) + ";");
+
+        // ゲッターメソッドを生成
+        final BlancoCgMethod getterMethod = fCgFactory.createMethod(BlancoNameAdjuster.toParameterName(fieldName),
+                fBundle.getXml2sourceFileGetLangdoc01(fieldName));
+        fCgClass.getMethodList().add(getterMethod);
+
+        getterMethod.setAccess("get");
+
+        // ゲッターメソッドのJavaDoc設定。
+        getterMethod.getLangDoc().getDescriptionList().add(
+                fBundle.getXml2sourceFileGetLangdoc02("string"));
+
+        // ゲッターメソッドの返り値設定
+        getterMethod.setNotnull(true);
+        getterMethod.setReturn(fCgFactory.createReturn("String",
+                fBundle.getXml2sourceFileGetReturnLangdoc(fieldName)));
+
+        // ゲッターメソッドの実装
+        getterMethod.getLineList().add("return this." + fieldName + ";");
     }
 
     private void createRequestIdMethod(String methodName, String requestIdName, String packageName) {

@@ -785,11 +785,11 @@ public class BlancoRestGeneratorTsXmlParser {
         }
 
         // WebサービスID
-        argProcessStructure.setPackage(BlancoXmlBindingUtil.getTextContent(
+        argProcessStructure.setServiceId(BlancoXmlBindingUtil.getTextContent(
                 argElementCommon, "webServiceId"));
 
         // ロケーション
-        argProcessStructure.setPackage(BlancoXmlBindingUtil.getTextContent(
+        argProcessStructure.setLocation(BlancoXmlBindingUtil.getTextContent(
                 argElementCommon, "location"));
 
         // パッケージ
@@ -810,7 +810,7 @@ public class BlancoRestGeneratorTsXmlParser {
         }
 
         // 認証が不要なAPI
-        argProcessStructure.setCreateImportList("true"
+        argProcessStructure.setNoAuthentication("true"
                 .equals(BlancoXmlBindingUtil.getTextContent(argElementCommon,
                         "noAuthentication")));
 
