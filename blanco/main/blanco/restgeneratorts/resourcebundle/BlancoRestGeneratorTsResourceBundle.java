@@ -1199,6 +1199,106 @@ public class BlancoRestGeneratorTsResourceBundle {
     }
 
     /**
+     * bundle[BlancoRestGeneratorTs], key[XML2SOURCE_FILE.TELEGRAM.GENERATOR.DESCRIPTION]
+     *
+     * [電文インスタンスを生成するメソッドです] (ja)<br>
+     *
+     * @return key[XML2SOURCE_FILE.TELEGRAM.GENERATOR.DESCRIPTION]に対応する値。外部から読み込みができない場合には、定義書の値を戻します。必ずnull以外の値が戻ります。
+     */
+    public String getXml2sourceFileTelegramGeneratorDescription() {
+        // 初期値として定義書の値を利用します。
+        String strFormat = "電文インスタンスを生成するメソッドです";
+        try {
+            if (fResourceBundle != null) {
+                strFormat = fResourceBundle.getString("XML2SOURCE_FILE.TELEGRAM.GENERATOR.DESCRIPTION");
+            }
+        } catch (MissingResourceException ex) {
+        }
+        // 置換文字列はひとつもありません。
+        return strFormat;
+    }
+
+    /**
+     * bundle[BlancoRestGeneratorTs], key[XML2SOURCE_FILE.TELEGRAM.GENERATOR.RETURN.DESCRIPTION]
+     *
+     * [生成された電文インスタンスです] (ja)<br>
+     *
+     * @return key[XML2SOURCE_FILE.TELEGRAM.GENERATOR.RETURN.DESCRIPTION]に対応する値。外部から読み込みができない場合には、定義書の値を戻します。必ずnull以外の値が戻ります。
+     */
+    public String getXml2sourceFileTelegramGeneratorReturnDescription() {
+        // 初期値として定義書の値を利用します。
+        String strFormat = "生成された電文インスタンスです";
+        try {
+            if (fResourceBundle != null) {
+                strFormat = fResourceBundle.getString("XML2SOURCE_FILE.TELEGRAM.GENERATOR.RETURN.DESCRIPTION");
+            }
+        } catch (MissingResourceException ex) {
+        }
+        // 置換文字列はひとつもありません。
+        return strFormat;
+    }
+
+    /**
+     * bundle[BlancoRestGeneratorTs], key[XML2SOURCE_FILE.TELEGRAM.GENERATOR.FACTORY.DESCRIPTION]
+     *
+     * [電文インスタンスのファクトリメソッドです] (ja)<br>
+     *
+     * @return key[XML2SOURCE_FILE.TELEGRAM.GENERATOR.FACTORY.DESCRIPTION]に対応する値。外部から読み込みができない場合には、定義書の値を戻します。必ずnull以外の値が戻ります。
+     */
+    public String getXml2sourceFileTelegramGeneratorFactoryDescription() {
+        // 初期値として定義書の値を利用します。
+        String strFormat = "電文インスタンスのファクトリメソッドです";
+        try {
+            if (fResourceBundle != null) {
+                strFormat = fResourceBundle.getString("XML2SOURCE_FILE.TELEGRAM.GENERATOR.FACTORY.DESCRIPTION");
+            }
+        } catch (MissingResourceException ex) {
+        }
+        // 置換文字列はひとつもありません。
+        return strFormat;
+    }
+
+    /**
+     * bundle[BlancoRestGeneratorTs], key[XML2SOURCE_FILE.TELEGRAM.GENERATOR.FACTORY.ARG.METHOD.DESCRIPTION]
+     *
+     * [生成対象のメソッドです] (ja)<br>
+     *
+     * @return key[XML2SOURCE_FILE.TELEGRAM.GENERATOR.FACTORY.ARG.METHOD.DESCRIPTION]に対応する値。外部から読み込みができない場合には、定義書の値を戻します。必ずnull以外の値が戻ります。
+     */
+    public String getXml2sourceFileTelegramGeneratorFactoryArgMethodDescription() {
+        // 初期値として定義書の値を利用します。
+        String strFormat = "生成対象のメソッドです";
+        try {
+            if (fResourceBundle != null) {
+                strFormat = fResourceBundle.getString("XML2SOURCE_FILE.TELEGRAM.GENERATOR.FACTORY.ARG.METHOD.DESCRIPTION");
+            }
+        } catch (MissingResourceException ex) {
+        }
+        // 置換文字列はひとつもありません。
+        return strFormat;
+    }
+
+    /**
+     * bundle[BlancoRestGeneratorTs], key[XML2SOURCE_FILE.TELEGRAM.GENERATOR.FACTORY.RETURN.DESCRIPTION]
+     *
+     * [ファクトリで生成された電文インスタンスです] (ja)<br>
+     *
+     * @return key[XML2SOURCE_FILE.TELEGRAM.GENERATOR.FACTORY.RETURN.DESCRIPTION]に対応する値。外部から読み込みができない場合には、定義書の値を戻します。必ずnull以外の値が戻ります。
+     */
+    public String getXml2sourceFileTelegramGeneratorFactoryReturnDescription() {
+        // 初期値として定義書の値を利用します。
+        String strFormat = "ファクトリで生成された電文インスタンスです";
+        try {
+            if (fResourceBundle != null) {
+                strFormat = fResourceBundle.getString("XML2SOURCE_FILE.TELEGRAM.GENERATOR.FACTORY.RETURN.DESCRIPTION");
+            }
+        } catch (MissingResourceException ex) {
+        }
+        // 置換文字列はひとつもありません。
+        return strFormat;
+    }
+
+    /**
      * bundle[BlancoRestGeneratorTs], key[XML2SOURCE_FILE.PROSESSOR.ARG.LANGDOC]
      *
      * [validation済みのリクエスト情報です] (ja)<br>
@@ -1501,6 +1601,30 @@ public class BlancoRestGeneratorTsResourceBundle {
         try {
             if (fResourceBundle != null) {
                 strFormat = fResourceBundle.getString("BLANCOREST.ERROR.MSG.05");
+            }
+        } catch (MissingResourceException ex) {
+        }
+        final MessageFormat messageFormat = new MessageFormat(strFormat);
+        final StringBuffer strbuf = new StringBuffer();
+        // 与えられた引数を元に置換文字列を置き換えます。
+        messageFormat.format(new Object[] {arg0}, strbuf, null);
+        return strbuf.toString();
+    }
+
+    /**
+     * bundle[BlancoRestGeneratorTs], key[BLANCOREST.ERROR.MSG.06]
+     *
+     * [[ {0} ]というメソッドはありません。] (ja)<br>
+     *
+     * @param arg0 置換文字列{0}を置換する値。java.lang.String型を与えてください。
+     * @return key[BLANCOREST.ERROR.MSG.06]に対応する値。外部から読み込みができない場合には、定義書の値を戻します。必ずnull以外の値が戻ります。
+     */
+    public String getBlancorestErrorMsg06(final String arg0) {
+        // 初期値として定義書の値を利用します。
+        String strFormat = "[ {0} ]というメソッドはありません。";
+        try {
+            if (fResourceBundle != null) {
+                strFormat = fResourceBundle.getString("BLANCOREST.ERROR.MSG.06");
             }
         } catch (MissingResourceException ex) {
         }

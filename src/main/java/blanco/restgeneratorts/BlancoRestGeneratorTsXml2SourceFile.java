@@ -291,25 +291,30 @@ public class BlancoRestGeneratorTsXml2SourceFile {
             final BlancoRestGeneratorTsTelegramProcessStructure argProcessStructure
     ) {
 
-        List<String> httpMethods = new ArrayList<>();
-        httpMethods.add(BlancoRestGeneratorTsConstants.HTTP_METHOD_GET);
-        httpMethods.add(BlancoRestGeneratorTsConstants.HTTP_METHOD_POST);
-        httpMethods.add(BlancoRestGeneratorTsConstants.HTTP_METHOD_PUT);
-        httpMethods.add(BlancoRestGeneratorTsConstants.HTTP_METHOD_DELETE);
-        List<String> telegramKind = new ArrayList<>();
-        telegramKind.add(BlancoRestGeneratorTsConstants.TELEGRAM_INPUT);
-        telegramKind.add(BlancoRestGeneratorTsConstants.TELEGRAM_OUTPUT);
+        Map<String, String> httpMethods = new HashMap<>();
+        httpMethods.put(BlancoRestGeneratorTsConstants.HTTP_METHOD_GET, "Get");
+        httpMethods.put(BlancoRestGeneratorTsConstants.HTTP_METHOD_POST, "Post");
+        httpMethods.put(BlancoRestGeneratorTsConstants.HTTP_METHOD_PUT, "Put");
+        httpMethods.put(BlancoRestGeneratorTsConstants.HTTP_METHOD_DELETE, "Delete");
+        Map<String, String> telegramKind = new HashMap<>();
+        telegramKind.put(BlancoRestGeneratorTsConstants.TELEGRAM_INPUT, "Request");
+        telegramKind.put(BlancoRestGeneratorTsConstants.TELEGRAM_OUTPUT, "Response");
 
-        for (String method : httpMethods) {
-            HashMap<String, BlancoRestGeneratorTsTelegramStructure> telegrams = argProcessStructure.getListTelegrams().get(method);
+        for (Map.Entry<String, String> method : httpMethods.entrySet()) {
+            HashMap<String, BlancoRestGeneratorTsTelegramStructure> telegrams = argProcessStructure.getListTelegrams().get(method.getKey());
             if (telegrams == null) {
                 /* このメソッドは未対応 */
-                createExecuteMethodNotImplemented(method);
+                createExecuteMethodNotImplemented(method.getKey());
+                createTelegramGenerateMethodNotImplemented(method, telegramKind);
             } else {
                 createAbstractProcessMethod(telegrams);
                 createExecuteMethod(telegrams, method);
+                createTelegramGenerateMethod(telegrams, method, telegramKind);
             }
         }
+
+        // 電文インスタンスのファクトリメソッドを生成
+        createTelegramGeneratorFactory(httpMethods, telegramKind);
     }
 
     private void createAbstractProcessMethod(HashMap<String, BlancoRestGeneratorTsTelegramStructure> argTelegrams) {
@@ -335,7 +340,7 @@ public class BlancoRestGeneratorTsXml2SourceFile {
 
     private void createExecuteMethod(
             HashMap<String, BlancoRestGeneratorTsTelegramStructure> argTelegrams,
-            String method) {
+            Map.Entry<String, String> method) {
 
         final BlancoCgMethod cgExecutorMethod = fCgFactory.createMethod(
                 BlancoRestGeneratorTsConstants.BASE_EXECUTOR_METHOD, fBundle.getXml2sourceFileExecutorDescription());
@@ -345,8 +350,8 @@ public class BlancoRestGeneratorTsXml2SourceFile {
         /*
          * 型チェックを通す為にデフォルトの電文親クラスを使います
          */
-        String requestSuperId = BlancoRestGeneratorTsUtil.getDefaultRequestTelegramId(method);
-        String responseSuperId = BlancoRestGeneratorTsUtil.getDefaultResponseTelegramId(method);
+        String requestSuperId = BlancoRestGeneratorTsUtil.getDefaultRequestTelegramId(method.getKey());
+        String responseSuperId = BlancoRestGeneratorTsUtil.getDefaultResponseTelegramId(method.getKey());
         /*
          * 本来の電文クラス
          */
@@ -410,10 +415,108 @@ public class BlancoRestGeneratorTsXml2SourceFile {
         // メソッドの実装
         ListLine.add(
                 "throw new " + BlancoRestGeneratorTsConstants.DEFAULT_EXCEPTION + "( " + BlancoCgLineUtil.getStringLiteralEnclosure(fTargetLang) +
-                        fBundle.getBlancorestErrorMsg05(method) + BlancoCgLineUtil.getStringLiteralEnclosure(fTargetLang)  +")" + BlancoCgLineUtil.getTerminator(fTargetLang));
+                        fBundle.getBlancorestErrorMsg05(method) + BlancoCgLineUtil.getStringLiteralEnclosure(fTargetLang) + ")" + BlancoCgLineUtil.getTerminator(fTargetLang));
 
     }
 
+
+    /**
+     * TelegramGenerateメソッドです。
+     *
+     * @param method
+     */
+    private void createTelegramGenerateMethod(
+            HashMap<String, BlancoRestGeneratorTsTelegramStructure> argTelegrams,
+            Map.Entry<String, String> method,
+            Map<String, String> telegramKind) {
+//        List<String> telegramNames = new ArrayList<>();
+//        String requestId = argTelegrams.get(BlancoRestGeneratorTsConstants.TELEGRAM_INPUT).getName();
+//        String responseId = argTelegrams.get(BlancoRestGeneratorTsConstants.TELEGRAM_OUTPUT).getName();
+//
+//        telegramNames.add(requestId);
+//        telegramNames.add(responseId);
+
+        for (Map.Entry<String, String> kind : telegramKind.entrySet()) {
+            final String name = argTelegrams.get(kind.getKey()).getName();
+            final BlancoCgMethod cgTelegramGenerateMethod = fCgFactory.createMethod(
+                    String.format("getApi%s%s", method.getValue(), kind.getValue()), fBundle.getXml2sourceFileTelegramGeneratorDescription());
+            fCgClass.getMethodList().add(cgTelegramGenerateMethod);
+
+            cgTelegramGenerateMethod.setAccess("protected");
+            cgTelegramGenerateMethod.setReturn(fCgFactory.createReturn(
+                    name,
+                    fBundle.getXml2sourceFileTelegramGeneratorReturnDescription()));
+            final List<String> listLine = cgTelegramGenerateMethod.getLineList();
+
+            // メソッドの実装
+            listLine.add("return new " + name + "()" + BlancoCgLineUtil.getTerminator(fTargetLang));
+        }
+    }
+
+
+    /**
+     * 非対応なメソッドが呼ばれた場合用のTelegramGenerateメソッドです。
+     *
+     * @param method 対象のメソッド
+     */
+    private void createTelegramGenerateMethodNotImplemented(Map.Entry<String, String> method, Map<String, String> telegramKind) {
+
+        for (Map.Entry<String, String> kind : telegramKind.entrySet()) {
+            final BlancoCgMethod cgTelegramGenerateMethod = fCgFactory.createMethod(
+                    String.format("getApi%s%s", method.getValue(), kind.getValue()), fBundle.getXml2sourceFileTelegramGeneratorDescription());
+            fCgClass.getMethodList().add(cgTelegramGenerateMethod);
+
+            cgTelegramGenerateMethod.setAccess("protected");
+            final List<String> listLine = cgTelegramGenerateMethod.getLineList();
+
+            // メソッドの実装
+            listLine.add(
+                    "throw new " + BlancoRestGeneratorTsConstants.DEFAULT_EXCEPTION + "( " + BlancoCgLineUtil.getStringLiteralEnclosure(fTargetLang) +
+                            fBundle.getBlancorestErrorMsg05(method.getKey()) + BlancoCgLineUtil.getStringLiteralEnclosure(fTargetLang) + ")" + BlancoCgLineUtil.getTerminator(fTargetLang));
+        }
+    }
+
+
+    /**
+     * 電文インスタンスのファクトリメソッドです
+     */
+    private void createTelegramGeneratorFactory(Map<String, String> httpMethods, Map<String, String> telegramKind) {
+        final String lineTerminal =  BlancoCgLineUtil.getTerminator(fTargetLang);
+        final String literalEnclosure = BlancoCgLineUtil.getStringLiteralEnclosure(fTargetLang);
+
+        // TODO: 正しい場所に移動
+        fCgSourceFile.getHeaderList().add("import { ApiTelegram } from \"/blanco/main/typescript/blanco/restgenerator/valueobject/ApiTelegram\"");
+
+        for (Map.Entry<String, String> kind : telegramKind.entrySet()) {
+            final BlancoCgMethod cgTelegramGenerateMethod = fCgFactory.createMethod(
+                    String.format("get%sTelegram", kind.getValue()), fBundle.getXml2sourceFileTelegramGeneratorFactoryDescription());
+            fCgClass.getMethodList().add(cgTelegramGenerateMethod);
+            cgTelegramGenerateMethod.getParameterList().add(
+                    fCgFactory.createParameter("method", "String",
+                            fBundle.getXml2sourceFileTelegramGeneratorFactoryArgMethodDescription()));
+            cgTelegramGenerateMethod.setAccess("protected");
+            cgTelegramGenerateMethod.setReturn(fCgFactory.createReturn(
+                    BlancoRestGeneratorTsConstants.API_TELEGRAM_BASE,
+                    fBundle.getXml2sourceFileTelegramGeneratorFactoryReturnDescription()));
+            final List<String> listLine = cgTelegramGenerateMethod.getLineList();
+
+            // メソッドの実装
+            listLine.add("let req: ApiTelegram" + lineTerminal);
+            listLine.add("switch(method) {");
+            for (Map.Entry<String, String> method : httpMethods.entrySet()) {
+                listLine.add(String.format("case %s%s%s:", literalEnclosure, method.getValue().toUpperCase(), literalEnclosure));
+                listLine.add(String.format("req = this.getApi%s%s()",
+                        method.getValue().substring(0, 1).toUpperCase() + method.getValue().substring(1).toLowerCase(),
+                        kind.getValue().substring(0, 1).toUpperCase() + kind.getValue().substring(1).toLowerCase()) + lineTerminal);
+                listLine.add("break" + lineTerminal);
+            }
+            listLine.add("default:");
+            listLine.add("throw new " + BlancoRestGeneratorTsConstants.DEFAULT_EXCEPTION + "(`" +
+                    fBundle.getBlancorestErrorMsg06("${method}") + "`)" + lineTerminal);
+            listLine.add("}");
+            listLine.add("return req" + lineTerminal);
+        }
+    }
 
 
     private void overrideAuthenticationRequired(BlancoRestGeneratorTsTelegramProcessStructure argStructure) {

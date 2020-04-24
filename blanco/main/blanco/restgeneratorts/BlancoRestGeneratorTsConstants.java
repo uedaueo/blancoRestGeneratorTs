@@ -267,4 +267,10 @@ public class BlancoRestGeneratorTsConstants {
      * 電文種別OUTPUTを表す文字列
      */
     public static final String TELEGRAM_OUTPUT = "TELEGRAM_OUTPUT";
+
+    /**
+     * 項目番号:45<br>
+     * 電文の基底クラス
+     */
+    public static final String API_TELEGRAM_BASE = "ApiTelegram";
 }
