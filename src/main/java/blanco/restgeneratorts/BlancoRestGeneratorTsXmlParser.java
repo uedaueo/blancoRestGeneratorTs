@@ -725,6 +725,9 @@ public class BlancoRestGeneratorTsXmlParser {
             parseProcessExtends(elementExtendsRoot, argImportHeaderList, processStructure);
         }
 
+        // ApiTelegramをHeaderListに追加
+        this.addApiTelegramToHeaderList(argImportHeaderList, processStructure);
+
         // 電文処理定義・実装
         final List<BlancoXmlElement> interfaceList = BlancoXmlBindingUtil
                 .getElementsByTagName(argElementSheet, fBundle.getMeta2xmlProcessImplements());
@@ -860,6 +863,37 @@ public class BlancoRestGeneratorTsXmlParser {
             }
         } else {
             System.out.println("/* Extends Skip */ className is not specified!!!");
+        }
+    }
+
+    /**
+     * ApiTelegramをHeaderListに追加する
+     * @param argImportHeaderList
+     * @param argProcessStructure
+     */
+    private void addApiTelegramToHeaderList(
+            final Map<String, List<String>> argImportHeaderList,
+            final BlancoRestGeneratorTsTelegramProcessStructure argProcessStructure) {
+        String superClassId = BlancoRestGeneratorTsConstants.API_TELEGRAM_BASE;
+
+        /*
+         * このクラスのパッケージ名を探す
+         */
+        String packageName = null;
+        BlancoValueObjectTsClassStructure voStructure = BlancoRestGeneratorTsUtil.objects.get(superClassId);
+        if (voStructure != null) {
+            packageName = voStructure.getPackage();
+        }
+        String superClassIdCanon = superClassId;
+        if (packageName != null) {
+            superClassIdCanon = packageName + "." + superClassId;
+        }
+        if (isVerbose()) {
+            System.out.println("addApiTelegramToHeaderList : " + superClassIdCanon);
+        }
+
+        if (argProcessStructure.getCreateImportList()) {
+            this.makeImportHeaderList(packageName, superClassId, argImportHeaderList, argProcessStructure.getBasedir(), argProcessStructure.getPackage());
         }
     }
 

@@ -484,9 +484,6 @@ public class BlancoRestGeneratorTsXml2SourceFile {
         final String lineTerminal =  BlancoCgLineUtil.getTerminator(fTargetLang);
         final String literalEnclosure = BlancoCgLineUtil.getStringLiteralEnclosure(fTargetLang);
 
-        // TODO: 正しい場所に移動
-        fCgSourceFile.getHeaderList().add("import { ApiTelegram } from \"/blanco/main/typescript/blanco/restgenerator/valueobject/ApiTelegram\"");
-
         for (Map.Entry<String, String> kind : telegramKind.entrySet()) {
             final BlancoCgMethod cgTelegramGenerateMethod = fCgFactory.createMethod(
                     String.format("get%sTelegram", kind.getValue()), fBundle.getXml2sourceFileTelegramGeneratorFactoryDescription());
