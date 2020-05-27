@@ -79,6 +79,16 @@ public class BlancoRestGeneratorTsTask extends Task {
     protected boolean fIsFieldClientProcessed = false;
 
     /**
+     * フィールド [processlist] に値がセットされたかどうか。
+     */
+    protected boolean fIsFieldProcesslistProcessed = false;
+
+    /**
+     * フィールド [processlistBase] に値がセットされたかどうか。
+     */
+    protected boolean fIsFieldProcesslistBaseProcessed = false;
+
+    /**
      * verboseモードで動作させるかどうか。
      *
      * @param arg verboseモードで動作させるかどうか。
@@ -360,6 +370,57 @@ public class BlancoRestGeneratorTsTask extends Task {
     }
 
     /**
+     * Antタスクの[processlist]アトリビュートのセッターメソッド。
+     *
+     * 項目番号: 10<br>
+     * 生成した電文処理のインスタンスを文字列から取得するための配列を生成する場合は、ここにファイル名を指定します。<br>
+     *
+     * @param arg セットしたい値
+     */
+    public void setProcesslist(final String arg) {
+        fInput.setProcesslist(arg);
+        fIsFieldProcesslistProcessed = true;
+    }
+
+    /**
+     * Antタスクの[processlist]アトリビュートのゲッターメソッド。
+     *
+     * 項目番号: 10<br>
+     * 生成した電文処理のインスタンスを文字列から取得するための配列を生成する場合は、ここにファイル名を指定します。<br>
+     *
+     * @return このフィールドの値
+     */
+    public String getProcesslist() {
+        return fInput.getProcesslist();
+    }
+
+    /**
+     * Antタスクの[processlistBase]アトリビュートのセッターメソッド。
+     *
+     * 項目番号: 11<br>
+     * processList に記述する import 文のbasedirを指定します。<br>
+     *
+     * @param arg セットしたい値
+     */
+    public void setProcesslistBase(final String arg) {
+        fInput.setProcesslistBase(arg);
+        fIsFieldProcesslistBaseProcessed = true;
+    }
+
+    /**
+     * Antタスクの[processlistBase]アトリビュートのゲッターメソッド。
+     *
+     * 項目番号: 11<br>
+     * processList に記述する import 文のbasedirを指定します。<br>
+     * デフォルト値[%]が設定されています。Apache Antタスク上でアトリビュートの指定が無い場合には、デフォルト値が設定されます。<br>
+     *
+     * @return このフィールドの値
+     */
+    public String getProcesslistBase() {
+        return fInput.getProcesslistBase();
+    }
+
+    /**
      * Antタスクのメイン処理。Apache Antから このメソッドが呼び出されます。
      *
      * @throws BuildException タスクとしての例外が発生した場合。
@@ -385,6 +446,8 @@ public class BlancoRestGeneratorTsTask extends Task {
             System.out.println("- sheetType:[" + getSheetType() + "]");
             System.out.println("- targetStyle:[" + getTargetStyle() + "]");
             System.out.println("- client:[" + getClient() + "]");
+            System.out.println("- processlist:[" + getProcesslist() + "]");
+            System.out.println("- processlistBase:[" + getProcesslistBase() + "]");
         }
 
         try {

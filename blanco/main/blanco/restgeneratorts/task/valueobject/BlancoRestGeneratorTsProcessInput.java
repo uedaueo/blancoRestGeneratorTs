@@ -91,6 +91,21 @@ public class BlancoRestGeneratorTsProcessInput {
     private boolean fClient = false;
 
     /**
+     * 生成した電文処理のインスタンスを文字列から取得するための配列を生成する場合は、ここにファイル名を指定します。
+     *
+     * フィールド: [processlist]。
+     */
+    private String fProcesslist;
+
+    /**
+     * processList に記述する import 文のbasedirを指定します。
+     *
+     * フィールド: [processlistBase]。
+     * デフォルト: [%]。
+     */
+    private String fProcesslistBase = "%";
+
+    /**
      * フィールド [verbose] の値を設定します。
      *
      * フィールドの説明: [verboseモードで動作させるかどうか。]。
@@ -342,6 +357,51 @@ public class BlancoRestGeneratorTsProcessInput {
     }
 
     /**
+     * フィールド [processlist] の値を設定します。
+     *
+     * フィールドの説明: [生成した電文処理のインスタンスを文字列から取得するための配列を生成する場合は、ここにファイル名を指定します。]。
+     *
+     * @param argProcesslist フィールド[processlist]に設定する値。
+     */
+    public void setProcesslist(final String argProcesslist) {
+        fProcesslist = argProcesslist;
+    }
+
+    /**
+     * フィールド [processlist] の値を取得します。
+     *
+     * フィールドの説明: [生成した電文処理のインスタンスを文字列から取得するための配列を生成する場合は、ここにファイル名を指定します。]。
+     *
+     * @return フィールド[processlist]から取得した値。
+     */
+    public String getProcesslist() {
+        return fProcesslist;
+    }
+
+    /**
+     * フィールド [processlistBase] の値を設定します。
+     *
+     * フィールドの説明: [processList に記述する import 文のbasedirを指定します。]。
+     *
+     * @param argProcesslistBase フィールド[processlistBase]に設定する値。
+     */
+    public void setProcesslistBase(final String argProcesslistBase) {
+        fProcesslistBase = argProcesslistBase;
+    }
+
+    /**
+     * フィールド [processlistBase] の値を取得します。
+     *
+     * フィールドの説明: [processList に記述する import 文のbasedirを指定します。]。
+     * デフォルト: [%]。
+     *
+     * @return フィールド[processlistBase]から取得した値。
+     */
+    public String getProcesslistBase() {
+        return fProcesslistBase;
+    }
+
+    /**
      * このバリューオブジェクトの文字列表現を取得します。
      *
      * <P>使用上の注意</P>
@@ -367,6 +427,8 @@ public class BlancoRestGeneratorTsProcessInput {
         buf.append(",sheetType=" + fSheetType);
         buf.append(",targetStyle=" + fTargetStyle);
         buf.append(",client=" + fClient);
+        buf.append(",processlist=" + fProcesslist);
+        buf.append(",processlistBase=" + fProcesslistBase);
         buf.append("]");
         return buf.toString();
     }
@@ -422,5 +484,11 @@ public class BlancoRestGeneratorTsProcessInput {
         // Name: fClient
         // Type: boolean
         target.fClient = this.fClient;
+        // Name: fProcesslist
+        // Type: java.lang.String
+        target.fProcesslist = this.fProcesslist;
+        // Name: fProcesslistBase
+        // Type: java.lang.String
+        target.fProcesslistBase = this.fProcesslistBase;
     }
 }

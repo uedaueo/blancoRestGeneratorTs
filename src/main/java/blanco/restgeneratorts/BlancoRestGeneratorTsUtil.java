@@ -8,7 +8,9 @@ import blanco.valueobjectts.valueobject.BlancoValueObjectTsClassStructure;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -34,33 +36,13 @@ public class BlancoRestGeneratorTsUtil {
         {put(fBundle.getMeta2xmlElementCommonPython(), BlancoCgSupportedLang.TS);}
     };
 
-    /**
-     * フィールド名やメソッド名の名前変形を行うかどうか。
-     */
-    private boolean fNameAdjust = true;
-
-    /**
-     * 自動生成するソースファイルの文字エンコーディング。
-     */
-    private String fEncoding = null;
-
-    public void setEncoding(final String argEncoding) {
-        fEncoding = argEncoding;
-    }
-
-    private boolean fVerbose = false;
-    public void setVerbose(boolean argVerbose) {
-        this.fVerbose = argVerbose;
-    }
-    public boolean isVerbose() {
-        return this.fVerbose;
-    }
+    static public boolean isVerbose = false;
 
     public static HashMap<String, BlancoValueObjectTsClassStructure> objects = new HashMap<>();
 
-    public void process(final BlancoRestGeneratorTsProcessInput input) throws IOException {
-        if (this.isVerbose()) {
-            System.out.println("BlancoRestGeneratorTsObjectsInfo : process start !");
+    static public void processValueObjects(final BlancoRestGeneratorTsProcessInput input) throws IOException {
+        if (isVerbose) {
+            System.out.println("BlancoRestGeneratorTsObjectsInfo : processValueObjects start !");
         }
 
         // XML化された中間ファイルから情報を読み込む
@@ -94,16 +76,16 @@ public class BlancoRestGeneratorTsUtil {
                 for (int index2 = 0; index2 < structures.length; index2++) {
                     BlancoValueObjectTsClassStructure structure = structures[index2];
                     if (structure != null) {
-                        if (this.isVerbose()) {
-                            System.out.println("objectInfo: " + structure.getName());
+                        if (isVerbose) {
+                            System.out.println("processValueObjects: " + structure.getName());
                         }
                         objects.put(structure.getName(), structure);
                     } else {
-                        System.out.println("BlancoRestGeneratorTsObjectsInfo: a structure is NULL!!!");
+                        System.out.println("processValueObjects: a structure is NULL!!!");
                     }
                 }
             } else {
-                System.out.println("BlancoRestGeneratorTsObjectsInfo: structures are NULL!!!");
+                System.out.println("processValueObjects: structures are NULL!!!");
             }
         }
     }
@@ -200,5 +182,56 @@ public class BlancoRestGeneratorTsUtil {
             simpleName = argClassNameCanon.substring(0, findLastDot);
         }
         return simpleName;
+    }
+
+    /**
+     * インポート文を生成する
+     * @param argPackageName
+     * @param argClassName
+     * @param argImportHeaderList
+     * @param argBasedir
+     * @param argTelegramPackage
+     */
+    static public void makeImportHeaderList(
+            final String argPackageName,
+            final String argClassName,
+            final Map<String, List<String>> argImportHeaderList,
+            final String argBasedir,
+            final String argTelegramPackage) {
+        if (argClassName == null || argClassName.length() == 0) {
+            System.out.println("BlancoRestGeneratorTsXmlParser#makeImportHeaderList className is not specified. SKIP.");
+            return;
+        }
+        String importFrom = "./" + argClassName;
+        if (argPackageName != null &&
+                argPackageName.length() != 0 &&
+                argPackageName.equals(argTelegramPackage) != true) {
+            String classNameCanon = argPackageName.replace('.', '/') + "/" + argClassName;
+
+            String basedir = "";
+            if (argBasedir != null) {
+                basedir = argBasedir;
+            }
+            importFrom = basedir + "/" + classNameCanon;
+        }
+
+        List<String> importClassList = argImportHeaderList.get(importFrom);
+        if (importClassList == null) {
+            importClassList = new ArrayList<>();
+            argImportHeaderList.put(importFrom, importClassList);
+        }
+        boolean isMatch = false;
+        for (String myClass : importClassList) {
+            if (argClassName.equals(myClass)) {
+                isMatch = true;
+                break;
+            }
+        }
+        if (!isMatch) {
+            importClassList.add(argClassName);
+            if (isVerbose) {
+                System.out.println("BlancoRestGeneratorTsXmlParser#makeImportHeaderList: new import { " + argClassName + " } from \"" + importFrom + "\"");
+            }
+        }
     }
 }

@@ -107,6 +107,11 @@ public class BlancoRestGeneratorTsXml2SourceFile {
     private BlancoCgClass fCgClass = null;
 
     /**
+     * 内部的に利用するblancoCg用インタフェイス情報。
+     */
+    private BlancoCgInterface fCgInterface = null;
+
+    /**
      * フィールド名やメソッド名の名前変形を行うかどうか。
      *
      */
@@ -140,7 +145,7 @@ public class BlancoRestGeneratorTsXml2SourceFile {
      * @throws IOException
      *             入出力例外が発生した場合。
      */
-    public void process(final File argMetaXmlSourceFile,
+    public BlancoRestGeneratorTsTelegramProcessStructure[] process(final File argMetaXmlSourceFile,
                         final File argDirectoryTarget)
             throws IOException, TransformerException {
 
@@ -158,7 +163,7 @@ public class BlancoRestGeneratorTsXml2SourceFile {
 
         if (processStructures == null) {
             System.out.println("!!! SKIP !!!! " + argMetaXmlSourceFile.getName());
-            return;
+            return null;
         }
 
         for (int index = 0; index < processStructures.length; index++) {
@@ -166,6 +171,7 @@ public class BlancoRestGeneratorTsXml2SourceFile {
             // 得られた情報から TypeScript コードを生成します。
             generate(processStructure, argDirectoryTarget);
         }
+        return processStructures;
     }
 
     private void generate(final BlancoRestGeneratorTsTelegramProcessStructure argProcessStructure, final File argDirectoryTarget) {
@@ -1043,6 +1049,189 @@ public class BlancoRestGeneratorTsXml2SourceFile {
                 .add("return "
                         + "\"" + genericType + "\""
                         + BlancoCgLineUtil.getTerminator(fTargetLang));
+    }
+
+    public void processProcessList(
+            final List<BlancoRestGeneratorTsTelegramProcessStructure> argProcessStructures,
+            final String argProcessListId, String processListBasedir,
+            final File argDirectoryTarget
+    ) {
+
+        if (this.isVerbose()) {
+            System.out.println("BlancoRestGeneratorTsXml2SourceFile#createProcessListClass file = " + argProcessListId);
+        }
+
+        fNameAdjust = true; // BlancoRestGenerator では常にフィールド名を変形します。
+
+        final BlancoRestGeneratorTsXmlParser parser = new BlancoRestGeneratorTsXmlParser();
+        parser.setVerbose(this.isVerbose());
+        parser.setCreateServiceMethod(this.isCreateServiceMethod());
+        final List<String> importHeaderList = parser.parseProcessListImport(argProcessStructures, argProcessListId, processListBasedir);
+
+        /*
+         * まずインタフェイスを生成します。
+         */
+        final String interfaceId = this.buildProcessListInterface(argDirectoryTarget, argProcessListId, importHeaderList);
+
+        /*
+         * 次に、電文処理リストクラスを生成します。
+         */
+        this.buildProcessList(argProcessStructures, importHeaderList, argDirectoryTarget, interfaceId, argProcessListId);
+
+    }
+
+    private String buildProcessListInterface(
+            final File argDirectoryTarget,
+            final String argProcessListId,
+            final List<String> argImportHeaderList
+    ) {
+        /* tueda DEBUG */
+        if (this.isVerbose()) {
+            System.out.println("BlancoRestGeneratorTsXml2SourceFile#buildProcessListInterface SATR with argTargetDirectory : " + argDirectoryTarget.getAbsolutePath());
+        }
+
+        /*
+         * 出力ディレクトリはant taskのtargetStyel引数で
+         * 指定された書式で出力されます。
+         * 従来と互換性を保つために、指定がない場合は blanco/main
+         * となります。
+         * by tueda, 2019/08/30
+         */
+        String strTarget = argDirectoryTarget
+                .getAbsolutePath(); // advanced
+        if (!this.isTargetStyleAdvanced()) {
+            strTarget += "/main"; // legacy
+        }
+        final File fileBlancoMain = new File(strTarget);
+
+        final String processListPackage = BlancoRestGeneratorTsUtil.getPackageName(argProcessListId);
+        final String processListInterface = BlancoRestGeneratorTsUtil.getSimpleClassName(argProcessListId) + "Interface";
+
+        final String toImort = "import { " + processListInterface + " } from \"./" + processListInterface + "\"";
+        argImportHeaderList.add(toImort);
+
+        fCgFactory = BlancoCgObjectFactory.getInstance();
+        fCgSourceFile = fCgFactory.createSourceFile(processListPackage, "このソースコードは blanco Frameworkによって自動生成されています。");
+        fCgSourceFile.setEncoding(fEncoding);
+        fCgSourceFile.setTabs(this.getTabs());
+        // クラスを作成
+        fCgInterface = fCgFactory.createInterface(processListInterface,
+                BlancoStringUtil.null2Blank("API 引数文字列からインスタンス取得するリストのインタフェイス定義です。"));
+        fCgSourceFile.getInterfaceList().add(fCgInterface);
+        fCgInterface.setAccess("public");
+        fCgInterface.getLangDoc().getTagList().add(fCgFactory.createLangDocTag("author", null, "blanco Framework"));
+
+        final String arrayConstructor = "[i: string]: any" + BlancoCgLineUtil.getTerminator(fTargetLang);
+        fCgInterface.getPlainTextList().add(arrayConstructor);
+
+        // 収集された情報を元に実際のソースコードを自動生成。
+        BlancoCgTransformerFactory.getTsSourceTransformer().transform(
+                fCgSourceFile, fileBlancoMain);
+        return processListInterface;
+    }
+
+    private void buildProcessList(
+            List<BlancoRestGeneratorTsTelegramProcessStructure> argProcessStructures,
+            List<String> argImportHeaderList,
+            File argDirectoryTarget,
+            String argInterfaceId,
+            String argProcessListId
+    ) {
+        /* tueda DEBUG */
+        if (this.isVerbose()) {
+            System.out.println("BlancoRestGeneratorTsXml2SourceFile#buildProcessList SATR with argTargetDirectory : " + argDirectoryTarget.getAbsolutePath());
+        }
+
+        /*
+         * 出力ディレクトリはant taskのtargetStyel引数で
+         * 指定された書式で出力されます。
+         * 従来と互換性を保つために、指定がない場合は blanco/main
+         * となります。
+         * by tueda, 2019/08/30
+         */
+        String strTarget = argDirectoryTarget
+                .getAbsolutePath(); // advanced
+        if (!this.isTargetStyleAdvanced()) {
+            strTarget += "/main"; // legacy
+        }
+        final File fileBlancoMain = new File(strTarget);
+
+        String processListPackage = BlancoRestGeneratorTsUtil.getPackageName(argProcessListId);
+        String processListClass = BlancoRestGeneratorTsUtil.getSimpleClassName(argProcessListId);
+
+        fCgFactory = BlancoCgObjectFactory.getInstance();
+        fCgSourceFile = fCgFactory.createSourceFile(processListPackage, "このソースコードは blanco Frameworkによって自動生成されています。");
+        fCgSourceFile.setEncoding(fEncoding);
+        fCgSourceFile.setTabs(this.getTabs());
+        // クラスを作成
+        fCgClass = fCgFactory.createClass(processListClass,
+                BlancoStringUtil.null2Blank("API 引数文字列からインスタンス取得するリストを保持するクラスです。"));
+        fCgSourceFile.getClassList().add(fCgClass);
+        fCgClass.setAccess("public");
+
+        /*
+         * Import 文の設定
+         */
+        for (String header : argImportHeaderList) {
+            fCgSourceFile.getHeaderList().add(header);
+        }
+
+        this.buildProcessListField(argProcessStructures, argInterfaceId);
+
+        // 収集された情報を元に実際のソースコードを自動生成。
+        BlancoCgTransformerFactory.getTsSourceTransformer().transform(
+                fCgSourceFile, fileBlancoMain);
+    }
+
+    /**
+     * 整形の都合で、field は Plain Text として入れる
+     * @param argProcessStructures
+     * @param argInterfaceId
+     */
+    private void buildProcessListField(
+            List<BlancoRestGeneratorTsTelegramProcessStructure> argProcessStructures,
+            String argInterfaceId
+    ) {
+        // System.lineSeparator は使ってはいけない。
+        // 起動時の固定値から変更できないので。
+        final String lineSeparator = System.getProperty("line.separator");
+        final String fieldName = "constructors";
+        final String fieldType = argInterfaceId;
+
+        final BlancoCgField field = fCgFactory.createField(fieldName,
+                fieldType,"API 引数文字列からインスタンス取得するリストです。");
+
+        fCgClass.getFieldList().add(field);
+
+        field.setAccess("public");
+        field.setStatic(true);
+        field.setNotnull(true);
+
+        /*
+         * 整形の都合で、 デフォルト値には固定でtabを入れておく
+         */
+        int tabs = this.getTabs();
+        String indentUnit = " ";
+        String indent = "";
+        for (int i = 0; i < tabs; i++) {
+            indent += indentUnit;
+        }
+        String indent2 = indent + indent;
+
+        StringBuffer sb = new StringBuffer();
+        sb.append("{" + lineSeparator);
+
+        boolean first = true;
+        for (BlancoRestGeneratorTsTelegramProcessStructure processStructure : argProcessStructures) {
+            if (!first) {
+                sb.append("," + lineSeparator);
+            }
+            sb.append(indent2 + processStructure.getName() + " : " + processStructure.getName());
+            first = false;
+        }
+        sb.append(lineSeparator + indent + "}");
+
+        field.setDefault(sb.toString());
     }
 
     /**

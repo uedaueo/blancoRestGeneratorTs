@@ -81,6 +81,28 @@ public class BlancoRestGeneratorTsXmlParser {
         return parseTelegramProcess(elementRoot,telegramStructureMap);
     }
 
+    public List<String> parseProcessListImport(List<BlancoRestGeneratorTsTelegramProcessStructure> argProcessStructures, String argProcessList, String processListBasedir) {
+
+        String listPackageName = BlancoRestGeneratorTsUtil.getPackageName(argProcessList);
+        String listClassName = BlancoRestGeneratorTsUtil.getSimpleClassName(argProcessList);
+
+        /*
+         * まず、すべての電文処理をimportするための情報を集めます
+         */
+        Map<String, List<String>> importHeaderList = new HashMap<>();
+        for (BlancoRestGeneratorTsTelegramProcessStructure processStructure : argProcessStructures) {
+            String packageName = processStructure.getPackage();
+            String processId = processStructure.getName();
+
+            BlancoRestGeneratorTsUtil.makeImportHeaderList(packageName, processId, importHeaderList, processListBasedir, listPackageName);
+        }
+
+        /*
+         * 次に、 import 文を生成します。
+         */
+        return this.parseHeaderList(null, importHeaderList);
+    }
+
     /**
      * 中間XMLファイル形式のXMLドキュメントをパースして、電文名で検索可能な電文情報の一覧を作成します。
      *
@@ -284,7 +306,7 @@ public class BlancoRestGeneratorTsXmlParser {
          * TypeScript 用 import 情報の作成
          */
         if (argTelegramStructure.getCreateImportList()) {
-            this.makeImportHeaderList(packageName, superClassId, argImportHeaderList, argTelegramStructure.getBasedir(), argTelegramStructure.getPackage());
+            BlancoRestGeneratorTsUtil.makeImportHeaderList(packageName, superClassId, argImportHeaderList, argTelegramStructure.getBasedir(), argTelegramStructure.getPackage());
         }
     }
 
@@ -332,7 +354,7 @@ public class BlancoRestGeneratorTsXmlParser {
                         packageName = voStructure.getPackage();
                     }
                 }
-                this.makeImportHeaderList(packageName, className, argImportHeaderList, argTelegramStructure.getBasedir(), argTelegramStructure.getPackage());
+                BlancoRestGeneratorTsUtil.makeImportHeaderList(packageName, className, argImportHeaderList, argTelegramStructure.getBasedir(), argTelegramStructure.getPackage());
             }
         }
     }
@@ -423,7 +445,7 @@ public class BlancoRestGeneratorTsXmlParser {
                  * TypeScript 用 import 情報の作成
                  */
                 if (argTelegramStructure.getCreateImportList()) {
-                    this.makeImportHeaderList(packageName, phpType, argImportHeaderList, argTelegramStructure.getBasedir(), argTelegramStructure.getPackage());
+                    BlancoRestGeneratorTsUtil.makeImportHeaderList(packageName, phpType, argImportHeaderList, argTelegramStructure.getBasedir(), argTelegramStructure.getPackage());
                 }
             }
 
@@ -482,7 +504,7 @@ public class BlancoRestGeneratorTsXmlParser {
                          * TypeScript 用 import 情報の作成
                          */
                         if (argTelegramStructure.getCreateImportList()) {
-                            this.makeImportHeaderList(packageName, phpGeneric, argImportHeaderList, argTelegramStructure.getBasedir(), argTelegramStructure.getPackage());
+                            BlancoRestGeneratorTsUtil.makeImportHeaderList(packageName, phpGeneric, argImportHeaderList, argTelegramStructure.getBasedir(), argTelegramStructure.getPackage());
                         }
                     }
 
@@ -859,7 +881,7 @@ public class BlancoRestGeneratorTsXmlParser {
              * TypeScript 用 import 情報の作成
              */
             if (argProcessStructure.getCreateImportList()) {
-                this.makeImportHeaderList(packageName, className, argImportHeaderList, argProcessStructure.getBasedir(), argProcessStructure.getPackage());
+                BlancoRestGeneratorTsUtil.makeImportHeaderList(packageName, className, argImportHeaderList, argProcessStructure.getBasedir(), argProcessStructure.getPackage());
             }
         } else {
             System.out.println("/* Extends Skip */ className is not specified!!!");
@@ -893,7 +915,7 @@ public class BlancoRestGeneratorTsXmlParser {
         }
 
         if (argProcessStructure.getCreateImportList()) {
-            this.makeImportHeaderList(packageName, superClassId, argImportHeaderList, argProcessStructure.getBasedir(), argProcessStructure.getPackage());
+            BlancoRestGeneratorTsUtil.makeImportHeaderList(packageName, superClassId, argImportHeaderList, argProcessStructure.getBasedir(), argProcessStructure.getPackage());
         }
     }
 
@@ -941,7 +963,7 @@ public class BlancoRestGeneratorTsXmlParser {
                         packageName = voStructure.getPackage();
                     }
                 }
-                this.makeImportHeaderList(packageName, className, argImportHeaderList, argProcessStructure.getBasedir(), argProcessStructure.getPackage());
+                BlancoRestGeneratorTsUtil.makeImportHeaderList(packageName, className, argImportHeaderList, argProcessStructure.getBasedir(), argProcessStructure.getPackage());
             }
         }
     }
@@ -1000,7 +1022,7 @@ public class BlancoRestGeneratorTsXmlParser {
                 if (voStructure != null) {
                     defaultTelegramPackage = voStructure.getPackage();
                 }
-                this.makeImportHeaderList(defaultTelegramPackage, defaultTelegramId, argImportHeaderList, argProcessStructure.getBasedir(), argProcessStructure.getPackage());
+                BlancoRestGeneratorTsUtil.makeImportHeaderList(defaultTelegramPackage, defaultTelegramId, argImportHeaderList, argProcessStructure.getBasedir(), argProcessStructure.getPackage());
                 // 応答
                 defaultTelegramId = BlancoRestGeneratorTsUtil.getDefaultResponseTelegramId(method);
                 defaultTelegramPackage = null;
@@ -1008,7 +1030,7 @@ public class BlancoRestGeneratorTsXmlParser {
                 if (voStructure != null) {
                     defaultTelegramPackage = voStructure.getPackage();
                 }
-                this.makeImportHeaderList(defaultTelegramPackage, defaultTelegramId, argImportHeaderList, argProcessStructure.getBasedir(), argProcessStructure.getPackage());
+                BlancoRestGeneratorTsUtil.makeImportHeaderList(defaultTelegramPackage, defaultTelegramId, argImportHeaderList, argProcessStructure.getBasedir(), argProcessStructure.getPackage());
             }
 
             if (telegrams.size() == 0) {
@@ -1028,62 +1050,11 @@ public class BlancoRestGeneratorTsXmlParser {
                 Set<String> kinds = telegrams.keySet();
                 for (String kind : kinds) {
                     BlancoRestGeneratorTsTelegramStructure telegram = telegrams.get(kind);
-                    this.makeImportHeaderList(telegram.getPackage(), telegram.getName(), argImportHeaderList, argProcessStructure.getBasedir(), argProcessStructure.getPackage());
+                    BlancoRestGeneratorTsUtil.makeImportHeaderList(telegram.getPackage(), telegram.getName(), argImportHeaderList, argProcessStructure.getBasedir(), argProcessStructure.getPackage());
                 }
             }
         }
 
         return found;
-    }
-
-    /**
-     * インポート文を生成する
-     * @param argPackageName
-     * @param argClassName
-     * @param argImportHeaderList
-     * @param argBasedir
-     * @param argTelegramPackage
-     */
-    private void makeImportHeaderList(
-            final String argPackageName,
-            final String argClassName,
-            final Map<String, List<String>> argImportHeaderList,
-            final String argBasedir,
-            final String argTelegramPackage) {
-        if (argClassName == null || argClassName.length() == 0) {
-            System.out.println("BlancoRestGeneratorTsXmlParser#makeImportHeaderList className is not specified. SKIP.");
-            return;
-        }
-        String importFrom = "./" + argClassName;
-        if (argPackageName != null &&
-                argPackageName.length() != 0 &&
-                argPackageName.equals(argTelegramPackage) != true) {
-            String classNameCanon = argPackageName.replace('.', '/') + "/" + argClassName;
-
-            String basedir = "";
-            if (argBasedir != null) {
-                basedir = argBasedir;
-            }
-            importFrom = basedir + "/" + classNameCanon;
-        }
-
-        List<String> importClassList = argImportHeaderList.get(importFrom);
-        if (importClassList == null) {
-            importClassList = new ArrayList<>();
-            argImportHeaderList.put(importFrom, importClassList);
-        }
-        boolean isMatch = false;
-        for (String myClass : importClassList) {
-            if (argClassName.equals(myClass)) {
-                isMatch = true;
-                break;
-            }
-        }
-        if (!isMatch) {
-            importClassList.add(argClassName);
-            if (this.isVerbose()) {
-                System.out.println("BlancoRestGeneratorTsXmlParser#makeImportHeaderList: new import { " + argClassName + " } from \"" + importFrom + "\"");
-            }
-        }
     }
 }

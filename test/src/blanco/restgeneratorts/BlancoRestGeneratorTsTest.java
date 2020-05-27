@@ -61,6 +61,8 @@ public class BlancoRestGeneratorTsTest {
         inputRestGenerator.setClient(true);
         inputRestGenerator.setVerbose(true);
         inputRestGenerator.setTabs(2);
+        inputRestGenerator.setProcesslist("blanco.sample.common.TelegramProcessList");
+        inputRestGenerator.setProcesslistBase("%");
 
         BlancoRestGeneratorTsProcessImpl imple = new BlancoRestGeneratorTsProcessImpl();
         imple.execute(inputRestGenerator);

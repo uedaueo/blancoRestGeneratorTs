@@ -16,10 +16,13 @@ import blanco.restgeneratorts.BlancoRestGeneratorTsUtil;
 import blanco.restgeneratorts.BlancoRestGeneratorTsXml2SourceFile;
 import blanco.restgeneratorts.resourcebundle.BlancoRestGeneratorTsResourceBundle;
 import blanco.restgeneratorts.task.valueobject.BlancoRestGeneratorTsProcessInput;
+import blanco.restgeneratorts.valueobject.BlancoRestGeneratorTsTelegramProcessStructure;
 
 import javax.xml.transform.TransformerException;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class BlancoRestGeneratorTsProcessImpl implements
         BlancoRestGeneratorTsProcess {
@@ -74,10 +77,18 @@ public class BlancoRestGeneratorTsProcessImpl implements
              * validator を作る時に使うために，
              * ValueObject で既に定義されている（はずの）オブジェクトを取得しておく
              */
-            final BlancoRestGeneratorTsUtil objectsInfo = new BlancoRestGeneratorTsUtil();
-            objectsInfo.setEncoding(input.getEncoding());
-            objectsInfo.setVerbose(input.getVerbose());
-            objectsInfo.process(input);
+            BlancoRestGeneratorTsUtil.isVerbose = input.getVerbose();
+            BlancoRestGeneratorTsUtil.processValueObjects(input);
+
+            /*
+             * 電文定義ID（文字列）の一覧を保持するクラス名・ファイル名を取得
+             */
+            String processListId = input.getProcesslist();
+            boolean createProcessList = false;
+            List<BlancoRestGeneratorTsTelegramProcessStructure> processStructureList = new ArrayList<>();
+            if (processListId != null && processListId.length() > 0) {
+                createProcessList = true;
+            }
 
             // テンポラリディレクトリを作成。
             new File(input.getTmpdir()
@@ -105,7 +116,31 @@ public class BlancoRestGeneratorTsProcessImpl implements
                 xml2source.setVerbose(input.getVerbose());
                 xml2source.setCreateServiceMethod(!input.getClient());
                 xml2source.setTabs(input.getTabs());
+
+                BlancoRestGeneratorTsTelegramProcessStructure[] processStructures =
                 xml2source.process(fileMeta2[index], new File(strTarget));
+                /*
+                 * processList の生成が指定されている場合は、
+                 * 自動生成した電文処理クラスの一覧を収集します。
+                 */
+                for (int index2 = 0; createProcessList && index2 < processStructures.length; index2++) {
+                    processStructureList.add(processStructures[index2]);
+                }
+            }
+
+            /*
+             * processList を生成します。
+             */
+            if (createProcessList && processStructureList.size() > 0) {
+
+
+                final BlancoRestGeneratorTsXml2SourceFile xml2source = new BlancoRestGeneratorTsXml2SourceFile();
+                xml2source.setEncoding(input.getEncoding());
+                xml2source.setSheetLang(new BlancoCgSupportedLang().convertToInt(input.getSheetType()));
+                xml2source.setTargetStyleAdvanced(isTargetStyleAdvanced);
+                xml2source.setTabs(2);
+                xml2source.setVerbose(input.getVerbose());
+                xml2source.processProcessList(processStructureList, processListId, input.getProcesslistBase(), new File(strTarget));
             }
         } catch (IOException ex) {
             throw new IllegalArgumentException(ex.toString());
