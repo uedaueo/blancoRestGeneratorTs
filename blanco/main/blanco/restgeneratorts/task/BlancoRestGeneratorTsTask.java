@@ -89,6 +89,11 @@ public class BlancoRestGeneratorTsTask extends Task {
     protected boolean fIsFieldProcesslistBaseProcessed = false;
 
     /**
+     * フィールド [lineSeparator] に値がセットされたかどうか。
+     */
+    protected boolean fIsFieldLineSeparatorProcessed = false;
+
+    /**
      * verboseモードで動作させるかどうか。
      *
      * @param arg verboseモードで動作させるかどうか。
@@ -421,6 +426,32 @@ public class BlancoRestGeneratorTsTask extends Task {
     }
 
     /**
+     * Antタスクの[lineSeparator]アトリビュートのセッターメソッド。
+     *
+     * 項目番号: 12<br>
+     * 行末記号をしていします。LF=0x0a, CR=0x0d, CFLF=0x0d0x0a とします。LFがデフォルトです。<br>
+     *
+     * @param arg セットしたい値
+     */
+    public void setLineSeparator(final String arg) {
+        fInput.setLineSeparator(arg);
+        fIsFieldLineSeparatorProcessed = true;
+    }
+
+    /**
+     * Antタスクの[lineSeparator]アトリビュートのゲッターメソッド。
+     *
+     * 項目番号: 12<br>
+     * 行末記号をしていします。LF=0x0a, CR=0x0d, CFLF=0x0d0x0a とします。LFがデフォルトです。<br>
+     * デフォルト値[LF]が設定されています。Apache Antタスク上でアトリビュートの指定が無い場合には、デフォルト値が設定されます。<br>
+     *
+     * @return このフィールドの値
+     */
+    public String getLineSeparator() {
+        return fInput.getLineSeparator();
+    }
+
+    /**
      * Antタスクのメイン処理。Apache Antから このメソッドが呼び出されます。
      *
      * @throws BuildException タスクとしての例外が発生した場合。
@@ -448,6 +479,7 @@ public class BlancoRestGeneratorTsTask extends Task {
             System.out.println("- client:[" + getClient() + "]");
             System.out.println("- processlist:[" + getProcesslist() + "]");
             System.out.println("- processlistBase:[" + getProcesslistBase() + "]");
+            System.out.println("- lineSeparator:[" + getLineSeparator() + "]");
         }
 
         try {

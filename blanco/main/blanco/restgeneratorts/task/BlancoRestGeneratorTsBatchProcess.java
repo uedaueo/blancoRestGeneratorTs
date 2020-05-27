@@ -82,6 +82,8 @@ public class BlancoRestGeneratorTsBatchProcess {
                 input.setProcesslist(arg.substring(13));
             } else if (arg.startsWith("-processlistBase=")) {
                 input.setProcesslistBase(arg.substring(17));
+            } else if (arg.startsWith("-lineSeparator=")) {
+                input.setLineSeparator(arg.substring(15));
             } else if (arg.equals("-?") || arg.equals("-help")) {
                 usage();
                 System.exit(END_SUCCESS);
@@ -175,7 +177,7 @@ public class BlancoRestGeneratorTsBatchProcess {
      */
     public static final void usage() {
         System.out.println("BlancoRestGeneratorTsBatchProcess: Usage:");
-        System.out.println("  java blanco.restgeneratorts.task.BlancoRestGeneratorTsBatchProcess -verbose=値1 -metadir=値2 -targetdir=値3 -tmpdir=値4 -nameAdjust=値5 -encoding=値6 -tabs=値7 -xmlrootelement=値8 -sheetType=値9 -targetStyle=値10 -client=値11 -processlist=値12 -processlistBase=値13");
+        System.out.println("  java blanco.restgeneratorts.task.BlancoRestGeneratorTsBatchProcess -verbose=値1 -metadir=値2 -targetdir=値3 -tmpdir=値4 -nameAdjust=値5 -encoding=値6 -tabs=値7 -xmlrootelement=値8 -sheetType=値9 -targetStyle=値10 -client=値11 -processlist=値12 -processlistBase=値13 -lineSeparator=値14");
         System.out.println("    -verbose");
         System.out.println("      説明[verboseモードで動作させるかどうか。]");
         System.out.println("      型[真偽]");
@@ -226,6 +228,10 @@ public class BlancoRestGeneratorTsBatchProcess {
         System.out.println("      説明[processList に記述する import 文のbasedirを指定します。]");
         System.out.println("      型[文字列]");
         System.out.println("      デフォルト値[%]");
+        System.out.println("    -lineSeparator");
+        System.out.println("      説明[行末記号をしていします。LF=0x0a, CR=0x0d, CFLF=0x0d0x0a とします。LFがデフォルトです。]");
+        System.out.println("      型[文字列]");
+        System.out.println("      デフォルト値[LF]");
         System.out.println("    -? , -help");
         System.out.println("      説明[使い方を表示します。]");
     }

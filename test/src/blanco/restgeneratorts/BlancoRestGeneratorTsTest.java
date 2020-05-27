@@ -39,6 +39,7 @@ public class BlancoRestGeneratorTsTest {
         inputValueObject.setTargetStyle("maven");
         inputValueObject.setVerbose(true);
         inputValueObject.setTabs(2);
+        inputValueObject.setLineSeparator("CRLF");
 
         BlancoValueObjectTsProcessImpl impleValueObject = new BlancoValueObjectTsProcessImpl();
         try {
@@ -63,6 +64,7 @@ public class BlancoRestGeneratorTsTest {
         inputRestGenerator.setTabs(2);
         inputRestGenerator.setProcesslist("blanco.sample.common.TelegramProcessList");
         inputRestGenerator.setProcesslistBase("%");
+        inputRestGenerator.setLineSeparator("CR");
 
         BlancoRestGeneratorTsProcessImpl imple = new BlancoRestGeneratorTsProcessImpl();
         imple.execute(inputRestGenerator);
