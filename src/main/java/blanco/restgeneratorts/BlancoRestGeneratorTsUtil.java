@@ -8,10 +8,7 @@ import blanco.valueobjectts.valueobject.BlancoValueObjectTsClassStructure;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * BlancoValueObject で作成されているObjectの一覧を XML から取得し，保持しておきます
@@ -45,15 +42,36 @@ public class BlancoRestGeneratorTsUtil {
             System.out.println("BlancoRestGeneratorTsObjectsInfo : processValueObjects start !");
         }
 
+        /* tmpdir はユニーク */
+        String baseTmpdir = input.getTmpdir();
+        /* searchTmpdir はカンマ区切り */
+        String tmpTmpdirs = input.getSearchTmpdir();
+        List<String> searchTmpdirList = null;
+        if (tmpTmpdirs != null && !tmpTmpdirs.equals(baseTmpdir)) {
+            String[] searchTmpdirs = tmpTmpdirs.split(",");
+            searchTmpdirList = new ArrayList<>(Arrays.asList(searchTmpdirs));
+        }
+        if (searchTmpdirList == null) {
+            searchTmpdirList = new ArrayList<>();
+        }
+        searchTmpdirList.add(baseTmpdir);
+
+        for (String tmpdir : searchTmpdirList) {
+            searchTmpdir(tmpdir.trim());
+        }
+    }
+
+    static private void searchTmpdir(String tmpdir) {
+
         // XML化された中間ファイルから情報を読み込む
-        final File[] fileMeta3 = new File(input.getTmpdir()
+        final File[] fileMeta3 = new File(tmpdir
                 + BlancoRestGeneratorTsConstants.OBJECT_SUBDIRECTORY)
                 .listFiles();
 
         if (fileMeta3 == null) {
-            System.out.println("!!! NO FILES in " + input.getTmpdir()
+            System.out.println("!!! NO FILES in " + tmpdir
                     + BlancoRestGeneratorTsConstants.OBJECT_SUBDIRECTORY);
-            throw new IllegalArgumentException("!!! NO FILES in " + input.getTmpdir()
+            throw new IllegalArgumentException("!!! NO FILES in " + tmpdir
                     + BlancoRestGeneratorTsConstants.OBJECT_SUBDIRECTORY);
         }
 

@@ -49,6 +49,48 @@ public class BlancoRestGeneratorTsTest {
         }
 
         /*
+         * もうひとつ、 ValueObject を生成します。
+         */
+        inputValueObject = new BlancoValueObjectTsProcessInput();
+        inputValueObject.setMetadir("meta/sampleObjects");
+        inputValueObject.setEncoding("UTF-8");
+        inputValueObject.setSheetType("php");
+        inputValueObject.setTmpdir("tmpSample");
+        inputValueObject.setTargetdir("sample/blanco");
+        inputValueObject.setTargetStyle("maven");
+        inputValueObject.setVerbose(true);
+        inputValueObject.setTabs(2);
+        inputValueObject.setLineSeparator("CRLF");
+
+        impleValueObject = new BlancoValueObjectTsProcessImpl();
+        try {
+            impleValueObject.execute(inputValueObject);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        /*
+         * 3つ目の、 ValueObject を生成します。
+         */
+        inputValueObject = new BlancoValueObjectTsProcessInput();
+        inputValueObject.setMetadir("meta/sampleObjects2");
+        inputValueObject.setEncoding("UTF-8");
+        inputValueObject.setSheetType("php");
+        inputValueObject.setTmpdir("tmpSample2");
+        inputValueObject.setTargetdir("sample/blanco");
+        inputValueObject.setTargetStyle("maven");
+        inputValueObject.setVerbose(true);
+        inputValueObject.setTabs(2);
+        inputValueObject.setLineSeparator("CRLF");
+
+        impleValueObject = new BlancoValueObjectTsProcessImpl();
+        try {
+            impleValueObject.execute(inputValueObject);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        /*
          * その後、電文と電文処理を生成します。
          */
         BlancoRestGeneratorTsProcessInput inputRestGenerator = new BlancoRestGeneratorTsProcessInput();
@@ -65,6 +107,7 @@ public class BlancoRestGeneratorTsTest {
         inputRestGenerator.setProcesslist("blanco.sample.common.TelegramProcessList");
         inputRestGenerator.setProcesslistBase("%");
         inputRestGenerator.setLineSeparator("CR");
+        inputRestGenerator.setSearchTmpdir("tmpSample,tmpSample2");
 
         BlancoRestGeneratorTsProcessImpl imple = new BlancoRestGeneratorTsProcessImpl();
         imple.execute(inputRestGenerator);
