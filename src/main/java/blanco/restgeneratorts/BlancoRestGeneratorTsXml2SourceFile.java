@@ -1226,7 +1226,7 @@ public class BlancoRestGeneratorTsXml2SourceFile {
             if (!first) {
                 sb.append("," + lineSeparator);
             }
-            sb.append(indent2 + processStructure.getName() + " : " + processStructure.getName());
+            sb.append(indent2 + processStructure.getName() + ": " + processStructure.getName());
             first = false;
         }
         sb.append(lineSeparator + indent + "}");
