@@ -230,6 +230,21 @@ public class BlancoRestGeneratorTsXmlParser {
                 argElementCommon, "package"));
         // 説明
         argTelegramStructure.setDescription(BlancoXmlBindingUtil.getTextContent(argElementCommon, "description"));
+        if (BlancoStringUtil.null2Blank(argTelegramStructure.getDescription())
+                .length() > 0) {
+            final String[] lines = BlancoNameUtil.splitString(argTelegramStructure
+                    .getDescription(), '\n');
+            for (int index = 0; index < lines.length; index++) {
+                if (index == 0) {
+                    argTelegramStructure.setDescription(lines[index]);
+                } else {
+                    // 複数行の description については、これを分割して格納します。
+                    // ２行目からは、適切に文字参照エンコーディングが実施されているものと仮定します。
+                    argTelegramStructure.getDescriptionList().add(lines[index]);
+                }
+            }
+        }
+
         // 電文種類 Input/Output
         argTelegramStructure.setTelegramType(BlancoXmlBindingUtil.getTextContent(argElementCommon, "type"));
         // HTTP メソッド
@@ -805,6 +820,10 @@ public class BlancoRestGeneratorTsXmlParser {
             for (int index = 0; index < lines.length; index++) {
                 if (index == 0) {
                     argProcessStructure.setDescription(lines[index]);
+                } else {
+                    // 複数行の description については、これを分割して格納します。
+                    // ２行目からは、適切に文字参照エンコーディングが実施されているものと仮定します。
+                    argProcessStructure.getDescriptionList().add(lines[index]);
                 }
             }
         }

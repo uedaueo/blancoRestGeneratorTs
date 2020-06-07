@@ -249,6 +249,9 @@ public class BlancoRestGeneratorTsXml2SourceFile {
         }
         // クラスのJavaDocを設定します。
         fCgClass.setDescription(argProcessStructure.getDescription());
+        for (String line : argProcessStructure.getDescriptionList()) {
+            fCgClass.getLangDoc().getDescriptionList().add(line);
+        }
 
         /* クラスのannotation を設定します */
         List annotationList = argProcessStructure.getAnnotationList();
@@ -716,6 +719,9 @@ public class BlancoRestGeneratorTsXml2SourceFile {
         }
         // クラスのJavaDocを設定します。
         fCgClass.setDescription(argTelegramStructure.getDescription());
+        for (String line : argTelegramStructure.getDescriptionList()) {
+            fCgClass.getLangDoc().getDescriptionList().add(line);
+        }
 
         /* クラスのannotation を設定します */
         List annotationList = argTelegramStructure.getAnnotationList();

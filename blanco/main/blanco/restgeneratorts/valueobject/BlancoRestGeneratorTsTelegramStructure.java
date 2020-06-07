@@ -22,6 +22,14 @@ public class BlancoRestGeneratorTsTelegramStructure {
     private String fDescription;
 
     /**
+     * クラスの補助説明です。文字参照エンコード済みの値を格納してください。
+     *
+     * フィールド: [descriptionList]。
+     * デフォルト: [new java.util.ArrayList&lt;java.lang.String&gt;()]。
+     */
+    private List<java.lang.String> fDescriptionList = new java.util.ArrayList<java.lang.String>();
+
+    /**
      * 電文種類
      *
      * フィールド: [telegramType]。
@@ -160,6 +168,29 @@ public class BlancoRestGeneratorTsTelegramStructure {
      */
     public String getDescription() {
         return fDescription;
+    }
+
+    /**
+     * フィールド [descriptionList] の値を設定します。
+     *
+     * フィールドの説明: [クラスの補助説明です。文字参照エンコード済みの値を格納してください。]。
+     *
+     * @param argDescriptionList フィールド[descriptionList]に設定する値。
+     */
+    public void setDescriptionList(final List<java.lang.String> argDescriptionList) {
+        fDescriptionList = argDescriptionList;
+    }
+
+    /**
+     * フィールド [descriptionList] の値を取得します。
+     *
+     * フィールドの説明: [クラスの補助説明です。文字参照エンコード済みの値を格納してください。]。
+     * デフォルト: [new java.util.ArrayList&lt;java.lang.String&gt;()]。
+     *
+     * @return フィールド[descriptionList]から取得した値。
+     */
+    public List<java.lang.String> getDescriptionList() {
+        return fDescriptionList;
     }
 
     /**
@@ -471,6 +502,7 @@ public class BlancoRestGeneratorTsTelegramStructure {
         buf.append("blanco.restgeneratorts.valueobject.BlancoRestGeneratorTsTelegramStructure[");
         buf.append("name=" + fName);
         buf.append(",description=" + fDescription);
+        buf.append(",descriptionList=" + fDescriptionList);
         buf.append(",telegramType=" + fTelegramType);
         buf.append(",telegramMethod=" + fTelegramMethod);
         buf.append(",telegramSuperClass=" + fTelegramSuperClass);
@@ -512,6 +544,17 @@ public class BlancoRestGeneratorTsTelegramStructure {
         // Name: fDescription
         // Type: java.lang.String
         target.fDescription = this.fDescription;
+        // Name: fDescriptionList
+        // Type: java.util.List
+        if (this.fDescriptionList != null) {
+            final java.util.Iterator<java.lang.String> iterator = this.fDescriptionList.iterator();
+            for (; iterator.hasNext();) {
+                java.lang.String loopSource = iterator.next();
+                java.lang.String loopTarget = null;
+                loopTarget = loopSource;
+                target.fDescriptionList.add(loopTarget);
+            }
+        }
         // Name: fTelegramType
         // Type: java.lang.String
         target.fTelegramType = this.fTelegramType;
