@@ -79,6 +79,14 @@ public class BlancoRestGeneratorTsTelegramFieldStructure {
     private Boolean fNullable;
 
     /**
+     * toJSONから除外する場合はtrue
+     *
+     * フィールド: [excludeToJson]。
+     * デフォルト: [false]。
+     */
+    private Boolean fExcludeToJson = false;
+
+    /**
      * 長さmin
      *
      * フィールド: [minLength]。
@@ -343,6 +351,29 @@ public class BlancoRestGeneratorTsTelegramFieldStructure {
     }
 
     /**
+     * フィールド [excludeToJson] の値を設定します。
+     *
+     * フィールドの説明: [toJSONから除外する場合はtrue]。
+     *
+     * @param argExcludeToJson フィールド[excludeToJson]に設定する値。
+     */
+    public void setExcludeToJson(final Boolean argExcludeToJson) {
+        fExcludeToJson = argExcludeToJson;
+    }
+
+    /**
+     * フィールド [excludeToJson] の値を取得します。
+     *
+     * フィールドの説明: [toJSONから除外する場合はtrue]。
+     * デフォルト: [false]。
+     *
+     * @return フィールド[excludeToJson]から取得した値。
+     */
+    public Boolean getExcludeToJson() {
+        return fExcludeToJson;
+    }
+
+    /**
      * フィールド [minLength] の値を設定します。
      *
      * フィールドの説明: [長さmin]。
@@ -499,6 +530,7 @@ public class BlancoRestGeneratorTsTelegramFieldStructure {
         buf.append(",required=" + fRequired);
         buf.append(",default=" + fDefault);
         buf.append(",nullable=" + fNullable);
+        buf.append(",excludeToJson=" + fExcludeToJson);
         buf.append(",minLength=" + fMinLength);
         buf.append(",maxLength=" + fMaxLength);
         buf.append(",minInclusive=" + fMinInclusive);
@@ -573,6 +605,9 @@ public class BlancoRestGeneratorTsTelegramFieldStructure {
         // Name: fNullable
         // Type: java.lang.Boolean
         target.fNullable = this.fNullable;
+        // Name: fExcludeToJson
+        // Type: java.lang.Boolean
+        target.fExcludeToJson = this.fExcludeToJson;
         // Name: fMinLength
         // Type: java.lang.Integer
         target.fMinLength = this.fMinLength;

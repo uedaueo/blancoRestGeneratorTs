@@ -121,6 +121,14 @@ public class BlancoRestGeneratorTsProcessInput {
     private String fSearchTmpdir;
 
     /**
+     * toJSONメソッドを生成します
+     *
+     * フィールド: [generateToJson]。
+     * デフォルト: [false]。
+     */
+    private boolean fGenerateToJson = false;
+
+    /**
      * フィールド [verbose] の値を設定します。
      *
      * フィールドの説明: [verboseモードで動作させるかどうか。]。
@@ -462,6 +470,29 @@ public class BlancoRestGeneratorTsProcessInput {
     }
 
     /**
+     * フィールド [generateToJson] の値を設定します。
+     *
+     * フィールドの説明: [toJSONメソッドを生成します]。
+     *
+     * @param argGenerateToJson フィールド[generateToJson]に設定する値。
+     */
+    public void setGenerateToJson(final boolean argGenerateToJson) {
+        fGenerateToJson = argGenerateToJson;
+    }
+
+    /**
+     * フィールド [generateToJson] の値を取得します。
+     *
+     * フィールドの説明: [toJSONメソッドを生成します]。
+     * デフォルト: [false]。
+     *
+     * @return フィールド[generateToJson]から取得した値。
+     */
+    public boolean getGenerateToJson() {
+        return fGenerateToJson;
+    }
+
+    /**
      * このバリューオブジェクトの文字列表現を取得します。
      *
      * <P>使用上の注意</P>
@@ -491,6 +522,7 @@ public class BlancoRestGeneratorTsProcessInput {
         buf.append(",processlistBase=" + fProcesslistBase);
         buf.append(",lineSeparator=" + fLineSeparator);
         buf.append(",searchTmpdir=" + fSearchTmpdir);
+        buf.append(",generateToJson=" + fGenerateToJson);
         buf.append("]");
         return buf.toString();
     }
@@ -558,5 +590,8 @@ public class BlancoRestGeneratorTsProcessInput {
         // Name: fSearchTmpdir
         // Type: java.lang.String
         target.fSearchTmpdir = this.fSearchTmpdir;
+        // Name: fGenerateToJson
+        // Type: boolean
+        target.fGenerateToJson = this.fGenerateToJson;
     }
 }

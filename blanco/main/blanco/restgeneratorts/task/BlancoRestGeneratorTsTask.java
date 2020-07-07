@@ -99,6 +99,11 @@ public class BlancoRestGeneratorTsTask extends Task {
     protected boolean fIsFieldSearchTmpdirProcessed = false;
 
     /**
+     * フィールド [generateToJson] に値がセットされたかどうか。
+     */
+    protected boolean fIsFieldGenerateToJsonProcessed = false;
+
+    /**
      * verboseモードで動作させるかどうか。
      *
      * @param arg verboseモードで動作させるかどうか。
@@ -482,6 +487,32 @@ public class BlancoRestGeneratorTsTask extends Task {
     }
 
     /**
+     * Antタスクの[generateToJson]アトリビュートのセッターメソッド。
+     *
+     * 項目番号: 14<br>
+     * toJSONメソッドを生成します<br>
+     *
+     * @param arg セットしたい値
+     */
+    public void setGenerateToJson(final boolean arg) {
+        fInput.setGenerateToJson(arg);
+        fIsFieldGenerateToJsonProcessed = true;
+    }
+
+    /**
+     * Antタスクの[generateToJson]アトリビュートのゲッターメソッド。
+     *
+     * 項目番号: 14<br>
+     * toJSONメソッドを生成します<br>
+     * デフォルト値[false]が設定されています。Apache Antタスク上でアトリビュートの指定が無い場合には、デフォルト値が設定されます。<br>
+     *
+     * @return このフィールドの値
+     */
+    public boolean getGenerateToJson() {
+        return fInput.getGenerateToJson();
+    }
+
+    /**
      * Antタスクのメイン処理。Apache Antから このメソッドが呼び出されます。
      *
      * @throws BuildException タスクとしての例外が発生した場合。
@@ -511,6 +542,7 @@ public class BlancoRestGeneratorTsTask extends Task {
             System.out.println("- processlistBase:[" + getProcesslistBase() + "]");
             System.out.println("- lineSeparator:[" + getLineSeparator() + "]");
             System.out.println("- searchTmpdir:[" + getSearchTmpdir() + "]");
+            System.out.println("- generateToJson:[" + getGenerateToJson() + "]");
         }
 
         try {

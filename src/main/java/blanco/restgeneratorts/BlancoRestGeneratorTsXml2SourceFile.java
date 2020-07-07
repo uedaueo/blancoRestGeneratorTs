@@ -21,6 +21,8 @@ import blanco.restgeneratorts.resourcebundle.BlancoRestGeneratorTsResourceBundle
 import blanco.restgeneratorts.valueobject.BlancoRestGeneratorTsTelegramStructure;
 import blanco.restgeneratorts.valueobject.BlancoRestGeneratorTsTelegramFieldStructure;
 import blanco.restgeneratorts.valueobject.BlancoRestGeneratorTsTelegramProcessStructure;
+import blanco.valueobjectts.valueobject.BlancoValueObjectTsClassStructure;
+import blanco.valueobjectts.valueobject.BlancoValueObjectTsFieldStructure;
 
 import javax.xml.transform.TransformerException;
 import java.io.File;
@@ -59,6 +61,14 @@ public class BlancoRestGeneratorTsXml2SourceFile {
     }
     public boolean isCreateServiceMethod() {
         return fCreateServiceMethod;
+    }
+
+    private boolean fDefaultGenerateToJson = false;
+    public boolean isDefaultGenerateToJson() {
+        return this.fDefaultGenerateToJson;
+    }
+    public void setDefaultGenerateToJson(boolean generateToJson) {
+        this.fDefaultGenerateToJson = generateToJson;
     }
 
     /**
@@ -745,6 +755,7 @@ public class BlancoRestGeneratorTsXml2SourceFile {
             System.out.println("BlancoRestGeneratorTsXml2SourceFile: Start create properties : " + argTelegramStructure.getName());
         }
 
+        boolean toJson = false;
         // 電文定義・一覧
         for (int indexField = 0; indexField < argTelegramStructure.getListField()
                 .size(); indexField++) {
@@ -760,6 +771,10 @@ public class BlancoRestGeneratorTsXml2SourceFile {
             if (fieldStructure.getType() == null) {
                 throw new IllegalArgumentException(fBundle.getXml2sourceFileErr003(
                         argTelegramStructure.getName(), fieldStructure.getName()));
+            }
+
+            if (!toJson && !fieldStructure.getExcludeToJson()) {
+                toJson = true;
             }
 
             if (this.isVerbose()) {
@@ -782,6 +797,10 @@ public class BlancoRestGeneratorTsXml2SourceFile {
             buildMethodGeneric(fieldStructure);
 
             // validation は後日実装予定
+        }
+
+        if (toJson && this.isDefaultGenerateToJson()) {
+            buildMethodToJSON(argTelegramStructure);
         }
 
         // 収集された情報を元に実際のソースコードを自動生成。
@@ -1055,6 +1074,49 @@ public class BlancoRestGeneratorTsXml2SourceFile {
                 .add("return "
                         + "\"" + genericType + "\""
                         + BlancoCgLineUtil.getTerminator(fTargetLang));
+    }
+
+    /**
+     * toJSON メソッドを生成します。
+     *
+     * @param argTelegramStructure
+     */
+    private void buildMethodToJSON(
+            final BlancoRestGeneratorTsTelegramStructure  argTelegramStructure
+    ) {
+        final BlancoCgMethod method = fCgFactory.createMethod("toJSON",
+                "この電文からJSONに書き出すプロパティを取得します。");
+        fCgClass.getMethodList().add(method);
+
+        method.setReturn(fCgFactory.createReturn("any",
+                "toJSONが返すオブジェクト"));
+        method.setNotnull(true);
+        /*
+         * 一応指定するが、Typescript では無効
+         */
+        method.setFinal(true);
+
+        final List<java.lang.String> listLine = method.getLineList();
+
+        listLine.add("return {");
+
+        String line = "";
+        for (int indexField = 0; indexField < argTelegramStructure.getListField()
+                .size(); indexField++) {
+            final BlancoRestGeneratorTsTelegramFieldStructure field =
+                    argTelegramStructure.getListField().get(indexField);
+
+            if (!field.getExcludeToJson()) {
+                if (indexField > 0 && line.length() > 0) {
+                    listLine.add(line + ",");
+                }
+                line = field.getName() + ": this." + field.getName();
+            }
+        }
+        if (line.length() > 0) {
+            listLine.add(line);
+        }
+        listLine.add("};");
     }
 
     public void processProcessList(

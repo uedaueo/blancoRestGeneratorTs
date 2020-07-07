@@ -133,6 +133,9 @@ JavaDocに利用されます</value>
                 <tablecolumn name="nullable">
                     <value>Nullable</value>
                 </tablecolumn>
+                <tablecolumn name="excludeToJSON">
+                    <value>toJSONから除外</value>
+                </tablecolumn>
                 <tablecolumn name="minLength">
                     <value>Min長</value>
                 </tablecolumn>

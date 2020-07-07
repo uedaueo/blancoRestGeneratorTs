@@ -539,6 +539,11 @@ public class BlancoRestGeneratorTsXmlParser {
             // Nullable に対応
             fieldStructure.setNullable("true".equals(BlancoXmlBindingUtil
                     .getTextContent(elementList, "nullable")));
+
+            // toJSON に対応
+            fieldStructure.setExcludeToJson("true".equals(BlancoXmlBindingUtil
+                    .getTextContent(elementList, "excludeToJSON")));
+
             // 説明
             fieldStructure.setDescription(BlancoXmlBindingUtil
                     .getTextContent(elementList, "fieldDescription"));

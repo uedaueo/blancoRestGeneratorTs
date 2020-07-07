@@ -39,6 +39,7 @@ public class BlancoRestGeneratorTsTest {
         inputValueObject.setTargetStyle("maven");
         inputValueObject.setVerbose(true);
         inputValueObject.setTabs(2);
+        inputValueObject.setGenerateToJson(true);
         inputValueObject.setLineSeparator("CRLF");
 
         BlancoValueObjectTsProcessImpl impleValueObject = new BlancoValueObjectTsProcessImpl();
@@ -60,6 +61,7 @@ public class BlancoRestGeneratorTsTest {
         inputValueObject.setTargetStyle("maven");
         inputValueObject.setVerbose(true);
         inputValueObject.setTabs(2);
+        inputValueObject.setGenerateToJson(true);
         inputValueObject.setLineSeparator("CRLF");
 
         impleValueObject = new BlancoValueObjectTsProcessImpl();
@@ -81,6 +83,7 @@ public class BlancoRestGeneratorTsTest {
         inputValueObject.setTargetStyle("maven");
         inputValueObject.setVerbose(true);
         inputValueObject.setTabs(2);
+        inputValueObject.setGenerateToJson(true);
         inputValueObject.setLineSeparator("CRLF");
 
         impleValueObject = new BlancoValueObjectTsProcessImpl();
@@ -104,6 +107,7 @@ public class BlancoRestGeneratorTsTest {
         inputRestGenerator.setClient(true);
         inputRestGenerator.setVerbose(true);
         inputRestGenerator.setTabs(2);
+        inputRestGenerator.setGenerateToJson(true);
         inputRestGenerator.setProcesslist("blanco.sample.common.TelegramProcessList");
         inputRestGenerator.setProcesslistBase("%");
         inputRestGenerator.setLineSeparator("CR");
