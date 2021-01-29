@@ -21,8 +21,6 @@ import blanco.restgeneratorts.resourcebundle.BlancoRestGeneratorTsResourceBundle
 import blanco.restgeneratorts.valueobject.BlancoRestGeneratorTsTelegramStructure;
 import blanco.restgeneratorts.valueobject.BlancoRestGeneratorTsTelegramFieldStructure;
 import blanco.restgeneratorts.valueobject.BlancoRestGeneratorTsTelegramProcessStructure;
-import blanco.valueobjectts.valueobject.BlancoValueObjectTsClassStructure;
-import blanco.valueobjectts.valueobject.BlancoValueObjectTsFieldStructure;
 
 import javax.xml.transform.TransformerException;
 import java.io.File;
@@ -799,6 +797,8 @@ public class BlancoRestGeneratorTsXml2SourceFile {
             // validation は後日実装予定
         }
 
+        buildMethodTelegramId(argTelegramStructure);
+
         if (toJson && this.isDefaultGenerateToJson()) {
             buildMethodToJSON(argTelegramStructure);
         }
@@ -1074,6 +1074,26 @@ public class BlancoRestGeneratorTsXml2SourceFile {
                 .add("return "
                         + "\"" + genericType + "\""
                         + BlancoCgLineUtil.getTerminator(fTargetLang));
+    }
+
+    private void buildMethodTelegramId(
+            final BlancoRestGeneratorTsTelegramStructure  argTelegramStructure
+    ) {
+        final BlancoCgMethod method = fCgFactory.createMethod("telegramId",
+                "この電文クラス名を文字列で返します。");
+        fCgClass.getMethodList().add(method);
+
+        method.setReturn(fCgFactory.createReturn("string",
+                "この電文のクラス名です"));
+        method.setNotnull(true);
+        /*
+         * 一応指定するが、Typescript では無効
+         */
+        method.setFinal(true);
+        method.setAccess("public");
+
+        final List<java.lang.String> listLine = method.getLineList();
+        listLine.add("return \"" + argTelegramStructure.getName() + "\";");
     }
 
     /**
