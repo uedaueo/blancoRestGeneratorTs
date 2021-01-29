@@ -1090,7 +1090,7 @@ public class BlancoRestGeneratorTsXml2SourceFile {
          * 一応指定するが、Typescript では無効
          */
         method.setFinal(true);
-        method.setAccess("public");
+        method.setAccess("get");
 
         final List<java.lang.String> listLine = method.getLineList();
         listLine.add("return \"" + argTelegramStructure.getName() + "\";");
