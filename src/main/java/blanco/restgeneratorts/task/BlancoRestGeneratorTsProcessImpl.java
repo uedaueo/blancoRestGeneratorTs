@@ -27,7 +27,7 @@ import java.util.List;
 public class BlancoRestGeneratorTsProcessImpl implements
         BlancoRestGeneratorTsProcess {
     /**
-     * このプロダクトのリソースバンドルへのアクセスオブジェクト。
+     * An access object to the resource bundle for this product.
      */
     private final BlancoRestGeneratorTsResourceBundle fBundle = new BlancoRestGeneratorTsResourceBundle();
 
@@ -46,7 +46,7 @@ public class BlancoRestGeneratorTsProcessImpl implements
             }
 
             /*
-             * 改行コードを決定します。
+             * Determines the newline code.
              */
             String LF = "\n";
             String CR = "\r";
@@ -78,20 +78,20 @@ public class BlancoRestGeneratorTsProcessImpl implements
             }
 
             /*
-             * targetdir, targetStyleの処理。
-             * 生成されたコードの保管場所を設定する。
+             * Processes targetdir and targetStyle.
+             * Sets the storage location for the generated code.
              * targetstyle = blanco:
-             *  targetdirの下に main ディレクトリを作成
+             *  Creates a main directory under targetdir.
              * targetstyle = maven:
-             *  targetdirの下に main/java ディレクトリを作成
+             *  Creates a main/java directory under targetdir.
              * targetstyle = free:
-             *  targetdirをそのまま使用してディレクトリを作成。
-             *  ただしtargetdirがからの場合はデフォルト文字列(blanco)使用する。
+             *  Creates a directory using targetdir as is.
+             *  However, the default string (blanco) is used if targetdir is empty.
              * by tueda, 2019/08/30
              */
             String strTarget = input.getTargetdir();
             String style = input.getTargetStyle();
-            // ここを通ったら常にtrue
+            // Always true when passing through here.
             boolean isTargetStyleAdvanced = true;
 
             if (style != null && BlancoRestGeneratorTsConstants.TARGET_STYLE_MAVEN.equals(style)) {
@@ -100,20 +100,19 @@ public class BlancoRestGeneratorTsProcessImpl implements
                     !BlancoRestGeneratorTsConstants.TARGET_STYLE_FREE.equals(style)) {
                 strTarget = strTarget + "/" + BlancoRestGeneratorTsConstants.TARGET_DIR_SUFFIX_BLANCO;
             }
-            /* style が free だったらtargetdirをそのまま使う */
+            /* Uses targetdir as is if style is free. */
             if (input.getVerbose()) {
                 System.out.println("BlancoRestGeneratorTsProcessImpl#process TARGETDIR = " + strTarget);
             }
 
             /*
-             * validator を作る時に使うために，
-             * ValueObject で既に定義されている（はずの）オブジェクトを取得しておく
+             * Gets an object that is already defined in ValueObject (supposed to be) to use when creating a validator.
              */
             BlancoRestGeneratorTsUtil.isVerbose = input.getVerbose();
             BlancoRestGeneratorTsUtil.processValueObjects(input);
 
             /*
-             * 電文定義ID（文字列）の一覧を保持するクラス名・ファイル名を取得
+             * Gets the class name and file name that holds the list of telegram definition IDs (strings).
              */
             String processListId = input.getProcesslist();
             boolean createProcessList = false;
@@ -122,17 +121,17 @@ public class BlancoRestGeneratorTsProcessImpl implements
                 createProcessList = true;
             }
 
-            // テンポラリディレクトリを作成。
+            // Creates a temporary directory.
             new File(input.getTmpdir()
                     + BlancoRestGeneratorTsConstants.TARGET_SUBDIRECTORY)
                     .mkdirs();
 
-            // 指定されたメタディレクトリを処理します。
+            // Processes the specified meta directory.
             new BlancoRestGeneratorTsMeta2Xml()
                     .processDirectory(fileMetadir, input.getTmpdir()
                             + BlancoRestGeneratorTsConstants.TARGET_SUBDIRECTORY);
 
-            // XML化された中間ファイルからソースコードを生成
+            // Generates source code from XML-ized intermediate files.
             final File[] fileMeta2 = new File(input.getTmpdir()
                     + BlancoRestGeneratorTsConstants.TARGET_SUBDIRECTORY)
                     .listFiles();
@@ -153,8 +152,7 @@ public class BlancoRestGeneratorTsProcessImpl implements
                 BlancoRestGeneratorTsTelegramProcessStructure[] processStructures =
                 xml2source.process(fileMeta2[index], new File(strTarget));
                 /*
-                 * processList の生成が指定されている場合は、
-                 * 自動生成した電文処理クラスの一覧を収集します。
+                 * If the generation of processList is specified, the list of auto-generated telegram processing class is collected.
                  */
                 for (int index2 = 0; createProcessList && index2 < processStructures.length; index2++) {
                     processStructureList.add(processStructures[index2]);
@@ -162,7 +160,7 @@ public class BlancoRestGeneratorTsProcessImpl implements
             }
 
             /*
-             * processList を生成します。
+             * Generates processList.
              */
             if (createProcessList && processStructureList.size() > 0) {
 
@@ -174,7 +172,7 @@ public class BlancoRestGeneratorTsProcessImpl implements
                 xml2source.setTabs(2);
                 xml2source.setVerbose(input.getVerbose());
                 /*
-                 * processList では toJSON メソッドは生成しません。
+                 * In processList, it does not generate toJSON method.
                  */
                 xml2source.setDefaultGenerateToJson(false);
                 xml2source.processProcessList(processStructureList, processListId, input.getProcesslistBase(), new File(strTarget));

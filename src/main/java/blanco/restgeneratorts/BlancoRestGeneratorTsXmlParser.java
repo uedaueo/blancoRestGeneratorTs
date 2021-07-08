@@ -18,7 +18,7 @@ import java.util.*;
 public class BlancoRestGeneratorTsXmlParser {
 
     /**
-     * このプロダクトのリソースバンドルへのアクセスオブジェクト。
+     * An access object to the resource bundle for this product.
      */
     private final BlancoRestGeneratorTsResourceBundle fBundle = new BlancoRestGeneratorTsResourceBundle();
 
@@ -40,11 +40,11 @@ public class BlancoRestGeneratorTsXmlParser {
     }
 
     /**
-     * 中間XMLファイルのXMLドキュメントをパースして、バリューオブジェクト情報の配列を取得します。
+     * Parses an XML document in an intermediate XML file to get an array of value object information.
      *
      * @param argMetaXmlSourceFile
-     *            中間XMLファイル。
-     * @return パースの結果得られたバリューオブジェクト情報の配列。
+     *            An intermediate XML file.
+     * @return An array of value object information obtained as a result of parsing.
      */
     public BlancoRestGeneratorTsTelegramProcessStructure[] parse(
             final File argMetaXmlSourceFile) {
@@ -55,18 +55,18 @@ public class BlancoRestGeneratorTsXmlParser {
             return null;
         }
 
-        // ルートエレメントを取得します。
+        // Gets the root element.
         final BlancoXmlElement elementRoot = BlancoXmlBindingUtil
                 .getDocumentElement(documentMeta);
         if (elementRoot == null) {
-            // ルートエレメントが無い場合には処理中断します。
+            // The process is aborted if there is no root element.
             if (this.isVerbose()) {
                 System.out.println("praser !!! NO ROOT ELEMENT !!!");
             }
             return null;
         }
 
-        // まず電文の一覧を取得します。
+        // First, it gets the list of telegrams.
         Map<String, BlancoRestGeneratorTsTelegramStructure> telegramStructureMap =
                 parseTelegrams(elementRoot);
 
@@ -77,7 +77,7 @@ public class BlancoRestGeneratorTsXmlParser {
             return null;
         }
 
-        // 次に電文処理を取得します。
+        // Then, it gets the telegram processing.
         return parseTelegramProcess(elementRoot,telegramStructureMap);
     }
 
@@ -87,7 +87,7 @@ public class BlancoRestGeneratorTsXmlParser {
         String listClassName = BlancoRestGeneratorTsUtil.getSimpleClassName(argProcessList);
 
         /*
-         * まず、すべての電文処理をimportするための情報を集めます
+         * First, it gathers the information to import all the telegram processing.
          */
         Map<String, List<String>> importHeaderList = new HashMap<>();
         for (BlancoRestGeneratorTsTelegramProcessStructure processStructure : argProcessStructures) {
@@ -98,13 +98,13 @@ public class BlancoRestGeneratorTsXmlParser {
         }
 
         /*
-         * 次に、 import 文を生成します。
+         * Then, it generates the import statement.
          */
         return this.parseHeaderList(null, importHeaderList);
     }
 
     /**
-     * 中間XMLファイル形式のXMLドキュメントをパースして、電文名で検索可能な電文情報の一覧を作成します。
+     * Parses an XML document in the form of an  intermediate XML file to create a list of telegram information that can be searched by telegram name.
      *
      * @param argElementRoot
      * @return
@@ -113,34 +113,33 @@ public class BlancoRestGeneratorTsXmlParser {
 
         Map <String, BlancoRestGeneratorTsTelegramStructure> telegramStructureMap = new HashMap<>();
 
-        // sheet(Excelシート)のリストを取得します。
+        // Gets a list of sheets (Excel sheets).
         final List<BlancoXmlElement> listSheet = BlancoXmlBindingUtil
                 .getElementsByTagName(argElementRoot, "sheet");
         final int sizeListSheet = listSheet.size();
         for (int index = 0; index < sizeListSheet; index++) {
-            // おのおののシートを処理します。
+            // Processes each sheet individually.
             final BlancoXmlElement elementSheet = (BlancoXmlElement) listSheet
                     .get(index);
 
             final Map<String, List<String>> importHeaderList = new HashMap<>();
-            // シートから詳細な情報を取得します。
+            // Gets detailed information from the sheet.
             final BlancoRestGeneratorTsTelegramStructure telegramStructure = parseTelegramSheet(elementSheet, importHeaderList);
 
-            // 電文情報を電文IDをキーにMapに格納する
+            // Stores the telegram information in a map with the telegram ID as the key.
             if (telegramStructure != null) {
                 telegramStructureMap.put(telegramStructure.getName(), telegramStructure);
             }
         }
         /**
-         *  InputとOutputが対になっているかのチェックは
-         *  TelegramProcessStructureへの格納時にを行う
+         *  Checking if Input and Output are paired is done when storing in the TelegramProcessStructure.
          */
         return telegramStructureMap;
     }
 
 
     /**
-     * 中間XMLファイル形式のXMLドキュメントをパースして、電文情報を取得します。
+     * Parses an XML document in the form of an  intermediate XML file to get telegram information.
      * @param argElementSheet
      * @param argImportHeaderList
      * @return
@@ -149,12 +148,12 @@ public class BlancoRestGeneratorTsXmlParser {
 
         final BlancoRestGeneratorTsTelegramStructure telegramStructure = new BlancoRestGeneratorTsTelegramStructure();
 
-        // 共通情報を取得します。
+        // Gets the common information.
         final BlancoXmlElement elementCommon = BlancoXmlBindingUtil
                 .getElement(argElementSheet, fBundle
                         .getMeta2xmlTelegramCommon());
         if (elementCommon == null) {
-            // commonが無い場合には、このシートの処理をスキップします。
+            // If there is no common, skips the processing of this sheet.
             // System.out.println("BlancoRestXmlSourceFile#process !!! NO COMMON !!!");
             return telegramStructure;
         }
@@ -162,7 +161,7 @@ public class BlancoRestGeneratorTsXmlParser {
         final String name = BlancoXmlBindingUtil.getTextContent(
                 elementCommon, "name");
         if (BlancoStringUtil.null2Blank(name).trim().length() == 0) {
-            // nameが空の場合には処理をスキップします。
+            // If name is empty, skips the process.
             // System.out.println("BlancoRestXmlSourceFile#process !!! NO NAME !!!");
             return telegramStructure;
         }
@@ -170,7 +169,7 @@ public class BlancoRestGeneratorTsXmlParser {
         final String httpMethod = BlancoXmlBindingUtil.getTextContent(
                 elementCommon, "telegramMethod");
         if (BlancoStringUtil.null2Blank(httpMethod).trim().length() == 0) {
-            // httpMethodが空の場合には処理をスキップします。
+            // If httpMethod is empty, skips the process.
             // System.out.println("BlancoRestXmlSourceFile#process !!! NO NAME !!!");
             return telegramStructure;
         }
@@ -179,13 +178,13 @@ public class BlancoRestGeneratorTsXmlParser {
             System.out.println("BlancoRestGeneratorTsXmlParser#parseTelegramSheet name = " + name);
         }
 
-        // 電文定義・共通
+        // TelegramDefinition common
         this.parseTelegramCommon(elementCommon, telegramStructure);
 
-        // 電文定義・継承
+        // TelegramDefinition inheritance
         this.parseTelegramExtends(argImportHeaderList, telegramStructure);
 
-        // 電文定義・実装
+        // TelegramDefinition implementation
         final List<BlancoXmlElement> interfaceList = BlancoXmlBindingUtil
                 .getElementsByTagName(argElementSheet,
                         fBundle.getMeta2xmlTelegramImplements());
@@ -194,7 +193,7 @@ public class BlancoRestGeneratorTsXmlParser {
             this.parseTelegramImplements(elementInterfaceRoot, argImportHeaderList, telegramStructure);
         }
 
-        // 一覧情報を取得します。
+        // Gets the list information.
         final List<BlancoXmlElement> listList = BlancoXmlBindingUtil
                 .getElementsByTagName(argElementSheet, fBundle.getMeta2xmlTeregramList());
         if (listList != null && listList.size() != 0) {
@@ -202,7 +201,7 @@ public class BlancoRestGeneratorTsXmlParser {
             this.parseTelegramFields(elementListRoot, argImportHeaderList, telegramStructure);
         }
 
-        // ヘッダ情報を取得します。
+        // Gets the header information.
         final List<BlancoXmlElement> headerElementList = BlancoXmlBindingUtil
                 .getElementsByTagName(argElementSheet,
                         fBundle.getMeta2xmlTelegramHeader());
@@ -215,20 +214,20 @@ public class BlancoRestGeneratorTsXmlParser {
     }
 
     /**
-     * 中間XMLファイル形式のXMLドキュメントをパースして、「電文定義・共通」を取得します。
+     * Parses an XML document in the form of an  intermediate XML file to get "TelegramDefinition common".
      *
      * @param argElementCommon
      * @param argTelegramStructure
      */
     private void parseTelegramCommon(final BlancoXmlElement argElementCommon, final BlancoRestGeneratorTsTelegramStructure argTelegramStructure) {
 
-        // 電文ID
+        // Telegram ID
         argTelegramStructure.setName(BlancoXmlBindingUtil.getTextContent(
                 argElementCommon, "name"));
-        // パッケージ
+        // Package
         argTelegramStructure.setPackage(BlancoXmlBindingUtil.getTextContent(
                 argElementCommon, "package"));
-        // 説明
+        // Description
         argTelegramStructure.setDescription(BlancoXmlBindingUtil.getTextContent(argElementCommon, "description"));
         if (BlancoStringUtil.null2Blank(argTelegramStructure.getDescription())
                 .length() > 0) {
@@ -238,20 +237,20 @@ public class BlancoRestGeneratorTsXmlParser {
                 if (index == 0) {
                     argTelegramStructure.setDescription(lines[index]);
                 } else {
-                    // 複数行の description については、これを分割して格納します。
-                    // ２行目からは、適切に文字参照エンコーディングが実施されているものと仮定します。
+                    // For a multi-line description, it will be split and stored.
+                    // From the second line, it is assumed that character reference encoding has been properly implemented.
                     argTelegramStructure.getDescriptionList().add(lines[index]);
                 }
             }
         }
 
-        // 電文種類 Input/Output
+        // Telegram type (Input/Output)
         argTelegramStructure.setTelegramType(BlancoXmlBindingUtil.getTextContent(argElementCommon, "type"));
-        // HTTP メソッド
+        // HTTP method
         argTelegramStructure.setTelegramMethod(BlancoXmlBindingUtil.getTextContent(argElementCommon, "telegramMethod"));
         argTelegramStructure.setBasedir(BlancoXmlBindingUtil.getTextContent(argElementCommon, "basedir"));
 
-        /* クラスの annotation に対応 */
+        /* Supports for class annotation. */
         String classAnnotation = BlancoXmlBindingUtil.getTextContent(
                 argElementCommon, "annotation");
         if (BlancoStringUtil.null2Blank(classAnnotation).length() > 0) {
@@ -266,9 +265,7 @@ public class BlancoRestGeneratorTsXmlParser {
     }
 
     /**
-     * blancoRestGenerator では、電文は常に
-     * Api[Get|Post|Put|Delete]Telegram <- ApiTelegram
-     * を継承します。
+     * In blancoRestGenerator, a telegram always inherits from Api[Get|Post|Put|Delete]Telegram <- ApiTelegram.
      *
      * @param argImportHeaderList
      * @param argTelegramStructure
@@ -277,7 +274,7 @@ public class BlancoRestGeneratorTsXmlParser {
             final Map<String, List<String>> argImportHeaderList,
             final BlancoRestGeneratorTsTelegramStructure argTelegramStructure) {
 
-        // method の NULL check は common で済み
+        // Null in a method is already checked in common.
         String method = argTelegramStructure.getTelegramMethod().toUpperCase();
         boolean isRequest = "Input".equals(argTelegramStructure.getTelegramType());
         String superClassId = "";
@@ -301,7 +298,7 @@ public class BlancoRestGeneratorTsXmlParser {
             throw new IllegalArgumentException("!!! NO SUCH METHOD !!! " + method);
         }
         /*
-         * このクラスのパッケージ名を探す
+         * Searches for the package name for this class.
          */
         String packageName = null;
         BlancoValueObjectTsClassStructure voStructure = BlancoRestGeneratorTsUtil.objects.get(superClassId);
@@ -318,7 +315,7 @@ public class BlancoRestGeneratorTsXmlParser {
         argTelegramStructure.setExtends(superClassIdCanon);
 
         /*
-         * TypeScript 用 import 情報の作成
+         * Creates import information for TypeScript.
          */
         if (argTelegramStructure.getCreateImportList()) {
             BlancoRestGeneratorTsUtil.makeImportHeaderList(packageName, superClassId, argImportHeaderList, argTelegramStructure.getBasedir(), argTelegramStructure.getPackage());
@@ -326,7 +323,7 @@ public class BlancoRestGeneratorTsXmlParser {
     }
 
     /**
-     * 中間XMLファイル形式のXMLドキュメントをパースして、「電文定義・実装」を取得します。
+     * Parses an XML document in the form of an  intermediate XML file to get "TelegramDefinition implementation".
      *  @param argElementInterfaceRoot
      * @param argImportHeaderList
      * @param argTelegramStructure
@@ -355,14 +352,14 @@ public class BlancoRestGeneratorTsXmlParser {
                     BlancoXmlBindingUtil
                             .getTextContent(elementList, "name"));
             /*
-             * TypeScript 用 import 情報の作成
+             * Creates import information for TypeScript.
              */
             if (argTelegramStructure.getCreateImportList()) {
                 String packageName = BlancoRestGeneratorTsUtil.getPackageName(interfaceName);
                 String className = BlancoRestGeneratorTsUtil.getSimpleClassName(interfaceName);
                 if (packageName.length() == 0) {
                     /*
-                     * このクラスのパッケージ名を探す
+                     * Searches for the package name for this class.
                      */
                     BlancoValueObjectTsClassStructure voStructure = BlancoRestGeneratorTsUtil.objects.get(className);
                     if (voStructure != null) {
@@ -375,7 +372,7 @@ public class BlancoRestGeneratorTsXmlParser {
     }
 
     /**
-     * 中間XMLファイル形式のXMLドキュメントをパースして、「電文定義・一覧」を取得します。
+     * Parses an XML document in the form of an  intermediate XML file to get "TelegramDefinition list".
      *  @param argElementListRoot
      * @param argImportHeaderList
      * @param argTelegramStructure
@@ -406,8 +403,8 @@ public class BlancoRestGeneratorTsXmlParser {
             }
 
             /*
-             * 型の取得。定義書にはphp風な型が定義されている前提。
-             * ここで TypeScript 風の型名に変えておく
+             * Gets the type. The definition document assumes that PHP-like types are defined.
+             * Changes the type name to TypeScript-style here.
              */
             String phpType = BlancoXmlBindingUtil.getTextContent(elementList, "fieldType");
             String targetType = phpType;
@@ -435,14 +432,14 @@ public class BlancoRestGeneratorTsXmlParser {
             if ("object".equalsIgnoreCase(phpType)) {
                 targetType = "any";
             } else {
-                /* この名前の package を探す */
+                /* Searches for a package with this name. */
                 BlancoValueObjectTsClassStructure voStructure = BlancoRestGeneratorTsUtil.objects.get(phpType);
                 String packageName = null;
                 if (voStructure != null) {
                     packageName = voStructure.getPackage();
                 }
                 if (packageName == null) {
-                    // package 名の分離を試みる
+                    // Tries to isolate the package name.
                     String simpleName = BlancoRestGeneratorTsUtil.getSimpleClassName(phpType);
                     if (simpleName != null && !simpleName.equals(phpType)) {
                         packageName = BlancoRestGeneratorTsUtil.getPackageName(phpType);
@@ -453,11 +450,11 @@ public class BlancoRestGeneratorTsXmlParser {
                     targetType = packageName + "." + phpType;
                 }
 
-                /* その他はそのまま記述する */
+                /* Others are written as is. */
 //                System.out.println("/* tueda */ Unknown php type: " + targetType);
 
                 /*
-                 * TypeScript 用 import 情報の作成
+                 * Creates import information for TypeScript.
                  */
                 if (argTelegramStructure.getCreateImportList()) {
                     BlancoRestGeneratorTsUtil.makeImportHeaderList(packageName, phpType, argImportHeaderList, argTelegramStructure.getBasedir(), argTelegramStructure.getPackage());
@@ -466,7 +463,7 @@ public class BlancoRestGeneratorTsXmlParser {
 
             fieldStructure.setType(targetType);
 
-            /* Generic に対応 */
+            /* Supports for Generic. */
             String phpGeneric = BlancoXmlBindingUtil.getTextContent(elementList, "fieldGeneric");
             if (BlancoStringUtil.null2Blank(phpGeneric).length() != 0) {
                 String targetGeneric = phpGeneric;
@@ -494,14 +491,14 @@ public class BlancoRestGeneratorTsXmlParser {
                     if ("object".equalsIgnoreCase(phpGeneric)) {
                         targetGeneric = "any";
                     } else {
-                        /* この名前の package を探す */
+                        /* Searches for a package with this name. */
                         BlancoValueObjectTsClassStructure voStructure = BlancoRestGeneratorTsUtil.objects.get(phpGeneric);
                         String packageName = null;
                         if (voStructure != null) {
                             packageName = voStructure.getPackage();
                         }
                         if (packageName == null) {
-                            // package 名の分離を試みる
+                            // Tries to isolate the package name.
                             String simpleName = BlancoRestGeneratorTsUtil.getSimpleClassName(phpGeneric);
                             if (simpleName != null && !simpleName.equals(phpGeneric)) {
                                 packageName = BlancoRestGeneratorTsUtil.getPackageName(phpGeneric);
@@ -512,11 +509,11 @@ public class BlancoRestGeneratorTsXmlParser {
                             targetGeneric = packageName + "." + phpGeneric;
                         }
 
-                        /* その他はそのまま記述する */
+                        /* Others are written as is. */
 //                        System.out.println("/* tueda */ Unknown php type: " + targetGeneric);
 
                         /*
-                         * TypeScript 用 import 情報の作成
+                         * Creates import information for TypeScript.
                          */
                         if (argTelegramStructure.getCreateImportList()) {
                             BlancoRestGeneratorTsUtil.makeImportHeaderList(packageName, phpGeneric, argImportHeaderList, argTelegramStructure.getBasedir(), argTelegramStructure.getPackage());
@@ -527,7 +524,7 @@ public class BlancoRestGeneratorTsXmlParser {
                 fieldStructure.setType(targetType);
             }
 
-            /* method の annnotation に対応 */
+            /* Supports for annotation of method. */
             String methodAnnotation = BlancoXmlBindingUtil.getTextContent(elementList, "annotation");
             if (BlancoStringUtil.null2Blank(methodAnnotation).length() != 0) {
                 String [] annotations = methodAnnotation.split("\\\\\\\\");
@@ -536,15 +533,15 @@ public class BlancoRestGeneratorTsXmlParser {
                 fieldStructure.setAnnotationList(annotationList);
             }
 
-            // Nullable に対応
+            // Supports for Nullable.
             fieldStructure.setNullable("true".equals(BlancoXmlBindingUtil
                     .getTextContent(elementList, "nullable")));
 
-            // toJSON に対応
+            // Supports for toJSON.
             fieldStructure.setExcludeToJson("true".equals(BlancoXmlBindingUtil
                     .getTextContent(elementList, "excludeToJSON")));
 
-            // 説明
+            // Description
             fieldStructure.setDescription(BlancoXmlBindingUtil
                     .getTextContent(elementList, "fieldDescription"));
             final String[] lines = BlancoNameUtil.splitString(
@@ -553,17 +550,17 @@ public class BlancoRestGeneratorTsXmlParser {
                 if (indexLine == 0) {
                     fieldStructure.setDescription(lines[indexLine]);
                 } else {
-                    // 複数行の description については、これを分割して格納します。
-                    // ２行目からは、適切に文字参照エンコーディングが実施されているものと仮定します。
+                    // For a multi-line description, it will be split and stored.
+                    // From the second line, assumes that character reference encoding has been properly implemented.   
                     fieldStructure.getDescriptionList().add(
                             lines[indexLine]);
                 }
             }
 
-            // デフォルト
+            // Default
             fieldStructure.setDefault(BlancoXmlBindingUtil.getTextContent(
                     elementList, "default"));
-            // 長さ
+            // Length
             String strMinLength = BlancoXmlBindingUtil
                     .getTextContent(elementList, "minLength");
             if (strMinLength != null) {
@@ -586,12 +583,12 @@ public class BlancoRestGeneratorTsXmlParser {
                 }
             }
 
-            // 最大最小
+            // Maximum and minimum
             fieldStructure.setMinInclusive(BlancoXmlBindingUtil
                     .getTextContent(elementList, "minInclusive"));
             fieldStructure.setMaxInclusive(BlancoXmlBindingUtil
                     .getTextContent(elementList, "maxInclusive"));
-            // 正規表現
+            // Regular expression
             fieldStructure.setPattern(BlancoXmlBindingUtil.getTextContent(
                     elementList, "pattern"));
 
@@ -619,8 +616,8 @@ public class BlancoRestGeneratorTsXmlParser {
         List<String> headerList = new ArrayList<>();
 
         /*
-         * header の一覧作成
-         * まず、定義書に書かれたものをそのまま出力します。
+         * Creates a list of header.
+         * First, outputs what is written in the definition as it is.
          */
         if (argHeaderElementList != null && argHeaderElementList.size() > 0) {
             final BlancoXmlElement elementHeaderRoot = argHeaderElementList.get(0);
@@ -645,11 +642,11 @@ public class BlancoRestGeneratorTsXmlParser {
         }
 
         /*
-         * 次に、自動生成されたものを出力します。
-         * 現在の方式だと、以下の前提が必要。
-         *  * 1ファイルに1クラスの定義
-         *  * 定義シートでは Java/kotlin 式の package 表記でディレクトリを表現
-         * TODO: 定義シート上にファイルの配置ディレクトリを定義できるようにすべし？
+         * Next, outputs the auto-generated one.
+         * The current method requires the following assumptions.
+         *  * One class definition per file
+         *  * Represents directories with Java/Kotlin style package notation in the definition sheet
+         * TODO: Should it be possible to define the directory where the files are located on the definition sheet?
          */
         if (argImportHeaderList != null && argImportHeaderList.size() > 0) {
             Set<String> fromList = argImportHeaderList.keySet();
@@ -679,11 +676,11 @@ public class BlancoRestGeneratorTsXmlParser {
     }
 
     /**
-     * 中間XMLファイル形式のXMLドキュメントをパースして、バリューオブジェクト情報の配列を取得します。
+     * Parses an XML document in the form of an  intermediate XML file to get an array of value object information.
      *
      * @param argElementRoot
-     *            中間XMLファイルのXMLドキュメント。
-     * @return パースの結果得られたバリューオブジェクト情報の配列。
+     *            An intermediate XML file.
+     * @return An array of value object information obtained as a result of parsing.
      */
     public BlancoRestGeneratorTsTelegramProcessStructure[] parseTelegramProcess(
             final BlancoXmlElement argElementRoot,
@@ -691,17 +688,17 @@ public class BlancoRestGeneratorTsXmlParser {
 
         final List<BlancoRestGeneratorTsTelegramProcessStructure> processStructures = new ArrayList<>();
 
-        // sheet(Excelシート)のリストを取得します。
+        // Gets a list of sheets (Excel sheets).
         final List<BlancoXmlElement> listSheet = BlancoXmlBindingUtil
                 .getElementsByTagName(argElementRoot, "sheet");
         final int sizeListSheet = listSheet.size();
         for (int index = 0; index < sizeListSheet; index++) {
-            // おのおののシートを処理します。
+            // Processes each sheet individually.
             final BlancoXmlElement elementSheet = (BlancoXmlElement) listSheet
                     .get(index);
 
             final Map<String, List<String>> importHeaderList = new HashMap<>();
-            // シートから詳細な情報を取得します。
+            // Gets detailed information from the sheet.
             final BlancoRestGeneratorTsTelegramProcessStructure structure =
                     parseProcessSheet(elementSheet, importHeaderList, argTelegramStructureMap);
 
@@ -728,12 +725,12 @@ public class BlancoRestGeneratorTsXmlParser {
             final Map <String, BlancoRestGeneratorTsTelegramStructure> argTelegramStructureMap) {
         BlancoRestGeneratorTsTelegramProcessStructure processStructure = new BlancoRestGeneratorTsTelegramProcessStructure();
 
-        // 共通情報を取得します。
+        // Gets the common information.
         final BlancoXmlElement elementCommon = BlancoXmlBindingUtil
                 .getElement(argElementSheet, fBundle
                         .getMeta2xmlProcessCommon());
         if (elementCommon == null) {
-            // commonが無い場合には、このシートの処理をスキップします。
+            // If there is no common, skips the processing of this sheet.
             // System.out.println("BlancoRestXmlSourceFile#processTelegramProcess !!! NO COMMON !!!");
             return null;
         }
@@ -742,7 +739,7 @@ public class BlancoRestGeneratorTsXmlParser {
                 elementCommon, "name");
 
         if (BlancoStringUtil.null2Blank(name).trim().length() == 0) {
-            // nameが空の場合には処理をスキップします。
+            // If name is empty, skips the process.
             // System.out.println("BlancoRestXmlSourceFile#processTelegramProcess !!! NO NAME !!!");
             return null;
         }
@@ -756,10 +753,10 @@ public class BlancoRestGeneratorTsXmlParser {
             System.out.println("BlancoRestGeneratorTsXmlParser#parseProcessSheet name = " + name);
         }
 
-        // 電文処理定義・共通
+        // TelegramProcessDefinition common
         parseProcessCommon(elementCommon, processStructure);
 
-        // 電文処理定義・継承
+        // TelegramProcessDefinition inheritance
         final List<BlancoXmlElement> extendsList = BlancoXmlBindingUtil
                 .getElementsByTagName(argElementSheet, fBundle.getMeta2xmlProcessExtends());
         if (extendsList != null && extendsList.size() != 0) {
@@ -767,10 +764,10 @@ public class BlancoRestGeneratorTsXmlParser {
             parseProcessExtends(elementExtendsRoot, argImportHeaderList, processStructure);
         }
 
-        // ApiTelegramをHeaderListに追加
+        // Adds ApiTelegram to HeaderList.
         this.addApiTelegramToHeaderList(argImportHeaderList, processStructure);
 
-        // 電文処理定義・実装
+        // TelegramProcessDefinition implementation.
         final List<BlancoXmlElement> interfaceList = BlancoXmlBindingUtil
                 .getElementsByTagName(argElementSheet, fBundle.getMeta2xmlProcessImplements());
         if (interfaceList != null && interfaceList.size() != 0) {
@@ -778,20 +775,20 @@ public class BlancoRestGeneratorTsXmlParser {
             parseProcessImplements(elementInterfaceRoot, argImportHeaderList, processStructure);
         }
 
-        // TypeScript では import 欄は無視します
+        // import field is ignored in TypeScript.
 
         /*
-         * 電文書IDから電文IDを決定し、定義されているもののみをprocessStructureに設定します。
-         * 電文IDは以下のルールで決定されます。
-         * <電文処理ID> + <Method> + <Request|Response>
+         * Determines the telegram ID from telegram process ID, and sets only the defined one to processStructure.
+         * The telegram ID is determined by the following rule.
+         * <Telegram process ID> + <Method> + <Request|Response>
          */
         if (!this.linkTelegramToProcess(processStructure.getName(), argTelegramStructureMap, processStructure, argImportHeaderList)) {
-            /* 電文が未定義またはInとOutが揃っていない */
+            /* The telegram is undefined or In and Out are not aligned. */
             System.out.println("!!! Invalid Telegram !!! for " + processStructure.getName());
             return null;
         }
 
-        // ヘッダ情報を取得します。
+        // Gets the header information.
         final List<BlancoXmlElement> headerElementList = BlancoXmlBindingUtil
                 .getElementsByTagName(argElementSheet,
                         fBundle.getMeta2xmlProcessHeader());
@@ -804,7 +801,7 @@ public class BlancoRestGeneratorTsXmlParser {
     }
 
     /**
-     * 中間XMLファイル形式のXMLドキュメントをパースして、「電文定義・共通」を取得します。
+     * Parses an XML document in the form of an  intermediate XML file to get "TelegramDefinition common".
      *
      * @param argElementCommon
      * @param argProcessStructure
@@ -812,10 +809,10 @@ public class BlancoRestGeneratorTsXmlParser {
     private void parseProcessCommon(final BlancoXmlElement argElementCommon, final BlancoRestGeneratorTsTelegramProcessStructure argProcessStructure) {
 
 
-        // 電文処理ID
+        // Telegram process ID
         argProcessStructure.setName(BlancoXmlBindingUtil.getTextContent(
                 argElementCommon, "name"));
-        // 説明
+        // Description
         argProcessStructure.setDescription(BlancoXmlBindingUtil.getTextContent(
                 argElementCommon, "description"));
         if (BlancoStringUtil.null2Blank(argProcessStructure.getDescription())
@@ -826,30 +823,30 @@ public class BlancoRestGeneratorTsXmlParser {
                 if (index == 0) {
                     argProcessStructure.setDescription(lines[index]);
                 } else {
-                    // 複数行の description については、これを分割して格納します。
-                    // ２行目からは、適切に文字参照エンコーディングが実施されているものと仮定します。
+                    // For a multi-line description, it will be split and stored.
+                    // From the second line, assumes that character reference encoding has been properly implemented.   
                     argProcessStructure.getDescriptionList().add(lines[index]);
                 }
             }
         }
 
-        // WebサービスID
+        // Web service ID
         argProcessStructure.setServiceId(BlancoXmlBindingUtil.getTextContent(
                 argElementCommon, "webServiceId"));
 
-        // ロケーション
+        // Location
         argProcessStructure.setLocation(BlancoXmlBindingUtil.getTextContent(
                 argElementCommon, "location"));
 
-        // パッケージ
+        // Package
         argProcessStructure.setPackage(BlancoXmlBindingUtil.getTextContent(
                 argElementCommon, "package"));
 
-        // 配置ディレクトリ
+        // Base directory
         argProcessStructure.setBasedir(BlancoXmlBindingUtil.getTextContent(
                 argElementCommon, "basedir"));
 
-        // アノテーション
+        // Annotation
         String classAnnotation = BlancoXmlBindingUtil.getTextContent(
                 argElementCommon, "annotation");
         if (BlancoStringUtil.null2Blank(classAnnotation).length() > 0) {
@@ -858,19 +855,19 @@ public class BlancoRestGeneratorTsXmlParser {
             argProcessStructure.setAnnotationList(annotationList);
         }
 
-        // 認証が不要なAPI
+        // API that do not require authentication
         argProcessStructure.setNoAuthentication("true"
                 .equals(BlancoXmlBindingUtil.getTextContent(argElementCommon,
                         "noAuthentication")));
 
-        // import 文の自動生成
+        // Auto-generation of import statements
         argProcessStructure.setCreateImportList("true"
                 .equals(BlancoXmlBindingUtil.getTextContent(argElementCommon,
                         "createImportList")));
     }
 
     /**
-     * 中間XMLファイル形式のXMLドキュメントをパースして、「電文定義・継承」を取得します。
+     * Parses an XML document in the form of an  intermediate XML file to get "TelegramDefinition inheritance".
      * @param argElementExtendsRoot
      * @param argImportHeaderList
      * @param argProcessStructure
@@ -886,7 +883,7 @@ public class BlancoRestGeneratorTsXmlParser {
             String packageName = BlancoXmlBindingUtil.getTextContent(argElementExtendsRoot, "package");
             if (packageName == null) {
                 /*
-                 * このクラスのパッケージ名を探す
+                 * Searches for the package name for this name.
                  */
                 BlancoValueObjectTsClassStructure voStructure = BlancoRestGeneratorTsUtil.objects.get(className);
                 if (voStructure != null) {
@@ -902,7 +899,7 @@ public class BlancoRestGeneratorTsXmlParser {
             argProcessStructure.setExtends(classNameCanon);
 
             /*
-             * TypeScript 用 import 情報の作成
+             * Creates import information for TypeScript.
              */
             if (argProcessStructure.getCreateImportList()) {
                 BlancoRestGeneratorTsUtil.makeImportHeaderList(packageName, className, argImportHeaderList, argProcessStructure.getBasedir(), argProcessStructure.getPackage());
@@ -913,7 +910,7 @@ public class BlancoRestGeneratorTsXmlParser {
     }
 
     /**
-     * ApiTelegramをHeaderListに追加する
+     * Adds ApiTelegram to HeaderList.
      * @param argImportHeaderList
      * @param argProcessStructure
      */
@@ -923,7 +920,7 @@ public class BlancoRestGeneratorTsXmlParser {
         String superClassId = BlancoRestGeneratorTsConstants.API_TELEGRAM_BASE;
 
         /*
-         * このクラスのパッケージ名を探す
+         * Searches for the package name for this name.
          */
         String packageName = null;
         BlancoValueObjectTsClassStructure voStructure = BlancoRestGeneratorTsUtil.objects.get(superClassId);
@@ -944,7 +941,7 @@ public class BlancoRestGeneratorTsXmlParser {
     }
 
     /**
-     * 中間XMLファイル形式のXMLドキュメントをパースして、「電文定義・実装」を取得します。
+     * Parses an XML document in the form of an  intermediate XML file to get "TelegramDefinition implementation".
      *  @param argElementInterfaceRoot
      * @param argImportHeaderList
      * @param argProcessStructure
@@ -973,14 +970,14 @@ public class BlancoRestGeneratorTsXmlParser {
                     BlancoXmlBindingUtil
                             .getTextContent(elementList, "name"));
             /*
-             * TypeScript 用 import 情報の作成
+             * Creates import information for TypeScript.
              */
             if (argProcessStructure.getCreateImportList()) {
                 String packageName = BlancoRestGeneratorTsUtil.getPackageName(interfaceName);
                 String className = BlancoRestGeneratorTsUtil.getSimpleClassName(interfaceName);
                 if (packageName.length() == 0) {
                     /*
-                     * このクラスのパッケージ名を探す
+                     * Searches for the package name for this name.
                      */
                     BlancoValueObjectTsClassStructure voStructure = BlancoRestGeneratorTsUtil.objects.get(className);
                     if (voStructure != null) {
@@ -993,9 +990,9 @@ public class BlancoRestGeneratorTsXmlParser {
     }
 
     /**
-     * 電文書IDから電文IDを決定し、定義されているもののみをprocessStructureに設定します。
-     * 電文IDは以下のルールで決定されます。
-     * <電文処理ID> + <Method> + <Request|Response>
+     * Determines the telegram ID from telegram process ID, and sets only the defined one to processStructure.
+     * The telegram ID is determined by the following rule.
+     * <Telegram process ID> + <Method> + <Request|Response>
      *
      * @param argProcessId
      * @param argTelegramStructureMap
@@ -1037,9 +1034,9 @@ public class BlancoRestGeneratorTsXmlParser {
 
             if (argProcessStructure.getCreateImportList() && this.isCreateServiceMethod()) {
                 /*
-                 * デフォルト電文クラスのimport情報を生成する
+                 * Creates import information for the default telegram class.
                  */
-                // 要求
+                // Request
                 String defaultTelegramId = BlancoRestGeneratorTsUtil.getDefaultRequestTelegramId(method);
                 String defaultTelegramPackage = null;
                 BlancoValueObjectTsClassStructure voStructure = BlancoRestGeneratorTsUtil.objects.get(defaultTelegramId);
@@ -1047,7 +1044,7 @@ public class BlancoRestGeneratorTsXmlParser {
                     defaultTelegramPackage = voStructure.getPackage();
                 }
                 BlancoRestGeneratorTsUtil.makeImportHeaderList(defaultTelegramPackage, defaultTelegramId, argImportHeaderList, argProcessStructure.getBasedir(), argProcessStructure.getPackage());
-                // 応答
+                // Response
                 defaultTelegramId = BlancoRestGeneratorTsUtil.getDefaultResponseTelegramId(method);
                 defaultTelegramPackage = null;
                 voStructure = BlancoRestGeneratorTsUtil.objects.get(defaultTelegramId);
@@ -1061,14 +1058,14 @@ public class BlancoRestGeneratorTsXmlParser {
                 continue;
             }
             if (telegrams.size() != 2) {
-                /* In と Out が揃っていない */
+                /* In and Out are not aligned. */
                 return false;
             }
             argProcessStructure.getListTelegrams().put(methodKey, telegrams);
             found = true;
 
             /*
-             * TypeScript 用 import 情報の作成
+             * Creates import information for TypeScript.
              */
             if (argProcessStructure.getCreateImportList() && this.isCreateServiceMethod()) {
                 Set<String> kinds = telegrams.keySet();

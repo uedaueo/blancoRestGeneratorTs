@@ -28,9 +28,9 @@ import java.io.IOException;
 import java.util.*;
 
 /**
- * 「メッセージ定義書」Excel様式からメッセージを処理するクラス・ソースコードを生成。
+ * Generates class source code to process messages from "Message Definition" Excel format.
  *
- * このクラスは、中間XMLファイルからソースコードを自動生成する機能を担います。
+ * This class is responsible for auto-generating source code from intermediate XML files.
  *
  * @author IGA Tosiki
  * @author tueda
@@ -70,17 +70,17 @@ public class BlancoRestGeneratorTsXml2SourceFile {
     }
 
     /**
-     * このプロダクトのリソースバンドルへのアクセスオブジェクト。
+     * An access object to the resource bundle for this product.
      */
     private final BlancoRestGeneratorTsResourceBundle fBundle = new BlancoRestGeneratorTsResourceBundle();
 
     /**
-     * 出力対象となるプログラミング言語。
+     * Target programming language.
      */
     private int fTargetLang = BlancoCgSupportedLang.TS;
 
     /**
-     * 入力シートに期待するプログラミング言語
+     * A programming language expected for the input sheet.
      */
     private int fSheetLang = BlancoCgSupportedLang.JAVA;
 
@@ -89,7 +89,7 @@ public class BlancoRestGeneratorTsXml2SourceFile {
     }
 
     /**
-     * ソースコード生成先ディレクトリのスタイル
+     * Style of the source code generation destination directory
      */
     private boolean fTargetStyleAdvanced = false;
     public void setTargetStyleAdvanced(boolean argTargetStyleAdvanced) {
@@ -100,42 +100,42 @@ public class BlancoRestGeneratorTsXml2SourceFile {
     }
 
     /**
-     * 内部的に利用するblancoCg用ファクトリ。
+     * A factory for blancoCg to be used internally.
      */
     private BlancoCgObjectFactory fCgFactory = null;
 
     /**
-     * 内部的に利用するblancoCg用ソースファイル情報。
+     * Source file information for blancoCg to be used internally.
      */
     private BlancoCgSourceFile fCgSourceFile = null;
 
     /**
-     * 内部的に利用するblancoCg用クラス情報。
+     * Class information for blancoCg to be used internally.
      */
     private BlancoCgClass fCgClass = null;
 
     /**
-     * 内部的に利用するblancoCg用インタフェイス情報。
+     * Interface information for blancoCg to be used internally.
      */
     private BlancoCgInterface fCgInterface = null;
 
     /**
-     * フィールド名やメソッド名の名前変形を行うかどうか。
+     * Whether to perform name transformation for field and method names.
      *
      */
     private boolean fNameAdjust = true;
 
     /**
-     * 要求電文のベースクラス
+     * Base class for request telegrams.
      */
     private String inputTelegramBase = null;
     /**
-     * 応答電文のベースクラス
+     * Base class for response telegrams.
      */
     private String outputTelegramBase = null;
 
     /**
-     * 自動生成するソースファイルの文字エンコーディング。
+     * Character encoding of auto-generated source files.
      */
     private String fEncoding = null;
 
@@ -144,14 +144,14 @@ public class BlancoRestGeneratorTsXml2SourceFile {
     }
 
     /**
-     * 中間XMLファイルからソースコードを自動生成します。
+     * Auto-generates source code from intermediate XML files.
      *
      * @param argMetaXmlSourceFile
-     *            メタ情報が含まれているXMLファイル。
+     *            An XML file that contains meta-information.
      * @param argDirectoryTarget
-     *            ソースコード生成先ディレクトリ (/mainを除く部分を指定します)。
+     *            Output directory of the generated source code (specify the part excluding /main).
      * @throws IOException
-     *             入出力例外が発生した場合。
+     *             If an I/O exception occurs.
      */
     public BlancoRestGeneratorTsTelegramProcessStructure[] process(final File argMetaXmlSourceFile,
                         final File argDirectoryTarget)
@@ -161,7 +161,7 @@ public class BlancoRestGeneratorTsXml2SourceFile {
             System.out.println("BlancoRestGeneratorTsXml2SourceFile#process file = " + argMetaXmlSourceFile.getName());
         }
 
-        fNameAdjust = true; // BlancoRestGenerator では常にフィールド名を変形します。
+        fNameAdjust = true; // In BlancoRestGenerator, it always transforms the field name.
 
         BlancoRestGeneratorTsXmlParser parser = new BlancoRestGeneratorTsXmlParser();
         parser.setVerbose(this.isVerbose());
@@ -176,7 +176,7 @@ public class BlancoRestGeneratorTsXml2SourceFile {
 
         for (int index = 0; index < processStructures.length; index++) {
             BlancoRestGeneratorTsTelegramProcessStructure processStructure = processStructures[index];
-            // 得られた情報から TypeScript コードを生成します。
+            // Generates TypeScript code from the obtained information.
             generate(processStructure, argDirectoryTarget);
         }
         return processStructures;
@@ -184,23 +184,23 @@ public class BlancoRestGeneratorTsXml2SourceFile {
 
     private void generate(final BlancoRestGeneratorTsTelegramProcessStructure argProcessStructure, final File argDirectoryTarget) {
 
-        // まず電文を生成します。
-        Set<String> methodKeys = argProcessStructure.getListTelegrams().keySet(); // parse 時点で check しているので null はないはず
+        // FIrst, generates a telegram.
+        Set<String> methodKeys = argProcessStructure.getListTelegrams().keySet(); // It should not be null because it is checked at time of parse.
         for (String methodKey : methodKeys) {
             HashMap<String, BlancoRestGeneratorTsTelegramStructure> kindMap =
                     argProcessStructure.getListTelegrams().get(methodKey);
-            Set<String> kindKeys = kindMap.keySet(); // parse 時点で check しているので null はないはず
+            Set<String> kindKeys = kindMap.keySet(); // It should not be null because it is checked at time of parse.
             for (String kindKey : kindKeys) {
                 generateTelegram(kindMap.get(kindKey), argDirectoryTarget);
             }
         }
 
-        // 次に電文処理を生成します。
+        // Next, it generates the telegram processing.
         generateTelegramProcess(argProcessStructure, argDirectoryTarget);
     }
 
     /**
-     * 電文処理クラスを生成します。
+     * Generates a telegram processing class.
      * @param argProcessStructure
      * @param argDirectoryTarget
      */
@@ -210,10 +210,8 @@ public class BlancoRestGeneratorTsXml2SourceFile {
 
 
         /*
-         * 出力ディレクトリはant taskのtargetStyel引数で
-         * 指定された書式で出力されます。
-         * 従来と互換性を保つために、指定がない場合は blanco/main
-         * となります。
+         * The output directory will be in the format specified by the targetStyle argument of the ant task.
+         * To maintain compatibility with the previous version, it will be blanco/main if not specified.
          * by tueda, 2019/08/30
          */
         String strTarget = argDirectoryTarget
@@ -230,24 +228,24 @@ public class BlancoRestGeneratorTsXml2SourceFile {
 
         fCgFactory = BlancoCgObjectFactory.getInstance();
         fCgSourceFile = fCgFactory.createSourceFile(argProcessStructure
-                .getPackage(), "このソースコードは blanco Frameworkによって自動生成されています。");
+                .getPackage(), "This source code has been generated by blanco Framework.");
         fCgSourceFile.setEncoding(fEncoding);
         fCgSourceFile.setTabs(this.getTabs());
-        // クラスを作成
+        // Creates a class.
         fCgClass = fCgFactory.createClass(BlancoRestGeneratorTsConstants.PREFIX_ABSTRACT + argProcessStructure.getName(),
                 BlancoStringUtil.null2Blank(argProcessStructure
                         .getDescription()));
         fCgSourceFile.getClassList().add(fCgClass);
-        // 電文処理クラスは常に public abstract
+        // The telegram processing class is always public abstract.
         fCgClass.setAccess("public");
         fCgClass.setAbstract(true);
-        // 継承
+        // Inheritance
         if (BlancoStringUtil.null2Blank(argProcessStructure.getExtends())
                 .length() > 0) {
             fCgClass.getExtendClassList().add(
                     fCgFactory.createType(argProcessStructure.getExtends()));
         }
-        // 実装
+        // Implementation
         for (int index = 0; index < argProcessStructure.getImplementsList()
                 .size(); index++) {
             final String impl = (String) argProcessStructure.getImplementsList()
@@ -255,13 +253,13 @@ public class BlancoRestGeneratorTsXml2SourceFile {
             fCgClass.getImplementInterfaceList().add(
                     fCgFactory.createType(impl));
         }
-        // クラスのJavaDocを設定します。
+        // Sets the JavaDoc for the class.
         fCgClass.setDescription(argProcessStructure.getDescription());
         for (String line : argProcessStructure.getDescriptionList()) {
             fCgClass.getLangDoc().getDescriptionList().add(line);
         }
 
-        /* クラスのannotation を設定します */
+        /* Sets the annotation for the class. */
         List annotationList = argProcessStructure.getAnnotationList();
         if (annotationList != null && annotationList.size() > 0) {
             fCgClass.getAnnotationList().addAll(argProcessStructure.getAnnotationList());
@@ -271,7 +269,7 @@ public class BlancoRestGeneratorTsXml2SourceFile {
             }
         }
 
-        /* TypeScript では import の代わりに header を設定します */
+        /* In TypeScript, sets the header instead of import. */
         for (int index = 0; index < argProcessStructure.getHeaderList()
                 .size(); index++) {
             final String header = (String) argProcessStructure.getHeaderList()
@@ -279,7 +277,7 @@ public class BlancoRestGeneratorTsXml2SourceFile {
             fCgSourceFile.getHeaderList().add(header);
         }
 
-        // サービスメソッドを生成します。
+        // Generates a service method.
         if (this.isCreateServiceMethod()) {
             createServiceMethods(argProcessStructure);
         } else {
@@ -288,19 +286,19 @@ public class BlancoRestGeneratorTsXml2SourceFile {
             }
         }
 
-        // isAuthenticationRequired メソッドの上書き
+        // Overrides isAuthenticationRequired method.
         overrideAuthenticationRequired(argProcessStructure);
 
-        // ロケーションとWEBサービスIDからURLを生成します。
+        // Generates a URL from a location and a web service ID.
         createLocationUrl(argProcessStructure);
 
-        // 収集された情報を元に実際のソースコードを自動生成。
+        // Auto-generates the actual source code based on the collected information.
         BlancoCgTransformerFactory.getTsSourceTransformer().transform(
                 fCgSourceFile, fileBlancoMain);
     }
 
     /**
-     * Serviceメソッドを実装します。
+     * Implements Service method.
      *
      * @param argProcessStructure
      */
@@ -320,7 +318,7 @@ public class BlancoRestGeneratorTsXml2SourceFile {
         for (Map.Entry<String, String> method : httpMethods.entrySet()) {
             HashMap<String, BlancoRestGeneratorTsTelegramStructure> telegrams = argProcessStructure.getListTelegrams().get(method.getKey());
             if (telegrams == null) {
-                /* このメソッドは未対応 */
+                /* This method is not supported. */
                 createExecuteMethodNotImplemented(method.getKey());
                 createTelegramGenerateMethodNotImplemented(method, telegramKind);
             } else {
@@ -330,13 +328,13 @@ public class BlancoRestGeneratorTsXml2SourceFile {
             }
         }
 
-        // 電文インスタンスのファクトリメソッドを生成
+        // Creates a factory method for a telegram instance.
         createTelegramGeneratorFactory(httpMethods, telegramKind);
     }
 
     private void createAbstractProcessMethod(HashMap<String, BlancoRestGeneratorTsTelegramStructure> argTelegrams) {
 
-        // Processor の定義
+        // Defines Processor.
         final BlancoCgMethod cgProcessorMethod = fCgFactory.createMethod(
                 BlancoRestGeneratorTsConstants.API_PROCESS_METHOD, fBundle.getXml2sourceFileProcessorDescription());
         fCgClass.getMethodList().add(cgProcessorMethod);
@@ -365,12 +363,12 @@ public class BlancoRestGeneratorTsXml2SourceFile {
         cgExecutorMethod.setAccess("protected");
 
         /*
-         * 型チェックを通す為にデフォルトの電文親クラスを使います
+         * Uses the default telegram parent class to pass the type check.
          */
         String requestSuperId = BlancoRestGeneratorTsUtil.getDefaultRequestTelegramId(method.getKey());
         String responseSuperId = BlancoRestGeneratorTsUtil.getDefaultResponseTelegramId(method.getKey());
         /*
-         * 本来の電文クラス
+         * The original telegram class.
          */
         String requestId = argTelegrams.get(BlancoRestGeneratorTsConstants.TELEGRAM_INPUT).getName();
         String responseId = argTelegrams.get(BlancoRestGeneratorTsConstants.TELEGRAM_OUTPUT).getName();
@@ -384,7 +382,7 @@ public class BlancoRestGeneratorTsXml2SourceFile {
         cgExecutorMethod.setReturn(fCgFactory.createReturn(responseSuperId,
                 fBundle.getXml2sourceFileExecutorReturnLangdoc()));
 
-        // メソッドの実装
+        // Implements the method.
         final List<String> listLine = cgExecutorMethod.getLineList();
 
         listLine.add(
@@ -401,7 +399,7 @@ public class BlancoRestGeneratorTsXml2SourceFile {
     }
 
     /**
-     * 非対応なメソッドが呼ばれた場合用のexecuteメソッドです。
+     * This is the execute method for when an unsupported method is called.
      *
      * @param method
      */
@@ -412,11 +410,11 @@ public class BlancoRestGeneratorTsXml2SourceFile {
         cgExecutorMethod.setAccess("protected");
         final List<String> ListLine = cgExecutorMethod.getLineList();
 
-        // 電文定義がないので，デフォルトの電文名を指定しておく
+        // Since there is no telegram definition, the default telegram name should be specified.
         String requestId = BlancoRestGeneratorTsUtil.getDefaultRequestTelegramId(method);
         String responseId = BlancoRestGeneratorTsUtil.getDefaultResponseTelegramId(method);
 
-        /* Excel sheet に電文定義がない場合にここにくるので、その場合は電文処理シートの定義を使う */
+        /* If there is no telegram definition in the Excel sheet, it will come here, in which case uses the definition in the telegram processing sheet. */
         cgExecutorMethod.getParameterList().add(
                 fCgFactory.createParameter("argRequest", requestId,
                         fBundle
@@ -425,11 +423,10 @@ public class BlancoRestGeneratorTsXml2SourceFile {
                 fBundle.getXml2sourceFileExecutorReturnLangdoc()));
 
         /*
-         * TypeScript では例外は Error を継承する必要がある。
-         * ここではそのまま Error を投げる。
+         * In TypeScript, exceptions need to inherit from Error. We'll just throw Error here.
          */
         //throw new BlancoRestException("GetMethod is not implemented in this api");
-        // メソッドの実装
+        // Implements the method.
         ListLine.add(
                 "throw new " + BlancoRestGeneratorTsConstants.DEFAULT_EXCEPTION + "( " + BlancoCgLineUtil.getStringLiteralEnclosure(fTargetLang) +
                         fBundle.getBlancorestErrorMsg05(method) + BlancoCgLineUtil.getStringLiteralEnclosure(fTargetLang) + ")" + BlancoCgLineUtil.getTerminator(fTargetLang));
@@ -438,7 +435,7 @@ public class BlancoRestGeneratorTsXml2SourceFile {
 
 
     /**
-     * TelegramGenerateメソッドです。
+     * TelegramGenerate method.
      *
      * @param method
      */
@@ -465,16 +462,16 @@ public class BlancoRestGeneratorTsXml2SourceFile {
                     fBundle.getXml2sourceFileTelegramGeneratorReturnDescription()));
             final List<String> listLine = cgTelegramGenerateMethod.getLineList();
 
-            // メソッドの実装
+            // Implements the method.
             listLine.add("return new " + name + "()" + BlancoCgLineUtil.getTerminator(fTargetLang));
         }
     }
 
 
     /**
-     * 非対応なメソッドが呼ばれた場合用のTelegramGenerateメソッドです。
+     * This is the TelegramGenerate method for when an unsupported method is called.
      *
-     * @param method 対象のメソッド
+     * @param method Target method.
      */
     private void createTelegramGenerateMethodNotImplemented(Map.Entry<String, String> method, Map<String, String> telegramKind) {
 
@@ -486,7 +483,7 @@ public class BlancoRestGeneratorTsXml2SourceFile {
             cgTelegramGenerateMethod.setAccess("protected");
             final List<String> listLine = cgTelegramGenerateMethod.getLineList();
 
-            // メソッドの実装
+            // Implements the method.
             listLine.add(
                     "throw new " + BlancoRestGeneratorTsConstants.DEFAULT_EXCEPTION + "( " + BlancoCgLineUtil.getStringLiteralEnclosure(fTargetLang) +
                             fBundle.getBlancorestErrorMsg05(method.getKey()) + BlancoCgLineUtil.getStringLiteralEnclosure(fTargetLang) + ")" + BlancoCgLineUtil.getTerminator(fTargetLang));
@@ -495,7 +492,7 @@ public class BlancoRestGeneratorTsXml2SourceFile {
 
 
     /**
-     * 電文インスタンスのファクトリメソッドです
+     * Factory method of the telegram instance.
      */
     private void createTelegramGeneratorFactory(Map<String, String> httpMethods, Map<String, String> telegramKind) {
         final String lineTerminal =  BlancoCgLineUtil.getTerminator(fTargetLang);
@@ -514,7 +511,7 @@ public class BlancoRestGeneratorTsXml2SourceFile {
                     fBundle.getXml2sourceFileTelegramGeneratorFactoryReturnDescription()));
             final List<String> listLine = cgTelegramGenerateMethod.getLineList();
 
-            // メソッドの実装
+            // Implements the method.
             listLine.add("let req: ApiTelegram" + lineTerminal);
             listLine.add("switch(method) {");
             for (Map.Entry<String, String> method : httpMethods.entrySet()) {
@@ -544,7 +541,7 @@ public class BlancoRestGeneratorTsXml2SourceFile {
         cgAuthenticationRequiredMethod.setReturn(fCgFactory.createReturn("java.lang.boolean",
                 fBundle.getXml2sourceFileAuthflagReturnLangdoc()));
 
-        // メソッドの実装
+        // Implements the method.
         final List<String> listLine = cgAuthenticationRequiredMethod.getLineList();
 
         String retval = "true";
@@ -557,7 +554,7 @@ public class BlancoRestGeneratorTsXml2SourceFile {
     }
 
     private void createLocationUrl(BlancoRestGeneratorTsTelegramProcessStructure argStructure) {
-        // ロケーションURLを作成
+        // Creates a location URL.
         String locationUrl = argStructure.getLocation() + "/" + argStructure.getServiceId();
 
         final String fieldName = "_locationURL";
@@ -572,18 +569,18 @@ public class BlancoRestGeneratorTsXml2SourceFile {
                         locationUrl)));
         field.setDefault("\"" + locationUrl +"\"");
 
-        // セッターメソッドを生成
+        // Generates a setter method.
         final BlancoCgMethod setterMethod = fCgFactory.createMethod(BlancoNameAdjuster.toParameterName(fieldName),
                 fBundle.getXml2sourceFileSetLangdoc01(fieldName));
         fCgClass.getMethodList().add(setterMethod);
 
         setterMethod.setAccess("set");
 
-        // セッターメソッドのJavaDoc設定
+        // JavaDoc configuration of the setter method.
         setterMethod.getLangDoc().getDescriptionList().add(
                 fBundle.getXml2sourceFileSetLangdoc02("string"));
 
-        // セッターメソッドのparam設定
+        // param configuration of the setter method.
         BlancoCgParameter param = fCgFactory.createParameter("arg"
                         + BlancoNameAdjuster.toClassName(fieldName),
                 "java.lang.string",
@@ -592,27 +589,27 @@ public class BlancoRestGeneratorTsXml2SourceFile {
 
         setterMethod.getParameterList().add(param);
 
-        // セッターメソッドの実装
+        // Implements the setter method.
         setterMethod.getLineList().add("this." + fieldName + " = "
                 + "arg" + BlancoNameAdjuster.toClassName(fieldName) + ";");
 
-        // ゲッターメソッドを生成
+        // Generates a getter method.
         final BlancoCgMethod getterMethod = fCgFactory.createMethod(BlancoNameAdjuster.toParameterName(fieldName),
                 fBundle.getXml2sourceFileGetLangdoc01(fieldName));
         fCgClass.getMethodList().add(getterMethod);
 
         getterMethod.setAccess("get");
 
-        // ゲッターメソッドのJavaDoc設定。
+        // JavaDoc configuration of the getter method.
         getterMethod.getLangDoc().getDescriptionList().add(
                 fBundle.getXml2sourceFileGetLangdoc02("string"));
 
-        // ゲッターメソッドの返り値設定
+        // Return value configuration of the getter method.
         getterMethod.setNotnull(true);
         getterMethod.setReturn(fCgFactory.createReturn("java.lang.string",
                 fBundle.getXml2sourceFileGetReturnLangdoc(fieldName)));
 
-        // ゲッターメソッドの実装
+        // Implements the getter method.
         getterMethod.getLineList().add("return this." + fieldName + ";");
     }
 
@@ -631,8 +628,8 @@ public class BlancoRestGeneratorTsXml2SourceFile {
                 fBundle.getXml2sourceFileRequestidReturnLangdoc()));
 
         /*
-         * メソッドの実装
-         * 定義されていないときはnullを返す
+         * Implements the method.
+         * Returns null if not defined.
          */
         final List<String> listLine = cgRequestIdMethod.getLineList();
         if(requestIdName == null) {
@@ -658,8 +655,8 @@ public class BlancoRestGeneratorTsXml2SourceFile {
                 fBundle.getXml2sourceFileRequestidReturnLangdoc()));
 
         /*
-         * メソッドの実装
-         * 定義されていないときはnullを返す
+         * Implements the method.
+         * Returns null if not defined.
          */
         final List<String> listLine = cgResponseIdMethod.getLineList();
         if(responseIdName == null) {
@@ -671,7 +668,7 @@ public class BlancoRestGeneratorTsXml2SourceFile {
     }
 
     /**
-     * 電文クラスを生成します。
+     * Generates a telegram class.
      *
      * @param argTelegramStructure
      * @param argDirectoryTarget
@@ -681,10 +678,8 @@ public class BlancoRestGeneratorTsXml2SourceFile {
             final File argDirectoryTarget) {
 
         /*
-         * 出力ディレクトリはant taskのtargetStyel引数で
-         * 指定された書式で出力されます。
-         * 従来と互換性を保つために、指定がない場合は blanco/main
-         * となります。
+         * The output directory will be in the format specified by the targetStyle argument of the ant task.
+         * To maintain compatibility with the previous version, it will be blanco/main if not specified.
          * by tueda, 2019/08/30
          */
         String strTarget = argDirectoryTarget
@@ -701,23 +696,23 @@ public class BlancoRestGeneratorTsXml2SourceFile {
 
         fCgFactory = BlancoCgObjectFactory.getInstance();
         fCgSourceFile = fCgFactory.createSourceFile(argTelegramStructure
-                .getPackage(), "このソースコードは blanco Frameworkによって自動生成されています。");
+                .getPackage(), "This source code has been generated by blanco Framework.");
         fCgSourceFile.setEncoding(fEncoding);
         fCgSourceFile.setTabs(this.getTabs());
-        // クラスを作成
+        // Creates a class.
         fCgClass = fCgFactory.createClass(argTelegramStructure.getName(),
                 BlancoStringUtil.null2Blank(argTelegramStructure
                         .getDescription()));
         fCgSourceFile.getClassList().add(fCgClass);
-        // 電文処理クラスは常に public
+        // The telegram processing class is always public.
         fCgClass.setAccess("public");
-        // 継承
+        // Inheritance
         if (BlancoStringUtil.null2Blank(argTelegramStructure.getExtends())
                 .length() > 0) {
             fCgClass.getExtendClassList().add(
                     fCgFactory.createType(argTelegramStructure.getExtends()));
         }
-        // 実装
+        // Implementation
         for (int index = 0; index < argTelegramStructure.getImplementsList()
                 .size(); index++) {
             final String impl = (String) argTelegramStructure.getImplementsList()
@@ -725,13 +720,13 @@ public class BlancoRestGeneratorTsXml2SourceFile {
             fCgClass.getImplementInterfaceList().add(
                     fCgFactory.createType(impl));
         }
-        // クラスのJavaDocを設定します。
+        // Sets the JavaDoc for the class.
         fCgClass.setDescription(argTelegramStructure.getDescription());
         for (String line : argTelegramStructure.getDescriptionList()) {
             fCgClass.getLangDoc().getDescriptionList().add(line);
         }
 
-        /* クラスのannotation を設定します */
+        /* Sets the annotation for the class. */
         List annotationList = argTelegramStructure.getAnnotationList();
         if (annotationList != null && annotationList.size() > 0) {
             fCgClass.getAnnotationList().addAll(argTelegramStructure.getAnnotationList());
@@ -741,7 +736,7 @@ public class BlancoRestGeneratorTsXml2SourceFile {
             }
         }
 
-        /* TypeScript では import の代わりに header を設定します */
+        /* In TypeScript, sets the header instead of import. */
         for (int index = 0; index < argTelegramStructure.getHeaderList()
                 .size(); index++) {
             final String header = (String) argTelegramStructure.getHeaderList()
@@ -754,14 +749,14 @@ public class BlancoRestGeneratorTsXml2SourceFile {
         }
 
         boolean toJson = false;
-        // 電文定義・一覧
+        // Telegram definition list.
         for (int indexField = 0; indexField < argTelegramStructure.getListField()
                 .size(); indexField++) {
-            // おのおののフィールドを処理します。
+            // Processes each field.
             final BlancoRestGeneratorTsTelegramFieldStructure fieldStructure =
                     argTelegramStructure.getListField().get(indexField);
 
-            // 必須項目が未設定の場合には例外処理を実施します。
+            // Performs exception processing if a required field is not set.
             if (fieldStructure.getName() == null) {
                 throw new IllegalArgumentException(fBundle
                         .getXml2sourceFileErr004(argTelegramStructure.getName()));
@@ -779,22 +774,22 @@ public class BlancoRestGeneratorTsXml2SourceFile {
                 System.out.println("property : " + fieldStructure.getName());
             }
 
-            // フィールドの生成。
+            // Creates fields.
             buildField(argTelegramStructure, fieldStructure);
 
-            // セッターメソッドの生成。
+            // Creates a setter method.
             buildMethodSet(fieldStructure);
 
-            // ゲッターメソッドの生成。
+            // Creates a getter method.
             buildMethodGet(fieldStructure);
 
-            // Type文字列を返すメソッドの生成
+            // Creates a method that returns a Type string.
             buildMethodType(fieldStructure);
 
-            // Generic文字列を返すメソッドの生成
+            // Creates a method that returns a Generic string.
             buildMethodGeneric(fieldStructure);
 
-            // validation は後日実装予定
+            // validation will be implemented later.
         }
 
         buildMethodTelegramId(argTelegramStructure);
@@ -803,15 +798,15 @@ public class BlancoRestGeneratorTsXml2SourceFile {
             buildMethodToJSON(argTelegramStructure);
         }
 
-        // 収集された情報を元に実際のソースコードを自動生成。
+        // Auto-generates the actual source code based on the collected information.
         BlancoCgTransformerFactory.getTsSourceTransformer().transform(
                 fCgSourceFile, fileBlancoMain);
     }
 
     /**
-     * クラスにフィールドを生成します。
+     * Generates a field in the class.
      * @param argClassStructure
-     *            クラス情報。
+     *            Class information.
      * @param argFieldStructure
      */
     private void buildField(
@@ -819,7 +814,7 @@ public class BlancoRestGeneratorTsXml2SourceFile {
             final BlancoRestGeneratorTsTelegramFieldStructure argFieldStructure) {
 
         /*
-         * フィールド名は常に変形する
+         * Field names are always transformed.
          */
         String fieldName = "f" + this.getFieldNameAdjustered(argFieldStructure);
         final BlancoCgField field = fCgFactory.createField(fieldName,
@@ -828,8 +823,7 @@ public class BlancoRestGeneratorTsXml2SourceFile {
         fCgClass.getFieldList().add(field);
 
         /*
-         * Generic に対応します。blancoCg 側では <> が付いている前提かつ
-         * package部をtrimするので、ここで設定しないと正しく設定されません。
+         * Supports Generic. If you don't set it here, it will not be set correctly because blancoCg assumes that "<>" is attached and trims the package part.
          */
         String generic = argFieldStructure.getGeneric();
         if (generic != null && generic.length() > 0) {
@@ -843,11 +837,11 @@ public class BlancoRestGeneratorTsXml2SourceFile {
 
         field.setAccess("private");
         /*
-         * 当面、final には対応しません。
+         * For the time being, final will not be supported.
          */
         field.setFinal(false);
 
-        // nullable に対応します。
+        // Supports nullable.
         Boolean isNullable = argFieldStructure.getNullable();
         if (isNullable != null && isNullable) {
             field.setNotnull(false);
@@ -855,14 +849,14 @@ public class BlancoRestGeneratorTsXml2SourceFile {
             field.setNotnull(true);
         }
 
-        // フィールドのJavaDocを設定します。
+        // Sets the JavaDoc for the field.
         field.setDescription(argFieldStructure.getDescription());
         for (String line : argFieldStructure.getDescriptionList()) {
             field.getLangDoc().getDescriptionList().add(line);
         }
 
         /*
-         * TypeScript ではプロパティのデフォルト値は原則必須
+         * In TypeScript, the default value of a property is mandatory in principle.
          */
         String defaultRawValue = argFieldStructure.getDefault();
         if ((defaultRawValue == null ||defaultRawValue.length() <= 0)) {
@@ -871,14 +865,14 @@ public class BlancoRestGeneratorTsXml2SourceFile {
                         .getXml2sourceFileErr009(argClassStructure.getName(), argFieldStructure.getName()));
             }
         } else {
-            // フィールドのデフォルト値を設定します。
+            // Sets the default value for the field.
             field.getLangDoc().getDescriptionList().add(
                     BlancoCgSourceUtil.escapeStringAsLangDoc(BlancoCgSupportedLang.TS, fBundle.getXml2sourceFileFieldDefault(argFieldStructure
                             .getDefault())));
-            // 当面の間、デフォルト値の変形は常にoff。定義書上の値をそのまま採用。
+            // For the time being, the default value tansformation is always off, and the value in the definition document is used as is.
             field.setDefault(argFieldStructure.getDefault());
 
-            /* メソッドの annotation を設定します */
+            /* Sets the annotation for the method. */
             List annotationList = argFieldStructure.getAnnotationList();
             if (annotationList != null && annotationList.size() > 0) {
                 field.getAnnotationList().addAll(annotationList);
@@ -890,14 +884,14 @@ public class BlancoRestGeneratorTsXml2SourceFile {
     }
 
     /**
-     * setメソッドを生成します。
+     * Generates a set method.
      *
      * @param argFieldStructure
-     *            フィールド情報。
+     *            Field information.
      */
     private void buildMethodSet(
             final BlancoRestGeneratorTsTelegramFieldStructure argFieldStructure) {
-        // おのおののフィールドに対するセッターメソッドを生成します。
+        // Generates a setter method for each field.
         final BlancoCgMethod method = fCgFactory.createMethod(argFieldStructure.getName(),
                 fBundle.getXml2sourceFileSetLangdoc01(argFieldStructure
                         .getName()));
@@ -905,7 +899,7 @@ public class BlancoRestGeneratorTsXml2SourceFile {
 
         method.setAccess("set");
 
-        // メソッドの JavaDoc設定。
+        // JavaDoc configuration of the method.
         if (argFieldStructure.getDescription() != null) {
             method.getLangDoc().getDescriptionList().add(
                     fBundle.getXml2sourceFileSetLangdoc02(argFieldStructure
@@ -930,7 +924,7 @@ public class BlancoRestGeneratorTsXml2SourceFile {
         }
         method.getParameterList().add(param);
 
-        // メソッドの実装
+        // Implements the method.
         method.getLineList().add(
                 "this.f"
                         + getFieldNameAdjustered(argFieldStructure)
@@ -940,14 +934,14 @@ public class BlancoRestGeneratorTsXml2SourceFile {
     }
 
     /**
-     * getメソッドを生成します。
+     * Generates a get method.
      *
      * @param argFieldStructure
-     *            フィールド情報。
+     *            Field information.
      */
     private void buildMethodGet(
             final BlancoRestGeneratorTsTelegramFieldStructure argFieldStructure) {
-        // おのおののフィールドに対するゲッターメソッドを生成します。
+        // Generates a getter method for each field.
         final BlancoCgMethod method = fCgFactory.createMethod(argFieldStructure.getName(),
                 fBundle.getXml2sourceFileGetLangdoc01(argFieldStructure
                         .getName()));
@@ -959,7 +953,7 @@ public class BlancoRestGeneratorTsXml2SourceFile {
 
         method.setAccess("get");
 
-        // メソッドの JavaDoc設定。
+        // JavaDoc configuration of the method.
         if (argFieldStructure.getDescription() != null) {
             method.getLangDoc().getDescriptionList().add(
                     fBundle.getXml2sourceFileGetLangdoc02(argFieldStructure
@@ -981,20 +975,20 @@ public class BlancoRestGeneratorTsXml2SourceFile {
             method.getReturn().getType().setGenerics(generic);
         }
 
-        // メソッドの実装
+        // Implements the method.
         method.getLineList().add(
                 "return this.f"
                         + this.getFieldNameAdjustered(argFieldStructure) + ";");
     }
 
     /**
-     * typeメソッドを展開します
+     * Expands type method.
      *
      * @param argFieldStructure
      */
     private void buildMethodType(
             final BlancoRestGeneratorTsTelegramFieldStructure argFieldStructure) {
-        // 常にフィールド名を調整
+        // Always adjusts field names.
         String fieldName = getFieldNameAdjustered(argFieldStructure);
 
         final BlancoCgMethod cgMethod = fCgFactory.createMethod("type"
@@ -1015,11 +1009,11 @@ public class BlancoRestGeneratorTsXml2SourceFile {
                     argFieldStructure.getDescription());
         }
 
-        // メソッドの実装
+        // Implements the method.
         final List<String> listLine = cgMethod.getLineList();
 
         /*
-         * TypeScript では、package が付与されている場合は外す
+         * In TypeScript, removes package if it's given.
          */
         String methodType = BlancoRestGeneratorTsUtil
                 .getSimpleClassName(argFieldStructure.getType());
@@ -1031,7 +1025,7 @@ public class BlancoRestGeneratorTsXml2SourceFile {
     }
 
     /**
-     * Genericメソッドを展開します。
+     * Expands Generic method.
      * @param argFieldStructure
      */
     private void buildMethodGeneric(
@@ -1061,11 +1055,11 @@ public class BlancoRestGeneratorTsXml2SourceFile {
                     argFieldStructure.getDescription());
         }
 
-        // メソッドの実装
+        // Implements the method.
         final List<String> listLine = cgMethod.getLineList();
 
         /*
-         * TypeScript では、package が付与されている場合は外す
+         * In TypeScript, removes package if it's given.
          */
         String genericType = BlancoRestGeneratorTsUtil
                 .getSimpleClassName(argFieldStructure.getGeneric());
@@ -1080,14 +1074,14 @@ public class BlancoRestGeneratorTsXml2SourceFile {
             final BlancoRestGeneratorTsTelegramStructure  argTelegramStructure
     ) {
         final BlancoCgMethod method = fCgFactory.createMethod("telegramId",
-                "この電文クラス名を文字列で返します。");
+                "Returns the name of this telegram class as a string.");
         fCgClass.getMethodList().add(method);
 
         method.setReturn(fCgFactory.createReturn("string",
-                "この電文のクラス名です"));
+                "The class name of this telegram."));
         method.setNotnull(true);
         /*
-         * 一応指定するが、Typescript では無効
+         * Specified, but not valid in TypeScript.
          */
         method.setFinal(true);
         method.setAccess("get");
@@ -1097,7 +1091,7 @@ public class BlancoRestGeneratorTsXml2SourceFile {
     }
 
     /**
-     * toJSON メソッドを生成します。
+     * Generates toJSON method.
      *
      * @param argTelegramStructure
      */
@@ -1105,14 +1099,14 @@ public class BlancoRestGeneratorTsXml2SourceFile {
             final BlancoRestGeneratorTsTelegramStructure  argTelegramStructure
     ) {
         final BlancoCgMethod method = fCgFactory.createMethod("toJSON",
-                "この電文からJSONに書き出すプロパティを取得します。");
+                "Gets the properties to be written to JSON from this telegram.");
         fCgClass.getMethodList().add(method);
 
         method.setReturn(fCgFactory.createReturn("any",
-                "toJSONが返すオブジェクト"));
+                "An object returned by toJSON"));
         method.setNotnull(true);
         /*
-         * 一応指定するが、Typescript では無効
+         * Specified, but not valid in TypeScript.
          */
         method.setFinal(true);
 
@@ -1149,7 +1143,7 @@ public class BlancoRestGeneratorTsXml2SourceFile {
             System.out.println("BlancoRestGeneratorTsXml2SourceFile#createProcessListClass file = " + argProcessListId);
         }
 
-        fNameAdjust = true; // BlancoRestGenerator では常にフィールド名を変形します。
+        fNameAdjust = true; // BlancoRestGenerator always transforms the field name.
 
         final BlancoRestGeneratorTsXmlParser parser = new BlancoRestGeneratorTsXmlParser();
         parser.setVerbose(this.isVerbose());
@@ -1157,12 +1151,12 @@ public class BlancoRestGeneratorTsXml2SourceFile {
         final List<String> importHeaderList = parser.parseProcessListImport(argProcessStructures, argProcessListId, processListBasedir);
 
         /*
-         * まずインタフェイスを生成します。
+         * First, generates an interface.
          */
         final String interfaceId = this.buildProcessListInterface(argDirectoryTarget, argProcessListId, importHeaderList);
 
         /*
-         * 次に、電文処理リストクラスを生成します。
+         * Then, generates the telegram processing list class.
          */
         this.buildProcessList(argProcessStructures, importHeaderList, argDirectoryTarget, interfaceId, argProcessListId);
 
@@ -1179,10 +1173,8 @@ public class BlancoRestGeneratorTsXml2SourceFile {
         }
 
         /*
-         * 出力ディレクトリはant taskのtargetStyel引数で
-         * 指定された書式で出力されます。
-         * 従来と互換性を保つために、指定がない場合は blanco/main
-         * となります。
+         * The output directory will be in the format specified by the targetStyle argument of the ant task.
+         * For compatibility, the output directory will be blanco/main if it is not specified.
          * by tueda, 2019/08/30
          */
         String strTarget = argDirectoryTarget
@@ -1199,12 +1191,12 @@ public class BlancoRestGeneratorTsXml2SourceFile {
         argImportHeaderList.add(toImort);
 
         fCgFactory = BlancoCgObjectFactory.getInstance();
-        fCgSourceFile = fCgFactory.createSourceFile(processListPackage, "このソースコードは blanco Frameworkによって自動生成されています。");
+        fCgSourceFile = fCgFactory.createSourceFile(processListPackage, "This source code has been generated by blanco Framework.");
         fCgSourceFile.setEncoding(fEncoding);
         fCgSourceFile.setTabs(this.getTabs());
-        // クラスを作成
+        // Creates a class.
         fCgInterface = fCgFactory.createInterface(processListInterface,
-                BlancoStringUtil.null2Blank("API 引数文字列からインスタンス取得するリストのインタフェイス定義です。"));
+                BlancoStringUtil.null2Blank("The interface definition of a list that gets instances from API argument string."));
         fCgSourceFile.getInterfaceList().add(fCgInterface);
         fCgInterface.setAccess("public");
         fCgInterface.getLangDoc().getTagList().add(fCgFactory.createLangDocTag("author", null, "blanco Framework"));
@@ -1212,7 +1204,7 @@ public class BlancoRestGeneratorTsXml2SourceFile {
         final String arrayConstructor = "[i: string]: any" + BlancoCgLineUtil.getTerminator(fTargetLang);
         fCgInterface.getPlainTextList().add(arrayConstructor);
 
-        // 収集された情報を元に実際のソースコードを自動生成。
+        // Auto-generates the actual source code based on the collected information.
         BlancoCgTransformerFactory.getTsSourceTransformer().transform(
                 fCgSourceFile, fileBlancoMain);
         return processListInterface;
@@ -1231,10 +1223,8 @@ public class BlancoRestGeneratorTsXml2SourceFile {
         }
 
         /*
-         * 出力ディレクトリはant taskのtargetStyel引数で
-         * 指定された書式で出力されます。
-         * 従来と互換性を保つために、指定がない場合は blanco/main
-         * となります。
+         * The output directory will be in the format specified by the targetStyle argument of the ant task.
+         * For compatibility, the output directory will be blanco/main if it is not specified.
          * by tueda, 2019/08/30
          */
         String strTarget = argDirectoryTarget
@@ -1248,17 +1238,17 @@ public class BlancoRestGeneratorTsXml2SourceFile {
         String processListClass = BlancoRestGeneratorTsUtil.getSimpleClassName(argProcessListId);
 
         fCgFactory = BlancoCgObjectFactory.getInstance();
-        fCgSourceFile = fCgFactory.createSourceFile(processListPackage, "このソースコードは blanco Frameworkによって自動生成されています。");
+        fCgSourceFile = fCgFactory.createSourceFile(processListPackage, "This source code has been generated by blanco Framework.");
         fCgSourceFile.setEncoding(fEncoding);
         fCgSourceFile.setTabs(this.getTabs());
-        // クラスを作成
+        // Creates a class.
         fCgClass = fCgFactory.createClass(processListClass,
-                BlancoStringUtil.null2Blank("API 引数文字列からインスタンス取得するリストを保持するクラスです。"));
+                BlancoStringUtil.null2Blank("A class that holds a list of instances to be obtained from API argument string."));
         fCgSourceFile.getClassList().add(fCgClass);
         fCgClass.setAccess("public");
 
         /*
-         * Import 文の設定
+         * Setting the Import statement.
          */
         for (String header : argImportHeaderList) {
             fCgSourceFile.getHeaderList().add(header);
@@ -1266,13 +1256,13 @@ public class BlancoRestGeneratorTsXml2SourceFile {
 
         this.buildProcessListField(argProcessStructures, argInterfaceId);
 
-        // 収集された情報を元に実際のソースコードを自動生成。
+        // Auto-generates the actual source code based on the collected information.
         BlancoCgTransformerFactory.getTsSourceTransformer().transform(
                 fCgSourceFile, fileBlancoMain);
     }
 
     /**
-     * 整形の都合で、field は Plain Text として入れる
+     * For the sake of formatting, the field is inserted as Plain Text.
      * @param argProcessStructures
      * @param argInterfaceId
      */
@@ -1280,14 +1270,13 @@ public class BlancoRestGeneratorTsXml2SourceFile {
             List<BlancoRestGeneratorTsTelegramProcessStructure> argProcessStructures,
             String argInterfaceId
     ) {
-        // System.lineSeparator は使ってはいけない。
-        // 起動時の固定値から変更できないので。
+        // System.lineSeparator should not be used, because it cannot be changed from its fixed value at startup.
         final String lineSeparator = System.getProperty("line.separator");
         final String fieldName = "constructors";
         final String fieldType = argInterfaceId;
 
         final BlancoCgField field = fCgFactory.createField(fieldName,
-                fieldType,"API 引数文字列からインスタンス取得するリストです。");
+                fieldType,"A list of instances to be obtained from API argument string.");
 
         fCgClass.getFieldList().add(field);
 
@@ -1296,7 +1285,7 @@ public class BlancoRestGeneratorTsXml2SourceFile {
         field.setNotnull(true);
 
         /*
-         * 整形の都合で、 デフォルト値には固定でtabを入れておく
+         * For the sake of formatting, the default value should be a fixed tab.
          */
         int tabs = this.getTabs();
         String indentUnit = " ";
@@ -1323,11 +1312,11 @@ public class BlancoRestGeneratorTsXml2SourceFile {
     }
 
     /**
-     * 調整済みのフィールド名を取得します。
+     * Gets an adjusted field name.
      *
      * @param argFieldStructure
-     *            フィールド情報。
-     * @return 調整後のフィールド名。
+     *            Field information.
+     * @return An adjusted field name.
      */
     private String getFieldNameAdjustered(
             final BlancoRestGeneratorTsTelegramFieldStructure argFieldStructure) {
