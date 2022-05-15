@@ -542,12 +542,12 @@ public class BlancoRestGeneratorTsTelegramFieldStructure {
     }
 
     /**
-     * このバリューオブジェクトを指定のターゲットに複写します。
+     * Copies this value object to the specified target.
      *
-     * <P>使用上の注意</P>
+     * <P>Cautions for use</P>
      * <UL>
-     * <LI>オブジェクトのシャロー範囲のみ複写処理対象となります。
-     * <LI>オブジェクトが循環参照している場合には、このメソッドは使わないでください。
+     * <LI>Only the shallow range of the object will be subject to the copying process.
+     * <LI>Do not use this method if the object has a circular reference.
      * </UL>
      *
      * @param target target value object.
@@ -570,7 +570,7 @@ public class BlancoRestGeneratorTsTelegramFieldStructure {
         target.fDescription = this.fDescription;
         // Name: fDescriptionList
         // Type: java.util.List
-        // フィールド[fDescriptionList]はサポート外の型[java.util.Listjava.lang.String]です。
+        // Field[fDescriptionList] is an unsupported type[java.util.Listjava.lang.String].
         // Name: fType
         // Type: java.lang.String
         target.fType = this.fType;
@@ -579,7 +579,7 @@ public class BlancoRestGeneratorTsTelegramFieldStructure {
         target.fGeneric = this.fGeneric;
         // Name: fAnnotationList
         // Type: java.util.List
-        // フィールド[fAnnotationList]はサポート外の型[java.util.Listjava.lang.String]です。
+        // Field[fAnnotationList] is an unsupported type[java.util.Listjava.lang.String].
         // Name: fRequired
         // Type: java.lang.Boolean
         target.fRequired = this.fRequired;
