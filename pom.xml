@@ -5,7 +5,7 @@
 	<groupId>blanco.restgeneratorts</groupId>
 	<artifactId>blanco-restgeneratorts</artifactId>
 	<packaging>jar</packaging>
-	<version>0.2.6</version>
+	<version>0.2.7</version>
 	<name>blanco-restgeneratorts</name>
 	<url>https://igapyon.github.io/blancofw-maven2</url>
 
@@ -231,7 +231,7 @@
 							<target>
 								<taskdef name="blancoresourcebundle" classname="blanco.resourcebundle.task.BlancoResourceBundleTask" classpathref="maven.compile.classpath">
 								</taskdef>
-								<blancoresourcebundle metadir="meta/program" encoding="${project.build.sourceEncoding}" />
+								<blancoresourcebundle metadir="meta/program" encoding="${project.build.sourceEncoding}" commenttimestamp="false" />
 							</target>
 						</configuration>
 						<goals>

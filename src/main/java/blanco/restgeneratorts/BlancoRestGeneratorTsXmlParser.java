@@ -39,6 +39,30 @@ public class BlancoRestGeneratorTsXmlParser {
         return fCreateServiceMethod;
     }
 
+    private boolean fSearchApiTelegramPackage = true;
+    public boolean searchApiTelegramPackage() {
+        return this.fSearchApiTelegramPackage;
+    }
+    public void setSearchApiTelegramPackage(boolean search) {
+        this.fSearchApiTelegramPackage = search;
+    }
+
+    private String fApiTelegramPackage;
+    public String getApiTelegramPackage() {
+        return this.fApiTelegramPackage;
+    }
+    public void setApiTelegramPackge(String apiTelegramPackge) {
+        this.fApiTelegramPackage = apiTelegramPackge;
+    }
+
+    private String fApiTelegramBase = "%";
+    public String getApiTelegramBase() {
+        return this.fApiTelegramBase;
+    }
+    public void setApiTelegramBase(String apiTelegramBase) {
+        this.fApiTelegramBase = apiTelegramBase;
+    }
+
     /**
      * Parses an XML document in an intermediate XML file to get an array of value object information.
      *
@@ -301,24 +325,38 @@ public class BlancoRestGeneratorTsXmlParser {
          * Searches for the package name for this class.
          */
         String packageName = null;
-        BlancoValueObjectTsClassStructure voStructure = BlancoRestGeneratorTsUtil.objects.get(superClassId);
-        if (voStructure != null) {
-            packageName = voStructure.getPackage();
-        }
         String superClassIdCanon = superClassId;
-        if (packageName != null) {
+        if (!this.searchApiTelegramPackage()) {
+            packageName = this.getApiTelegramPackage();
             superClassIdCanon = packageName + "." + superClassId;
-        }
-        if (isVerbose()) {
-            System.out.println("Extends : " + superClassIdCanon);
-        }
-        argTelegramStructure.setExtends(superClassIdCanon);
+            if (isVerbose()) {
+                System.out.println("Extends : " + superClassIdCanon);
+            }
+            argTelegramStructure.setExtends(superClassIdCanon);
 
-        /*
-         * Creates import information for TypeScript.
-         */
-        if (argTelegramStructure.getCreateImportList()) {
-            BlancoRestGeneratorTsUtil.makeImportHeaderList(packageName, superClassId, argImportHeaderList, argTelegramStructure.getBasedir(), argTelegramStructure.getPackage());
+            /*
+             * Creates import information for TypeScript.
+             */
+            BlancoRestGeneratorTsUtil.makeImportHeaderList(packageName, superClassId, argImportHeaderList, this.getApiTelegramBase(), argTelegramStructure.getPackage());
+        } else {
+            BlancoValueObjectTsClassStructure voStructure = BlancoRestGeneratorTsUtil.objects.get(superClassId);
+            if (voStructure != null) {
+                packageName = voStructure.getPackage();
+            }
+            if (packageName != null) {
+                superClassIdCanon = packageName + "." + superClassId;
+            }
+            if (isVerbose()) {
+                System.out.println("Extends : " + superClassIdCanon);
+            }
+            argTelegramStructure.setExtends(superClassIdCanon);
+
+            /*
+             * Creates import information for TypeScript.
+             */
+            if (argTelegramStructure.getCreateImportList()) {
+                BlancoRestGeneratorTsUtil.makeImportHeaderList(packageName, superClassId, argImportHeaderList, argTelegramStructure.getBasedir(), argTelegramStructure.getPackage());
+            }
         }
     }
 
@@ -551,7 +589,7 @@ public class BlancoRestGeneratorTsXmlParser {
                     fieldStructure.setDescription(lines[indexLine]);
                 } else {
                     // For a multi-line description, it will be split and stored.
-                    // From the second line, assumes that character reference encoding has been properly implemented.   
+                    // From the second line, assumes that character reference encoding has been properly implemented.
                     fieldStructure.getDescriptionList().add(
                             lines[indexLine]);
                 }
@@ -824,7 +862,7 @@ public class BlancoRestGeneratorTsXmlParser {
                     argProcessStructure.setDescription(lines[index]);
                 } else {
                     // For a multi-line description, it will be split and stored.
-                    // From the second line, assumes that character reference encoding has been properly implemented.   
+                    // From the second line, assumes that character reference encoding has been properly implemented.
                     argProcessStructure.getDescriptionList().add(lines[index]);
                 }
             }

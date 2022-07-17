@@ -88,6 +88,10 @@ public class BlancoRestGeneratorTsBatchProcess {
                 input.setSearchTmpdir(arg.substring(14));
             } else if (arg.startsWith("-generateToJson=")) {
                 input.setGenerateToJson(Boolean.valueOf(arg.substring(16)).booleanValue());
+            } else if (arg.startsWith("-apiTelegramPackage=")) {
+                input.setApiTelegramPackage(arg.substring(20));
+            } else if (arg.startsWith("-apiTelegramBase=")) {
+                input.setApiTelegramBase(arg.substring(17));
             } else if (arg.equals("-?") || arg.equals("-help")) {
                 usage();
                 System.exit(END_SUCCESS);
@@ -181,7 +185,7 @@ public class BlancoRestGeneratorTsBatchProcess {
      */
     public static final void usage() {
         System.out.println("BlancoRestGeneratorTsBatchProcess: Usage:");
-        System.out.println("  java blanco.restgeneratorts.task.BlancoRestGeneratorTsBatchProcess -verbose=value1 -metadir=value2 -targetdir=value3 -tmpdir=value4 -nameAdjust=value5 -encoding=value6 -tabs=value7 -xmlrootelement=value8 -sheetType=value9 -targetStyle=value10 -client=value11 -processlist=value12 -processlistBase=value13 -lineSeparator=value14 -searchTmpdir=value15 -generateToJson=value16");
+        System.out.println("  java blanco.restgeneratorts.task.BlancoRestGeneratorTsBatchProcess -verbose=value1 -metadir=value2 -targetdir=value3 -tmpdir=value4 -nameAdjust=value5 -encoding=value6 -tabs=value7 -xmlrootelement=value8 -sheetType=value9 -targetStyle=value10 -client=value11 -processlist=value12 -processlistBase=value13 -lineSeparator=value14 -searchTmpdir=value15 -generateToJson=value16 -apiTelegramPackage=value17 -apiTelegramBase=value18");
         System.out.println("    -verbose");
         System.out.println("      explanation[Whether to run in verbose mode.]");
         System.out.println("      type[boolean]");
@@ -243,6 +247,13 @@ public class BlancoRestGeneratorTsBatchProcess {
         System.out.println("      explanation[toJSONメソッドを生成します]");
         System.out.println("      type[boolean]");
         System.out.println("      default value[false]");
+        System.out.println("    -apiTelegramPackage");
+        System.out.println("      explanation[電文の親クラスの配置場所を、Javaのパッケージ形式で指定します。]");
+        System.out.println("      type[string]");
+        System.out.println("    -apiTelegramBase");
+        System.out.println("      explanation[電文の親クラスの配置場所のaliasを指定します。通常は % です。]");
+        System.out.println("      type[string]");
+        System.out.println("      default value[%]");
         System.out.println("    -? , -help");
         System.out.println("      explanation[show the usage.]");
     }

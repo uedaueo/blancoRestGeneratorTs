@@ -104,6 +104,16 @@ public class BlancoRestGeneratorTsTask extends Task {
     protected boolean fIsFieldGenerateToJsonProcessed = false;
 
     /**
+     * フィールド [apiTelegramPackage] に値がセットされたかどうか。
+     */
+    protected boolean fIsFieldApiTelegramPackageProcessed = false;
+
+    /**
+     * フィールド [apiTelegramBase] に値がセットされたかどうか。
+     */
+    protected boolean fIsFieldApiTelegramBaseProcessed = false;
+
+    /**
      * verboseモードで動作させるかどうか。
      *
      * @param arg verboseモードで動作させるかどうか。
@@ -513,6 +523,57 @@ public class BlancoRestGeneratorTsTask extends Task {
     }
 
     /**
+     * Antタスクの[apiTelegramPackage]アトリビュートのセッターメソッド。
+     *
+     * 項目番号: 16<br>
+     * 電文の親クラスの配置場所を、Javaのパッケージ形式で指定します。<br>
+     *
+     * @param arg セットしたい値
+     */
+    public void setApiTelegramPackage(final String arg) {
+        fInput.setApiTelegramPackage(arg);
+        fIsFieldApiTelegramPackageProcessed = true;
+    }
+
+    /**
+     * Antタスクの[apiTelegramPackage]アトリビュートのゲッターメソッド。
+     *
+     * 項目番号: 16<br>
+     * 電文の親クラスの配置場所を、Javaのパッケージ形式で指定します。<br>
+     *
+     * @return このフィールドの値
+     */
+    public String getApiTelegramPackage() {
+        return fInput.getApiTelegramPackage();
+    }
+
+    /**
+     * Antタスクの[apiTelegramBase]アトリビュートのセッターメソッド。
+     *
+     * 項目番号: 17<br>
+     * 電文の親クラスの配置場所のaliasを指定します。通常は % です。<br>
+     *
+     * @param arg セットしたい値
+     */
+    public void setApiTelegramBase(final String arg) {
+        fInput.setApiTelegramBase(arg);
+        fIsFieldApiTelegramBaseProcessed = true;
+    }
+
+    /**
+     * Antタスクの[apiTelegramBase]アトリビュートのゲッターメソッド。
+     *
+     * 項目番号: 17<br>
+     * 電文の親クラスの配置場所のaliasを指定します。通常は % です。<br>
+     * デフォルト値[%]が設定されています。Apache Antタスク上でアトリビュートの指定が無い場合には、デフォルト値が設定されます。<br>
+     *
+     * @return このフィールドの値
+     */
+    public String getApiTelegramBase() {
+        return fInput.getApiTelegramBase();
+    }
+
+    /**
      * Antタスクのメイン処理。Apache Antから このメソッドが呼び出されます。
      *
      * @throws BuildException タスクとしての例外が発生した場合。
@@ -543,6 +604,8 @@ public class BlancoRestGeneratorTsTask extends Task {
             System.out.println("- lineSeparator:[" + getLineSeparator() + "]");
             System.out.println("- searchTmpdir:[" + getSearchTmpdir() + "]");
             System.out.println("- generateToJson:[" + getGenerateToJson() + "]");
+            System.out.println("- apiTelegramPackage:[" + getApiTelegramPackage() + "]");
+            System.out.println("- apiTelegramBase:[" + getApiTelegramBase() + "]");
         }
 
         try {

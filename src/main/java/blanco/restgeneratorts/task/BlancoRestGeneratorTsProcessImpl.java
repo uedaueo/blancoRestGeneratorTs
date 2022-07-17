@@ -10,6 +10,7 @@
 package blanco.restgeneratorts.task;
 
 import blanco.cg.BlancoCgSupportedLang;
+import blanco.commons.util.BlancoStringUtil;
 import blanco.restgeneratorts.BlancoRestGeneratorTsConstants;
 import blanco.restgeneratorts.BlancoRestGeneratorTsMeta2Xml;
 import blanco.restgeneratorts.BlancoRestGeneratorTsUtil;
@@ -121,6 +122,12 @@ public class BlancoRestGeneratorTsProcessImpl implements
                 createProcessList = true;
             }
 
+            /*
+             * Get apiTelegramPackage and base
+             */
+            String apiTelegramPackage = input.getApiTelegramPackage();
+            String apiTelegramBase = input.getApiTelegramBase(); // has default value.
+
             // Creates a temporary directory.
             new File(input.getTmpdir()
                     + BlancoRestGeneratorTsConstants.TARGET_SUBDIRECTORY)
@@ -148,6 +155,12 @@ public class BlancoRestGeneratorTsProcessImpl implements
                 xml2source.setCreateServiceMethod(!input.getClient());
                 xml2source.setTabs(input.getTabs());
                 xml2source.setDefaultGenerateToJson(input.getGenerateToJson());
+
+                if (BlancoStringUtil.null2Blank(apiTelegramPackage).length() > 0) {
+                    xml2source.setSearchApiTelegramPackage(false);
+                    xml2source.setApiTelegramPackge(apiTelegramPackage);
+                    xml2source.setApiTelegramBase(apiTelegramBase);
+                }
 
                 BlancoRestGeneratorTsTelegramProcessStructure[] processStructures =
                 xml2source.process(fileMeta2[index], new File(strTarget));

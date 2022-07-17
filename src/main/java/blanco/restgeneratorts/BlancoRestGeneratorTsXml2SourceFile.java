@@ -69,6 +69,30 @@ public class BlancoRestGeneratorTsXml2SourceFile {
         this.fDefaultGenerateToJson = generateToJson;
     }
 
+    private boolean fSearchApiTelegramPackage = true;
+    public boolean searchApiTelegramPackage() {
+        return this.fSearchApiTelegramPackage;
+    }
+    public void setSearchApiTelegramPackage(boolean search) {
+        this.fSearchApiTelegramPackage = search;
+    }
+
+    private String fApiTelegramPackage;
+    public String getApiTelegramPackage() {
+        return this.fApiTelegramPackage;
+    }
+    public void setApiTelegramPackge(String apiTelegramPackge) {
+        this.fApiTelegramPackage = apiTelegramPackge;
+    }
+
+    private String fApiTelegramBase = "%";
+    public String getApiTelegramBase() {
+        return this.fApiTelegramBase;
+    }
+    public void setApiTelegramBase(String apiTelegramBase) {
+        this.fApiTelegramBase = apiTelegramBase;
+    }
+
     /**
      * An access object to the resource bundle for this product.
      */
@@ -166,6 +190,12 @@ public class BlancoRestGeneratorTsXml2SourceFile {
         BlancoRestGeneratorTsXmlParser parser = new BlancoRestGeneratorTsXmlParser();
         parser.setVerbose(this.isVerbose());
         parser.setCreateServiceMethod(this.isCreateServiceMethod());
+        if (!this.searchApiTelegramPackage()) {
+            parser.setSearchApiTelegramPackage(false);
+            parser.setApiTelegramPackge(this.getApiTelegramPackage());
+            parser.setApiTelegramBase(this.getApiTelegramBase());
+        }
+
         BlancoRestGeneratorTsTelegramProcessStructure[] processStructures =
                 parser.parse(argMetaXmlSourceFile);
 

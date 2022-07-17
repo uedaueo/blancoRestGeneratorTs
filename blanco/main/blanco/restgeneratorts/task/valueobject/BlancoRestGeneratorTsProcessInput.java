@@ -129,6 +129,21 @@ public class BlancoRestGeneratorTsProcessInput {
     private boolean fGenerateToJson = false;
 
     /**
+     * 電文の親クラスの配置場所を、Javaのパッケージ形式で指定します。
+     *
+     * フィールド: [apiTelegramPackage]。
+     */
+    private String fApiTelegramPackage;
+
+    /**
+     * 電文の親クラスの配置場所のaliasを指定します。通常は % です。
+     *
+     * フィールド: [apiTelegramBase]。
+     * デフォルト: [%]。
+     */
+    private String fApiTelegramBase = "%";
+
+    /**
      * フィールド [verbose] の値を設定します。
      *
      * フィールドの説明: [Whether to run in verbose mode.]。
@@ -493,6 +508,51 @@ public class BlancoRestGeneratorTsProcessInput {
     }
 
     /**
+     * フィールド [apiTelegramPackage] の値を設定します。
+     *
+     * フィールドの説明: [電文の親クラスの配置場所を、Javaのパッケージ形式で指定します。]。
+     *
+     * @param argApiTelegramPackage フィールド[apiTelegramPackage]に設定する値。
+     */
+    public void setApiTelegramPackage(final String argApiTelegramPackage) {
+        fApiTelegramPackage = argApiTelegramPackage;
+    }
+
+    /**
+     * フィールド [apiTelegramPackage] の値を取得します。
+     *
+     * フィールドの説明: [電文の親クラスの配置場所を、Javaのパッケージ形式で指定します。]。
+     *
+     * @return フィールド[apiTelegramPackage]から取得した値。
+     */
+    public String getApiTelegramPackage() {
+        return fApiTelegramPackage;
+    }
+
+    /**
+     * フィールド [apiTelegramBase] の値を設定します。
+     *
+     * フィールドの説明: [電文の親クラスの配置場所のaliasを指定します。通常は % です。]。
+     *
+     * @param argApiTelegramBase フィールド[apiTelegramBase]に設定する値。
+     */
+    public void setApiTelegramBase(final String argApiTelegramBase) {
+        fApiTelegramBase = argApiTelegramBase;
+    }
+
+    /**
+     * フィールド [apiTelegramBase] の値を取得します。
+     *
+     * フィールドの説明: [電文の親クラスの配置場所のaliasを指定します。通常は % です。]。
+     * デフォルト: [%]。
+     *
+     * @return フィールド[apiTelegramBase]から取得した値。
+     */
+    public String getApiTelegramBase() {
+        return fApiTelegramBase;
+    }
+
+    /**
      * Gets the string representation of this value object.
      *
      * <P>Precautions for use</P>
@@ -523,6 +583,8 @@ public class BlancoRestGeneratorTsProcessInput {
         buf.append(",lineSeparator=" + fLineSeparator);
         buf.append(",searchTmpdir=" + fSearchTmpdir);
         buf.append(",generateToJson=" + fGenerateToJson);
+        buf.append(",apiTelegramPackage=" + fApiTelegramPackage);
+        buf.append(",apiTelegramBase=" + fApiTelegramBase);
         buf.append("]");
         return buf.toString();
     }
@@ -593,5 +655,11 @@ public class BlancoRestGeneratorTsProcessInput {
         // Name: fGenerateToJson
         // Type: boolean
         target.fGenerateToJson = this.fGenerateToJson;
+        // Name: fApiTelegramPackage
+        // Type: java.lang.String
+        target.fApiTelegramPackage = this.fApiTelegramPackage;
+        // Name: fApiTelegramBase
+        // Type: java.lang.String
+        target.fApiTelegramBase = this.fApiTelegramBase;
     }
 }

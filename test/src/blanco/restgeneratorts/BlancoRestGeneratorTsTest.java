@@ -112,6 +112,8 @@ public class BlancoRestGeneratorTsTest {
         inputRestGenerator.setProcesslistBase("%");
         inputRestGenerator.setLineSeparator("CR");
         inputRestGenerator.setSearchTmpdir("tmpSample,tmpSample2");
+        inputRestGenerator.setApiTelegramPackage("api.telegrams");
+        inputRestGenerator.setApiTelegramBase("%%");
 
         BlancoRestGeneratorTsProcessImpl imple = new BlancoRestGeneratorTsProcessImpl();
         imple.execute(inputRestGenerator);
