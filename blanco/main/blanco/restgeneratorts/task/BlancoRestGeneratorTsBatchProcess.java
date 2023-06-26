@@ -92,6 +92,8 @@ public class BlancoRestGeneratorTsBatchProcess {
                 input.setApiTelegramPackage(arg.substring(20));
             } else if (arg.startsWith("-apiTelegramBase=")) {
                 input.setApiTelegramBase(arg.substring(17));
+            } else if (arg.startsWith("-telegramStyle=")) {
+                input.setTelegramStyle(arg.substring(15));
             } else if (arg.equals("-?") || arg.equals("-help")) {
                 usage();
                 System.exit(END_SUCCESS);
@@ -185,7 +187,7 @@ public class BlancoRestGeneratorTsBatchProcess {
      */
     public static final void usage() {
         System.out.println("BlancoRestGeneratorTsBatchProcess: Usage:");
-        System.out.println("  java blanco.restgeneratorts.task.BlancoRestGeneratorTsBatchProcess -verbose=value1 -metadir=value2 -targetdir=value3 -tmpdir=value4 -nameAdjust=value5 -encoding=value6 -tabs=value7 -xmlrootelement=value8 -sheetType=value9 -targetStyle=value10 -client=value11 -processlist=value12 -processlistBase=value13 -lineSeparator=value14 -searchTmpdir=value15 -generateToJson=value16 -apiTelegramPackage=value17 -apiTelegramBase=value18");
+        System.out.println("  java blanco.restgeneratorts.task.BlancoRestGeneratorTsBatchProcess -verbose=value1 -metadir=value2 -targetdir=value3 -tmpdir=value4 -nameAdjust=value5 -encoding=value6 -tabs=value7 -xmlrootelement=value8 -sheetType=value9 -targetStyle=value10 -client=value11 -processlist=value12 -processlistBase=value13 -lineSeparator=value14 -searchTmpdir=value15 -generateToJson=value16 -apiTelegramPackage=value17 -apiTelegramBase=value18 -telegramStyle=value19");
         System.out.println("    -verbose");
         System.out.println("      explanation[Whether to run in verbose mode.]");
         System.out.println("      type[boolean]");
@@ -254,6 +256,10 @@ public class BlancoRestGeneratorTsBatchProcess {
         System.out.println("      explanation[電文の親クラスの配置場所のaliasを指定します。通常は % です。]");
         System.out.println("      type[string]");
         System.out.println("      default value[%]");
+        System.out.println("    -telegramStyle");
+        System.out.println("      explanation[電文の形式を指定します。\nblanco: 電文をCommonRequest/CommonResponseでくるみます。\nplain: 電文を直接 payload に乗せます。GET は第一階層がクエリ文字列として定義されます。]");
+        System.out.println("      type[string]");
+        System.out.println("      default value[blanco]");
         System.out.println("    -? , -help");
         System.out.println("      explanation[show the usage.]");
     }

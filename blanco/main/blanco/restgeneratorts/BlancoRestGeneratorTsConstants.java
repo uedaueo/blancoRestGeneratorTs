@@ -270,7 +270,79 @@ public class BlancoRestGeneratorTsConstants {
 
     /**
      * 項目番号:45<br>
+     * 電文種別ERRORを表す文字列
+     */
+    public static final String TELEGRAM_ERROR = "TELEGRAM_ERROR";
+
+    /**
+     * 項目番号:46<br>
      * 電文の基底クラス
      */
     public static final String API_TELEGRAM_BASE = "ApiTelegram";
+
+    /**
+     * 項目番号:47<br>
+     * 電文定義書に要求電文として定義された電文種別を表す文字列
+     */
+    public static final String TELEGRAM_TYPE_INPUT = "Input";
+
+    /**
+     * 項目番号:48<br>
+     * 電文定義書に応答電文として定義された電文種別を表す文字列
+     */
+    public static final String TELEGRAM_TYPE_OUTPUT = "Output";
+
+    /**
+     * 項目番号:49<br>
+     * 電文定義書にエラー電文として定義された電文種別を表す文字列
+     */
+    public static final String TELEGRAM_TYPE_ERROR = "Error";
+
+    /**
+     * 項目番号:50<br>
+     * Task引数として渡される電文スタイル文字列: blanco
+     */
+    public static final String TELEGRAM_STYLE_BLANCO = "blanco";
+
+    /**
+     * 項目番号:51<br>
+     * Task引数として渡される電文スタイル文字列: plain
+     */
+    public static final String TELEGRAM_STYLE_PLAIN = "plain";
+
+    /**
+     * 項目番号:52<br>
+     * エラー電文に追加されるstatusCodeのプロパティ名
+     */
+    public static final String TELEGRAM_STATUS_CODE = "statusCode";
+
+    /**
+     * 項目番号:53<br>
+     * BODYで渡されたプロパティをURIパスで渡されたプロパティで上書きする
+     */
+    public static final String ON_CONFLICT_PREFER_PATH = "PREFER_PATH";
+
+    /**
+     * 項目番号:54<br>
+     * BODYで渡されたプロパティをURIパスより優先する
+     */
+    public static final String ON_CONFLICT_PREFER_BODY = "PREFER_BODY";
+
+    /**
+     * 項目番号:55<br>
+     * BODYとURIパスでプロパティが重複した場合はREJECTする
+     */
+    public static final String ON_CONFLICT_REJECT = "REJECT";
+
+    /**
+     * 項目番号:56<br>
+     * 電文プロパティをQuery文字列として受け取る際の種別
+     */
+    public static final String TELEGRAM_QUERY_KIND_PATH = "path";
+
+    /**
+     * 項目番号:57<br>
+     * 電文プロパティをQuery文字列として受け取る際の種別
+     */
+    public static final String TELEGRAM_QUERY_KIND_QUERY = "query";
 }

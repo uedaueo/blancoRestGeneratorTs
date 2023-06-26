@@ -128,6 +128,18 @@ public class BlancoRestGeneratorTsProcessImpl implements
             String apiTelegramPackage = input.getApiTelegramPackage();
             String apiTelegramBase = input.getApiTelegramBase(); // has default value.
 
+            /*
+             * Specify telegramStyle
+             */
+            String telegramStyle = input.getTelegramStyle();
+            if (!telegramStyle.equals(BlancoRestGeneratorTsConstants.TELEGRAM_STYLE_BLANCO) && !telegramStyle.equals(BlancoRestGeneratorTsConstants.TELEGRAM_STYLE_PLAIN)) {
+                throw new IllegalArgumentException(fBundle.getBlancorestTelegramStyleError());
+            }
+            if (telegramStyle.equals(BlancoRestGeneratorTsConstants.TELEGRAM_STYLE_PLAIN)) {
+                BlancoRestGeneratorTsUtil.isTelegramStyleBlanco = false;
+                BlancoRestGeneratorTsUtil.isTelegramStylePlain = true;
+            }
+
             // Creates a temporary directory.
             new File(input.getTmpdir()
                     + BlancoRestGeneratorTsConstants.TARGET_SUBDIRECTORY)

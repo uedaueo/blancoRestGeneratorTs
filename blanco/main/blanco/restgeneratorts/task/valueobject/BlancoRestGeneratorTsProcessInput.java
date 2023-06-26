@@ -144,6 +144,14 @@ public class BlancoRestGeneratorTsProcessInput {
     private String fApiTelegramBase = "%";
 
     /**
+     * 電文の形式を指定します。\nblanco: 電文をCommonRequest/CommonResponseでくるみます。\nplain: 電文を直接 payload に乗せます。GET は第一階層がクエリ文字列として定義されます。
+     *
+     * フィールド: [telegramStyle]。
+     * デフォルト: [blanco]。
+     */
+    private String fTelegramStyle = "blanco";
+
+    /**
      * フィールド [verbose] の値を設定します。
      *
      * フィールドの説明: [Whether to run in verbose mode.]。
@@ -553,6 +561,29 @@ public class BlancoRestGeneratorTsProcessInput {
     }
 
     /**
+     * フィールド [telegramStyle] の値を設定します。
+     *
+     * フィールドの説明: [電文の形式を指定します。\nblanco: 電文をCommonRequest/CommonResponseでくるみます。\nplain: 電文を直接 payload に乗せます。GET は第一階層がクエリ文字列として定義されます。]。
+     *
+     * @param argTelegramStyle フィールド[telegramStyle]に設定する値。
+     */
+    public void setTelegramStyle(final String argTelegramStyle) {
+        fTelegramStyle = argTelegramStyle;
+    }
+
+    /**
+     * フィールド [telegramStyle] の値を取得します。
+     *
+     * フィールドの説明: [電文の形式を指定します。\nblanco: 電文をCommonRequest/CommonResponseでくるみます。\nplain: 電文を直接 payload に乗せます。GET は第一階層がクエリ文字列として定義されます。]。
+     * デフォルト: [blanco]。
+     *
+     * @return フィールド[telegramStyle]から取得した値。
+     */
+    public String getTelegramStyle() {
+        return fTelegramStyle;
+    }
+
+    /**
      * Gets the string representation of this value object.
      *
      * <P>Precautions for use</P>
@@ -585,6 +616,7 @@ public class BlancoRestGeneratorTsProcessInput {
         buf.append(",generateToJson=" + fGenerateToJson);
         buf.append(",apiTelegramPackage=" + fApiTelegramPackage);
         buf.append(",apiTelegramBase=" + fApiTelegramBase);
+        buf.append(",telegramStyle=" + fTelegramStyle);
         buf.append("]");
         return buf.toString();
     }
@@ -661,5 +693,8 @@ public class BlancoRestGeneratorTsProcessInput {
         // Name: fApiTelegramBase
         // Type: java.lang.String
         target.fApiTelegramBase = this.fApiTelegramBase;
+        // Name: fTelegramStyle
+        // Type: java.lang.String
+        target.fTelegramStyle = this.fTelegramStyle;
     }
 }

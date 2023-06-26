@@ -127,6 +127,50 @@ public class BlancoRestGeneratorTsTelegramStructure {
     private ArrayList<BlancoRestGeneratorTsTelegramFieldStructure> fListField = new java.util.ArrayList<blanco.restgeneratorts.valueobject.BlancoRestGeneratorTsTelegramFieldStructure>();
 
     /**
+     * 電文IDの後ろに付与されます。エラー電文で使用される想定です。
+     *
+     * フィールド: [telegramSuffix]。
+     */
+    private String fTelegramSuffix;
+
+    /**
+     * 応答ステータス。エラー電文で使用される想定です。
+     *
+     * フィールド: [statusCode]。
+     */
+    private String fStatusCode;
+
+    /**
+     * メソッド毎に固定のパスを追加する場合に使用。
+     *
+     * フィールド: [additionalPath]。
+     */
+    private String fAdditionalPath;
+
+    /**
+     * POST/PUTメソッドでURIパスとbodyのJSONプロパティの名前が被った際の動作を規定する。
+     *
+     * フィールド: [paramPreferred]。
+     * デフォルト: [&quot;PATH&quot;]。
+     */
+    private String fParamPreferred = "PATH";
+
+    /**
+     * パラメータをQueryStringで取得する場合はtrueとします。
+     *
+     * フィールド: [hasQueryParams]。
+     * デフォルト: [false]。
+     */
+    private Boolean fHasQueryParams = false;
+
+    /**
+     * 最終的に使用されるパッケージ名を保存します。
+     *
+     * フィールド: [calculatedPackage]。
+     */
+    private String fCalculatedPackage;
+
+    /**
      * フィールド [name] の値を設定します。
      *
      * フィールドの説明: [電文ID]。
@@ -486,6 +530,140 @@ public class BlancoRestGeneratorTsTelegramStructure {
     }
 
     /**
+     * フィールド [telegramSuffix] の値を設定します。
+     *
+     * フィールドの説明: [電文IDの後ろに付与されます。エラー電文で使用される想定です。]。
+     *
+     * @param argTelegramSuffix フィールド[telegramSuffix]に設定する値。
+     */
+    public void setTelegramSuffix(final String argTelegramSuffix) {
+        fTelegramSuffix = argTelegramSuffix;
+    }
+
+    /**
+     * フィールド [telegramSuffix] の値を取得します。
+     *
+     * フィールドの説明: [電文IDの後ろに付与されます。エラー電文で使用される想定です。]。
+     *
+     * @return フィールド[telegramSuffix]から取得した値。
+     */
+    public String getTelegramSuffix() {
+        return fTelegramSuffix;
+    }
+
+    /**
+     * フィールド [statusCode] の値を設定します。
+     *
+     * フィールドの説明: [応答ステータス。エラー電文で使用される想定です。]。
+     *
+     * @param argStatusCode フィールド[statusCode]に設定する値。
+     */
+    public void setStatusCode(final String argStatusCode) {
+        fStatusCode = argStatusCode;
+    }
+
+    /**
+     * フィールド [statusCode] の値を取得します。
+     *
+     * フィールドの説明: [応答ステータス。エラー電文で使用される想定です。]。
+     *
+     * @return フィールド[statusCode]から取得した値。
+     */
+    public String getStatusCode() {
+        return fStatusCode;
+    }
+
+    /**
+     * フィールド [additionalPath] の値を設定します。
+     *
+     * フィールドの説明: [メソッド毎に固定のパスを追加する場合に使用。]。
+     *
+     * @param argAdditionalPath フィールド[additionalPath]に設定する値。
+     */
+    public void setAdditionalPath(final String argAdditionalPath) {
+        fAdditionalPath = argAdditionalPath;
+    }
+
+    /**
+     * フィールド [additionalPath] の値を取得します。
+     *
+     * フィールドの説明: [メソッド毎に固定のパスを追加する場合に使用。]。
+     *
+     * @return フィールド[additionalPath]から取得した値。
+     */
+    public String getAdditionalPath() {
+        return fAdditionalPath;
+    }
+
+    /**
+     * フィールド [paramPreferred] の値を設定します。
+     *
+     * フィールドの説明: [POST/PUTメソッドでURIパスとbodyのJSONプロパティの名前が被った際の動作を規定する。]。
+     *
+     * @param argParamPreferred フィールド[paramPreferred]に設定する値。
+     */
+    public void setParamPreferred(final String argParamPreferred) {
+        fParamPreferred = argParamPreferred;
+    }
+
+    /**
+     * フィールド [paramPreferred] の値を取得します。
+     *
+     * フィールドの説明: [POST/PUTメソッドでURIパスとbodyのJSONプロパティの名前が被った際の動作を規定する。]。
+     * デフォルト: [&quot;PATH&quot;]。
+     *
+     * @return フィールド[paramPreferred]から取得した値。
+     */
+    public String getParamPreferred() {
+        return fParamPreferred;
+    }
+
+    /**
+     * フィールド [hasQueryParams] の値を設定します。
+     *
+     * フィールドの説明: [パラメータをQueryStringで取得する場合はtrueとします。]。
+     *
+     * @param argHasQueryParams フィールド[hasQueryParams]に設定する値。
+     */
+    public void setHasQueryParams(final Boolean argHasQueryParams) {
+        fHasQueryParams = argHasQueryParams;
+    }
+
+    /**
+     * フィールド [hasQueryParams] の値を取得します。
+     *
+     * フィールドの説明: [パラメータをQueryStringで取得する場合はtrueとします。]。
+     * デフォルト: [false]。
+     *
+     * @return フィールド[hasQueryParams]から取得した値。
+     */
+    public Boolean getHasQueryParams() {
+        return fHasQueryParams;
+    }
+
+    /**
+     * フィールド [calculatedPackage] の値を設定します。
+     *
+     * フィールドの説明: [最終的に使用されるパッケージ名を保存します。]。
+     *
+     * @param argCalculatedPackage フィールド[calculatedPackage]に設定する値。
+     */
+    public void setCalculatedPackage(final String argCalculatedPackage) {
+        fCalculatedPackage = argCalculatedPackage;
+    }
+
+    /**
+     * フィールド [calculatedPackage] の値を取得します。
+     *
+     * フィールドの説明: [最終的に使用されるパッケージ名を保存します。]。
+     *
+     * @return フィールド[calculatedPackage]から取得した値。
+     */
+    public String getCalculatedPackage() {
+        return fCalculatedPackage;
+    }
+
+    /**
      * Gets the string representation of this value object.
      *
      * <P>Precautions for use</P>
@@ -516,6 +694,12 @@ public class BlancoRestGeneratorTsTelegramStructure {
         buf.append(",importList=" + fImportList);
         buf.append(",headerList=" + fHeaderList);
         buf.append(",listField=" + fListField);
+        buf.append(",telegramSuffix=" + fTelegramSuffix);
+        buf.append(",statusCode=" + fStatusCode);
+        buf.append(",additionalPath=" + fAdditionalPath);
+        buf.append(",paramPreferred=" + fParamPreferred);
+        buf.append(",hasQueryParams=" + fHasQueryParams);
+        buf.append(",calculatedPackage=" + fCalculatedPackage);
         buf.append("]");
         return buf.toString();
     }
@@ -586,5 +770,23 @@ public class BlancoRestGeneratorTsTelegramStructure {
         // Name: fListField
         // Type: java.util.ArrayList
         // Field[fListField] is an unsupported type[java.util.ArrayListblanco.restgeneratorts.valueobject.BlancoRestGeneratorTsTelegramFieldStructure].
+        // Name: fTelegramSuffix
+        // Type: java.lang.String
+        target.fTelegramSuffix = this.fTelegramSuffix;
+        // Name: fStatusCode
+        // Type: java.lang.String
+        target.fStatusCode = this.fStatusCode;
+        // Name: fAdditionalPath
+        // Type: java.lang.String
+        target.fAdditionalPath = this.fAdditionalPath;
+        // Name: fParamPreferred
+        // Type: java.lang.String
+        target.fParamPreferred = this.fParamPreferred;
+        // Name: fHasQueryParams
+        // Type: java.lang.Boolean
+        target.fHasQueryParams = this.fHasQueryParams;
+        // Name: fCalculatedPackage
+        // Type: java.lang.String
+        target.fCalculatedPackage = this.fCalculatedPackage;
     }
 }

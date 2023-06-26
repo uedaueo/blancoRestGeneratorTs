@@ -114,6 +114,11 @@ public class BlancoRestGeneratorTsTask extends Task {
     protected boolean fIsFieldApiTelegramBaseProcessed = false;
 
     /**
+     * フィールド [telegramStyle] に値がセットされたかどうか。
+     */
+    protected boolean fIsFieldTelegramStyleProcessed = false;
+
+    /**
      * verboseモードで動作させるかどうか。
      *
      * @param arg verboseモードで動作させるかどうか。
@@ -574,6 +579,32 @@ public class BlancoRestGeneratorTsTask extends Task {
     }
 
     /**
+     * Antタスクの[telegramStyle]アトリビュートのセッターメソッド。
+     *
+     * 項目番号: 18<br>
+     * 電文の形式を指定します。\nblanco: 電文をCommonRequest/CommonResponseでくるみます。\nplain: 電文を直接 payload に乗せます。GET は第一階層がクエリ文字列として定義されます。<br>
+     *
+     * @param arg セットしたい値
+     */
+    public void setTelegramStyle(final String arg) {
+        fInput.setTelegramStyle(arg);
+        fIsFieldTelegramStyleProcessed = true;
+    }
+
+    /**
+     * Antタスクの[telegramStyle]アトリビュートのゲッターメソッド。
+     *
+     * 項目番号: 18<br>
+     * 電文の形式を指定します。\nblanco: 電文をCommonRequest/CommonResponseでくるみます。\nplain: 電文を直接 payload に乗せます。GET は第一階層がクエリ文字列として定義されます。<br>
+     * デフォルト値[blanco]が設定されています。Apache Antタスク上でアトリビュートの指定が無い場合には、デフォルト値が設定されます。<br>
+     *
+     * @return このフィールドの値
+     */
+    public String getTelegramStyle() {
+        return fInput.getTelegramStyle();
+    }
+
+    /**
      * Antタスクのメイン処理。Apache Antから このメソッドが呼び出されます。
      *
      * @throws BuildException タスクとしての例外が発生した場合。
@@ -606,6 +637,7 @@ public class BlancoRestGeneratorTsTask extends Task {
             System.out.println("- generateToJson:[" + getGenerateToJson() + "]");
             System.out.println("- apiTelegramPackage:[" + getApiTelegramPackage() + "]");
             System.out.println("- apiTelegramBase:[" + getApiTelegramBase() + "]");
+            System.out.println("- telegramStyle:[" + getTelegramStyle() + "]");
         }
 
         try {

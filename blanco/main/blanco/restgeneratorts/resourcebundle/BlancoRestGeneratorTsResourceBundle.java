@@ -1674,4 +1674,84 @@ public class BlancoRestGeneratorTsResourceBundle {
         // 置換文字列はひとつもありません。
         return strFormat;
     }
+
+    /**
+     * bundle[BlancoRestGeneratorTs], key[BLANCOREST.TELEGRAM_STYLE.ERROR]
+     *
+     * [BlancoRestGeneratorTs では telegramStyle は今の所 blanco または plain のみをサポートしています。] (ja)<br>
+     *
+     * @return key[BLANCOREST.TELEGRAM_STYLE.ERROR]に対応する値。外部から読み込みができない場合には、定義書の値を戻します。必ずnull以外の値が戻ります。
+     */
+    public String getBlancorestTelegramStyleError() {
+        // 初期値として定義書の値を利用します。
+        String strFormat = "BlancoRestGeneratorTs では telegramStyle は今の所 blanco または plain のみをサポートしています。";
+        try {
+            if (fResourceBundle != null) {
+                strFormat = fResourceBundle.getString("BLANCOREST.TELEGRAM_STYLE.ERROR");
+            }
+        } catch (MissingResourceException ex) {
+        }
+        // 置換文字列はひとつもありません。
+        return strFormat;
+    }
+
+    /**
+     * bundle[BlancoRestGeneratorTs], key[BLANCOREST.TELEGRAM_STYLE_PLAIN.STATUS_CODE_RESERVED]
+     *
+     * [エラー電文では statusCode プロパティは予約されています。] (ja)<br>
+     *
+     * @return key[BLANCOREST.TELEGRAM_STYLE_PLAIN.STATUS_CODE_RESERVED]に対応する値。外部から読み込みができない場合には、定義書の値を戻します。必ずnull以外の値が戻ります。
+     */
+    public String getBlancorestTelegramStylePlainStatusCodeReserved() {
+        // 初期値として定義書の値を利用します。
+        String strFormat = "エラー電文では statusCode プロパティは予約されています。";
+        try {
+            if (fResourceBundle != null) {
+                strFormat = fResourceBundle.getString("BLANCOREST.TELEGRAM_STYLE_PLAIN.STATUS_CODE_RESERVED");
+            }
+        } catch (MissingResourceException ex) {
+        }
+        // 置換文字列はひとつもありません。
+        return strFormat;
+    }
+
+    /**
+     * bundle[BlancoRestGeneratorTs], key[BLANCOREST.TELEGRAM_STYLE_PLAIN.STATUS_CODE_REQUIRED]
+     *
+     * [エラー電文では statusCode は必須です。] (ja)<br>
+     *
+     * @return key[BLANCOREST.TELEGRAM_STYLE_PLAIN.STATUS_CODE_REQUIRED]に対応する値。外部から読み込みができない場合には、定義書の値を戻します。必ずnull以外の値が戻ります。
+     */
+    public String getBlancorestTelegramStylePlainStatusCodeRequired() {
+        // 初期値として定義書の値を利用します。
+        String strFormat = "エラー電文では statusCode は必須です。";
+        try {
+            if (fResourceBundle != null) {
+                strFormat = fResourceBundle.getString("BLANCOREST.TELEGRAM_STYLE_PLAIN.STATUS_CODE_REQUIRED");
+            }
+        } catch (MissingResourceException ex) {
+        }
+        // 置換文字列はひとつもありません。
+        return strFormat;
+    }
+
+    /**
+     * bundle[BlancoRestGeneratorTs], key[BLANCOREST.TELEGRAM_STYLE_PLAIN.STATUS_CODE.LANGDOC]
+     *
+     * [エラー電文を返す際のHttpStatus Codeです。] (ja)<br>
+     *
+     * @return key[BLANCOREST.TELEGRAM_STYLE_PLAIN.STATUS_CODE.LANGDOC]に対応する値。外部から読み込みができない場合には、定義書の値を戻します。必ずnull以外の値が戻ります。
+     */
+    public String getBlancorestTelegramStylePlainStatusCodeLangdoc() {
+        // 初期値として定義書の値を利用します。
+        String strFormat = "エラー電文を返す際のHttpStatus Codeです。";
+        try {
+            if (fResourceBundle != null) {
+                strFormat = fResourceBundle.getString("BLANCOREST.TELEGRAM_STYLE_PLAIN.STATUS_CODE.LANGDOC");
+            }
+        } catch (MissingResourceException ex) {
+        }
+        // 置換文字列はひとつもありません。
+        return strFormat;
+    }
 }

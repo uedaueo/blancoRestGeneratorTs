@@ -72,6 +72,20 @@ public class BlancoRestGeneratorTsTelegramFieldStructure {
     private String fDefault;
 
     /**
+     * JSON/クエリのプロパティ名として用いる文字列
+     *
+     * フィールド: [alias]。
+     */
+    private String fAlias;
+
+    /**
+     * プロパティ名の取得元種別。path/query が明示されていない場合は、GET/DELETE では query。POST/PUTでは JSON プロパティを期待する。
+     *
+     * フィールド: [queryKind]。
+     */
+    private String fQueryKind;
+
+    /**
      * 必須項目の場合はtrue
      *
      * フィールド: [nullable]。
@@ -329,6 +343,50 @@ public class BlancoRestGeneratorTsTelegramFieldStructure {
     }
 
     /**
+     * フィールド [alias] の値を設定します。
+     *
+     * フィールドの説明: [JSON/クエリのプロパティ名として用いる文字列]。
+     *
+     * @param argAlias フィールド[alias]に設定する値。
+     */
+    public void setAlias(final String argAlias) {
+        fAlias = argAlias;
+    }
+
+    /**
+     * フィールド [alias] の値を取得します。
+     *
+     * フィールドの説明: [JSON/クエリのプロパティ名として用いる文字列]。
+     *
+     * @return フィールド[alias]から取得した値。
+     */
+    public String getAlias() {
+        return fAlias;
+    }
+
+    /**
+     * フィールド [queryKind] の値を設定します。
+     *
+     * フィールドの説明: [プロパティ名の取得元種別。path/query が明示されていない場合は、GET/DELETE では query。POST/PUTでは JSON プロパティを期待する。]。
+     *
+     * @param argQueryKind フィールド[queryKind]に設定する値。
+     */
+    public void setQueryKind(final String argQueryKind) {
+        fQueryKind = argQueryKind;
+    }
+
+    /**
+     * フィールド [queryKind] の値を取得します。
+     *
+     * フィールドの説明: [プロパティ名の取得元種別。path/query が明示されていない場合は、GET/DELETE では query。POST/PUTでは JSON プロパティを期待する。]。
+     *
+     * @return フィールド[queryKind]から取得した値。
+     */
+    public String getQueryKind() {
+        return fQueryKind;
+    }
+
+    /**
      * フィールド [nullable] の値を設定します。
      *
      * フィールドの説明: [必須項目の場合はtrue]。
@@ -529,6 +587,8 @@ public class BlancoRestGeneratorTsTelegramFieldStructure {
         buf.append(",annotationList=" + fAnnotationList);
         buf.append(",required=" + fRequired);
         buf.append(",default=" + fDefault);
+        buf.append(",alias=" + fAlias);
+        buf.append(",queryKind=" + fQueryKind);
         buf.append(",nullable=" + fNullable);
         buf.append(",excludeToJson=" + fExcludeToJson);
         buf.append(",minLength=" + fMinLength);
@@ -586,6 +646,12 @@ public class BlancoRestGeneratorTsTelegramFieldStructure {
         // Name: fDefault
         // Type: java.lang.String
         target.fDefault = this.fDefault;
+        // Name: fAlias
+        // Type: java.lang.String
+        target.fAlias = this.fAlias;
+        // Name: fQueryKind
+        // Type: java.lang.String
+        target.fQueryKind = this.fQueryKind;
         // Name: fNullable
         // Type: java.lang.Boolean
         target.fNullable = this.fNullable;

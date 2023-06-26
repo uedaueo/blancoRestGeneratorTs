@@ -274,6 +274,23 @@ public class BlancoRestGeneratorTsXmlParser {
         argTelegramStructure.setTelegramMethod(BlancoXmlBindingUtil.getTextContent(argElementCommon, "telegramMethod"));
         argTelegramStructure.setBasedir(BlancoXmlBindingUtil.getTextContent(argElementCommon, "basedir"));
 
+        // telegram suffix
+        argTelegramStructure.setTelegramSuffix(BlancoXmlBindingUtil.getTextContent(argElementCommon, "telegramSuffix"));
+
+        // StatusCode
+        if (BlancoRestGeneratorTsConstants.TELEGRAM_TYPE_ERROR.equals(argTelegramStructure.getTelegramType())) {
+            String statusCode = BlancoXmlBindingUtil.getTextContent(argElementCommon, "statusCode");
+            if (BlancoStringUtil.null2Blank(statusCode).trim().length() == 0) {
+                throw new IllegalArgumentException(fBundle.getBlancorestTelegramStylePlainStatusCodeRequired());
+            }
+            argTelegramStructure.setStatusCode("\"" + statusCode + "\"");
+        }
+
+        // Additional Path
+        argTelegramStructure.setAdditionalPath(BlancoXmlBindingUtil.getTextContent(argElementCommon, "additionalPath"));
+        // paramPreferred
+        argTelegramStructure.setParamPreferred(BlancoXmlBindingUtil.getTextContent(argElementCommon, "paramPreferred"));
+
         /* Supports for class annotation. */
         String classAnnotation = BlancoXmlBindingUtil.getTextContent(
                 argElementCommon, "annotation");
@@ -438,6 +455,12 @@ public class BlancoRestGeneratorTsXmlParser {
                     || fieldStructure.getName().trim().length() == 0) {
 //                System.out.println("*** NO NAME SKIP!!! ");
                 continue;
+            }
+
+            /* if telegramStyle is plain, statusCode is reserved. */
+            if (BlancoRestGeneratorTsConstants.TELEGRAM_TYPE_ERROR.equals(argTelegramStructure.getTelegramType()) &&
+                    BlancoRestGeneratorTsConstants.TELEGRAM_STATUS_CODE.equals(fieldStructure.getName())) {
+                throw new IllegalArgumentException(fBundle.getBlancorestTelegramStylePlainStatusCodeReserved());
             }
 
             /*
@@ -630,11 +653,36 @@ public class BlancoRestGeneratorTsXmlParser {
             fieldStructure.setPattern(BlancoXmlBindingUtil.getTextContent(
                     elementList, "pattern"));
 
+            /* alias */
+            fieldStructure.setAlias(BlancoXmlBindingUtil.getTextContent(elementList, "alias"));
+            /* queryKind */
+            fieldStructure.setQueryKind(BlancoXmlBindingUtil.getTextContent(elementList, "queryKind"));
+            if (BlancoStringUtil.null2Blank(fieldStructure.getQueryKind()).trim().length() > 0) {
+                argTelegramStructure.setHasQueryParams(true);
+            }
+
             if (fieldStructure.getType() == null
                     || fieldStructure.getType().trim().length() == 0) {
                 throw new IllegalArgumentException(fBundle.getXml2sourceFileErr005(argTelegramStructure.getName(), fieldStructure.getName()));
             }
 
+            argTelegramStructure.getListField().add(fieldStructure);
+        }
+
+        /* Set StatusCode for ErrorTelegram if telegram style is plain. */
+        if (BlancoRestGeneratorTsConstants.TELEGRAM_TYPE_ERROR.equals(argTelegramStructure.getTelegramType())) {
+            final BlancoRestGeneratorTsTelegramFieldStructure fieldStructure = new BlancoRestGeneratorTsTelegramFieldStructure();
+
+            fieldStructure.setNo("0");
+            fieldStructure.setName(BlancoRestGeneratorTsConstants.TELEGRAM_STATUS_CODE);
+            fieldStructure.setType("string");
+            fieldStructure.setNullable(false);
+            String statusCode = argTelegramStructure.getStatusCode();
+            if (BlancoStringUtil.null2Blank(statusCode).trim().length() == 0) {
+                throw new IllegalArgumentException(fBundle.getBlancorestTelegramStylePlainStatusCodeRequired());
+            }
+            fieldStructure.setDefault(statusCode);
+            fieldStructure.setDescription(fBundle.getBlancorestTelegramStylePlainStatusCodeLangdoc());
             argTelegramStructure.getListField().add(fieldStructure);
         }
     }

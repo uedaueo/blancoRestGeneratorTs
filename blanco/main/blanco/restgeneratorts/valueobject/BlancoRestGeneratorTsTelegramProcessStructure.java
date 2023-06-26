@@ -2,6 +2,7 @@ package blanco.restgeneratorts.valueobject;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * BlancoRestGeneratorTsのなかで利用されるValueObjectです。
@@ -126,6 +127,15 @@ public class BlancoRestGeneratorTsTelegramProcessStructure {
      * デフォルト: [new java.util.HashMap&lt;&gt;()]。
      */
     private HashMap<String, HashMap<String, BlancoRestGeneratorTsTelegramStructure>> fListTelegrams = new java.util.HashMap<>();
+
+    /**
+     * この電文処理が使用するエラー電文。
+     *
+     * Map<HttpMethod, List<telegramStructure>> を想定。
+     * フィールド: [errorTelegrams]。
+     * デフォルト: [new java.util.HashMap&lt;&gt;()]。
+     */
+    private Map<String, List<BlancoRestGeneratorTsTelegramStructure>> fErrorTelegrams = new java.util.HashMap<>();
 
     /**
      * フィールド [name] の値を設定します。
@@ -488,6 +498,31 @@ public class BlancoRestGeneratorTsTelegramProcessStructure {
     }
 
     /**
+     * フィールド [errorTelegrams] の値を設定します。
+     *
+     * フィールドの説明: [この電文処理が使用するエラー電文。]。
+     * Map<HttpMethod, List<telegramStructure>> を想定。
+     *
+     * @param argErrorTelegrams フィールド[errorTelegrams]に設定する値。
+     */
+    public void setErrorTelegrams(final Map<String, List<BlancoRestGeneratorTsTelegramStructure>> argErrorTelegrams) {
+        fErrorTelegrams = argErrorTelegrams;
+    }
+
+    /**
+     * フィールド [errorTelegrams] の値を取得します。
+     *
+     * フィールドの説明: [この電文処理が使用するエラー電文。]。
+     * Map<HttpMethod, List<telegramStructure>> を想定。
+     * デフォルト: [new java.util.HashMap&lt;&gt;()]。
+     *
+     * @return フィールド[errorTelegrams]から取得した値。
+     */
+    public Map<String, List<BlancoRestGeneratorTsTelegramStructure>> getErrorTelegrams() {
+        return fErrorTelegrams;
+    }
+
+    /**
      * Gets the string representation of this value object.
      *
      * <P>Precautions for use</P>
@@ -518,6 +553,7 @@ public class BlancoRestGeneratorTsTelegramProcessStructure {
         buf.append(",importList=" + fImportList);
         buf.append(",headerList=" + fHeaderList);
         buf.append(",listTelegrams=" + fListTelegrams);
+        buf.append(",errorTelegrams=" + fErrorTelegrams);
         buf.append("]");
         return buf.toString();
     }
@@ -588,5 +624,8 @@ public class BlancoRestGeneratorTsTelegramProcessStructure {
         // Name: fListTelegrams
         // Type: java.util.HashMap
         // Field[fListTelegrams] is an unsupported type[java.util.HashMapjava.lang.String, java.util.HashMap<java.lang.String, blanco.restgeneratorts.valueobject.BlancoRestGeneratorTsTelegramStructure>].
+        // Name: fErrorTelegrams
+        // Type: java.util.Map
+        // Field[fErrorTelegrams] is an unsupported type[java.util.Mapjava.lang.String, java.util.List<blanco.restgeneratorts.valueobject.BlancoRestGeneratorTsTelegramStructure>].
     }
 }
