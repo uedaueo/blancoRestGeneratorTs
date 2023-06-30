@@ -208,7 +208,7 @@ public class BlancoRestGeneratorTsXml2SourceFile {
         if (BlancoRestGeneratorTsUtil.isTelegramStyleBlanco) {
             expander = new BlancoRestGeneratorTsBlancoStyleExpander();
         } else {
-            throw new IllegalArgumentException("NIY BlancoRestGeneratorTsPlainStyelExpander.");
+            expander = new BlancoRestGeneratorTsPlainStyleExpander();
         }
 
         expander.setEncoding(this.fEncoding);

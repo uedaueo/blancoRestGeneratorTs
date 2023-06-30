@@ -3,6 +3,7 @@ package blanco.restgeneratorts;
 import blanco.cg.BlancoCgSupportedLang;
 import blanco.restgeneratorts.resourcebundle.BlancoRestGeneratorTsResourceBundle;
 import blanco.restgeneratorts.task.valueobject.BlancoRestGeneratorTsProcessInput;
+import blanco.restgeneratorts.valueobject.BlancoRestGeneratorTsTelegramStructure;
 import blanco.valueobjectts.BlancoValueObjectTsXmlParser;
 import blanco.valueobjectts.valueobject.BlancoValueObjectTsClassStructure;
 
@@ -253,5 +254,29 @@ public class BlancoRestGeneratorTsUtil {
                 System.out.println("BlancoRestGeneratorTsXmlParser#makeImportHeaderList: new import { " + argClassName + " } from \"" + importFrom + "\"");
             }
         }
+    }
+
+    /**
+     * Search telegrams startWith specified name.
+     * It may very slow if the sheet contains many telegrams, but be patient
+     * because it is just on generate sources phase.
+     * @param start
+     * @param argTelegramStructureMap
+     * @return
+     */
+    static public List<BlancoRestGeneratorTsTelegramStructure> searchTelegramsStartWith(
+            final String start,
+            final Map<String, BlancoRestGeneratorTsTelegramStructure> argTelegramStructureMap
+    ) {
+        List<BlancoRestGeneratorTsTelegramStructure> telegrams = new ArrayList<>();
+
+        Set<String> keySet = argTelegramStructureMap.keySet();
+        for (String key : keySet) {
+            if (key != null && key.startsWith(start)) {
+                telegrams.add(argTelegramStructureMap.get(key));
+            }
+        }
+
+        return telegrams;
     }
 }

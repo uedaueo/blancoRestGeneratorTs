@@ -18,6 +18,7 @@ import blanco.restgeneratorts.valueobject.BlancoRestGeneratorTsTelegramProcessSt
 import blanco.restgeneratorts.valueobject.BlancoRestGeneratorTsTelegramStructure;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -30,7 +31,7 @@ import java.util.Set;
  * @author IGA Tosiki
  * @author tueda
  */
-public class BlancoRestGeneratorTsBlancoStyleExpander extends  BlancoRestGeneratorTsExpander {
+public class BlancoRestGeneratorTsPlainStyleExpander extends  BlancoRestGeneratorTsExpander {
     public void expand(final BlancoRestGeneratorTsTelegramProcessStructure argProcessStructure, final File argDirectoryTarget) {
 
         // FIrst, generates a telegram.
@@ -41,6 +42,13 @@ public class BlancoRestGeneratorTsBlancoStyleExpander extends  BlancoRestGenerat
             Set<String> kindKeys = kindMap.keySet(); // It should not be null because it is checked at time of parse.
             for (String kindKey : kindKeys) {
                 generateTelegram(kindMap.get(kindKey), argDirectoryTarget);
+            }
+            /* Generate Error Telegrams if telegramType is plain. */
+            List<BlancoRestGeneratorTsTelegramStructure> errorTelegrams = argProcessStructure.getErrorTelegrams().get(methodKey);
+            if (errorTelegrams != null && !errorTelegrams.isEmpty()) {
+                for (BlancoRestGeneratorTsTelegramStructure errorTelegram : errorTelegrams) {
+                    generateTelegram(errorTelegram, argDirectoryTarget);
+                }
             }
         }
 
@@ -174,6 +182,17 @@ public class BlancoRestGeneratorTsBlancoStyleExpander extends  BlancoRestGenerat
         }
 
         buildMethodTelegramId(argTelegramStructure);
+        buildMethodTelegramType(argTelegramStructure);
+        buildMethodTelegramMethod(argTelegramStructure);
+
+        if (BlancoRestGeneratorTsConstants.TELEGRAM_TYPE_INPUT.equalsIgnoreCase(argTelegramStructure.getTelegramType())) {
+            buildMethodGetPathParams(argTelegramStructure);
+            buildMethodGetQueryParams(argTelegramStructure);
+            if (BlancoRestGeneratorTsConstants.TELEGRAM_METHOD_POST.equalsIgnoreCase(argTelegramStructure.getTelegramMethod()) ||
+            BlancoRestGeneratorTsConstants.TELEGRAM_METHOD_PUT.equalsIgnoreCase(argTelegramStructure.getTelegramMethod())) {
+                buildMethodGetBodyParams(argTelegramStructure);
+            }
+        }
 
         if (toJson && this.isDefaultGenerateToJson()) {
             buildMethodToJSON(argTelegramStructure);
@@ -219,12 +238,170 @@ public class BlancoRestGeneratorTsBlancoStyleExpander extends  BlancoRestGenerat
                 if (indexField > 0 && line.length() > 0) {
                     listLine.add(line + ",");
                 }
-                line = field.getName() + ": this." + field.getName();
+                String alias = field.getName();
+                if (field.getAlias() != null && field.getAlias().trim().length() > 0) {
+                    alias = field.getAlias();
+                }
+                line = alias + ": this." + field.getName();
             }
         }
         if (line.length() > 0) {
             listLine.add(line);
         }
         listLine.add("};");
+    }
+
+    /**
+     * Build method for path parameters.
+     * @param argTelegramStructure
+     */
+    private void buildMethodGetPathParams(
+            final BlancoRestGeneratorTsTelegramStructure  argTelegramStructure
+    ) {
+        final BlancoCgMethod method = fCgFactory.createMethod("getPathParams",
+                "Get the path parameters from this telegram.");
+        fCgClass.getMethodList().add(method);
+
+        method.setReturn(fCgFactory.createReturn("string | undefined",
+                "A string returned by getPathParams"));
+        method.setNotnull(true);
+        /*
+         * Specified, but not valid in TypeScript.
+         */
+        method.setFinal(true);
+
+        /* additional path */
+        String additionalPath = argTelegramStructure.getAdditionalPath();
+        String pathParams = "";
+        if (additionalPath != null && additionalPath.trim().length() > 0) {
+            pathParams += additionalPath;
+        }
+
+        for (BlancoRestGeneratorTsTelegramFieldStructure fieldStructure : argTelegramStructure.getListField()) {
+            if (BlancoRestGeneratorTsConstants.TELEGRAM_QUERY_KIND_PATH.equalsIgnoreCase(fieldStructure.getQueryKind())) {
+                String alias = fieldStructure.getName();
+                if (fieldStructure.getAlias() != null && fieldStructure.getAlias().trim().length() > 0) {
+                    alias = fieldStructure.getAlias();
+                }
+                pathParams += "/";
+                pathParams += alias;
+            }
+        }
+
+        final List<String> listLine = method.getLineList();
+        if (pathParams.length() == 0) {
+            listLine.add("return undefined;");
+        } else {
+            listLine.add("return \"" + pathParams + "\";");
+        }
+    }
+
+    /**
+     * Build method for query parameters
+     * @param argTelegramStructure
+     */
+    private void buildMethodGetQueryParams(
+            final BlancoRestGeneratorTsTelegramStructure  argTelegramStructure
+    ) {
+        final BlancoCgMethod method = fCgFactory.createMethod("getQueryParams",
+                "Get the query parameters from this telegram.");
+        fCgClass.getMethodList().add(method);
+
+        method.setReturn(fCgFactory.createReturn("any",
+                "A string returned by getQueryParams"));
+        method.setNotnull(true);
+        /*
+         * Specified, but not valid in TypeScript.
+         */
+        method.setFinal(true);
+
+        String telegramMethod = argTelegramStructure.getTelegramMethod();
+        boolean isGetDelete = BlancoRestGeneratorTsConstants.TELEGRAM_METHOD_GET.equalsIgnoreCase(telegramMethod) || BlancoRestGeneratorTsConstants.TELEGRAM_METHOD_DELETE.equalsIgnoreCase(telegramMethod);
+
+        final List<String> listLine = new ArrayList<>();
+        listLine.add("return {");
+        String line = "";
+        boolean isFirst = true;
+        for (BlancoRestGeneratorTsTelegramFieldStructure fieldStructure :
+         argTelegramStructure.getListField()) {
+            String queryKind = fieldStructure.getQueryKind();
+            /*
+             * Add to query params if queryKind is not PATH,
+             * always on Get or Delete,
+             * specified Query on Post or Put.
+             */
+            if (!BlancoRestGeneratorTsConstants.TELEGRAM_QUERY_KIND_PATH.equalsIgnoreCase(queryKind) &&
+                    (isGetDelete || BlancoRestGeneratorTsConstants.TELEGRAM_QUERY_KIND_QUERY.equalsIgnoreCase(queryKind))) {
+                if (!isFirst) {
+                    listLine.add(line + ",");
+                }
+                isFirst = false;
+                String alias = fieldStructure.getName();
+                if (fieldStructure.getAlias() != null && fieldStructure.getAlias().trim().length() > 0) {
+                    alias = fieldStructure.getAlias();
+                }
+                line = alias + ": this." + fieldStructure.getName();
+            }
+        }
+        if (line.length() > 0) {
+            listLine.add(line);
+        }
+        listLine.add("};");
+        if (isFirst) {
+            method.getLineList().add("return undefined;");
+        } else {
+            method.getLineList().addAll(listLine);
+        }
+    }
+
+    /**
+     * Build method for body parameters
+     * @param argTelegramStructure
+     */
+    private void buildMethodGetBodyParams(
+            final BlancoRestGeneratorTsTelegramStructure  argTelegramStructure
+    ) {
+        final BlancoCgMethod method = fCgFactory.createMethod("getBodyParams",
+                "Get the body parameters from this telegram.");
+        fCgClass.getMethodList().add(method);
+
+        method.setReturn(fCgFactory.createReturn("any",
+                "A string returned by getBodyParams"));
+        method.setNotnull(true);
+        /*
+         * Specified, but not valid in TypeScript.
+         */
+        method.setFinal(true);
+
+        final List<String> listLine = new ArrayList<>();
+        listLine.add("return {");
+
+        String line = "";
+        boolean isFirst = true;
+        for (BlancoRestGeneratorTsTelegramFieldStructure fieldStructure :
+                argTelegramStructure.getListField()) {
+            String queryKind = fieldStructure.getQueryKind();
+            if (!BlancoRestGeneratorTsConstants.TELEGRAM_QUERY_KIND_PATH.equalsIgnoreCase(queryKind) &&
+                    !BlancoRestGeneratorTsConstants.TELEGRAM_QUERY_KIND_QUERY.equalsIgnoreCase(queryKind)) {
+                if (!isFirst) {
+                    listLine.add(line + ",");
+                }
+                isFirst = false;
+                String alias = fieldStructure.getName();
+                if (fieldStructure.getAlias() != null && fieldStructure.getAlias().trim().length() > 0) {
+                    alias = fieldStructure.getAlias();
+                }
+                line = alias + ": this." + fieldStructure.getName();
+            }
+        }
+        if (line.length() > 0) {
+            listLine.add(line);
+        }
+        listLine.add("};");
+        if (isFirst) {
+            method.getLineList().add("return undefined;");
+        } else {
+            method.getLineList().addAll(listLine);
+        }
     }
 }

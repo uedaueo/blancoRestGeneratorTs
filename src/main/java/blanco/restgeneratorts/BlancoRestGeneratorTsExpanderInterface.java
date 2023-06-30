@@ -19,14 +19,4 @@ public interface BlancoRestGeneratorTsExpanderInterface {
             final BlancoRestGeneratorTsTelegramProcessStructure argProcessStructure,
             final File argDirectoryTarget
     );
-
-    /**
-     * Generates a telegram class.
-     *
-     * @param argTelegramStructure
-     * @param argDirectoryTarget
-     */
-    public void generateTelegram(
-            final BlancoRestGeneratorTsTelegramStructure argTelegramStructure,
-            final File argDirectoryTarget);
 }

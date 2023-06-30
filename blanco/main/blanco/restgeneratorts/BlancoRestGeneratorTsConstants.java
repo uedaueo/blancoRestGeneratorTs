@@ -345,4 +345,28 @@ public class BlancoRestGeneratorTsConstants {
      * 電文プロパティをQuery文字列として受け取る際の種別
      */
     public static final String TELEGRAM_QUERY_KIND_QUERY = "query";
+
+    /**
+     * 項目番号:58<br>
+     * 定義書で定義されているHTTPメソッド文字列
+     */
+    public static final String TELEGRAM_METHOD_GET = "GET";
+
+    /**
+     * 項目番号:59<br>
+     * 定義書で定義されているHTTPメソッド文字列
+     */
+    public static final String TELEGRAM_METHOD_POST = "POST";
+
+    /**
+     * 項目番号:60<br>
+     * 定義書で定義されているHTTPメソッド文字列
+     */
+    public static final String TELEGRAM_METHOD_PUT = "PUT";
+
+    /**
+     * 項目番号:61<br>
+     * 定義書で定義されているHTTPメソッド文字列
+     */
+    public static final String TELEGRAM_METHOD_DELETE = "DELETE";
 }

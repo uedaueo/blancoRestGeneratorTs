@@ -1150,6 +1150,15 @@ public class BlancoRestGeneratorTsXmlParser {
             argProcessStructure.getListTelegrams().put(methodKey, telegrams);
             found = true;
 
+            /* Search Error telegrams on telegramType is plain. */
+            if (BlancoRestGeneratorTsUtil.isTelegramStylePlain) {
+                String telegramIdPrefix = argProcessId + method + "Error";
+                List<BlancoRestGeneratorTsTelegramStructure> listErrors = BlancoRestGeneratorTsUtil.searchTelegramsStartWith(telegramIdPrefix, argTelegramStructureMap);
+                if (listErrors.size() > 0) {
+                    argProcessStructure.getErrorTelegrams().put(methodKey, listErrors);
+                }
+            }
+
             /*
              * Creates import information for TypeScript.
              */

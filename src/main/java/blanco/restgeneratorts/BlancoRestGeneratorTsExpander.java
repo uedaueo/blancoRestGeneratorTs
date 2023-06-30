@@ -926,47 +926,44 @@ public abstract class BlancoRestGeneratorTsExpander implements BlancoRestGenerat
         listLine.add("return \"" + argTelegramStructure.getName() + "\";");
     }
 
-    /**
-     * Generates toJSON method.
-     *
-     * @param argTelegramStructure
-     */
-    protected void buildMethodToJSON(
+    protected void buildMethodTelegramType(
             final BlancoRestGeneratorTsTelegramStructure  argTelegramStructure
     ) {
-        final BlancoCgMethod method = fCgFactory.createMethod("toJSON",
-                "Gets the properties to be written to JSON from this telegram.");
+        final BlancoCgMethod method = fCgFactory.createMethod("telegramType",
+                "Returns the kind of this telegram as a string.");
         fCgClass.getMethodList().add(method);
 
-        method.setReturn(fCgFactory.createReturn("any",
-                "An object returned by toJSON"));
+        method.setReturn(fCgFactory.createReturn("string",
+                "The kind of this telegram."));
         method.setNotnull(true);
         /*
          * Specified, but not valid in TypeScript.
          */
         method.setFinal(true);
+        method.setAccess("get");
 
         final List<String> listLine = method.getLineList();
+        listLine.add("return \"" + argTelegramStructure.getTelegramType() + "\";");
+    }
 
-        listLine.add("return {");
+    protected void buildMethodTelegramMethod(
+            final BlancoRestGeneratorTsTelegramStructure  argTelegramStructure
+    ) {
+        final BlancoCgMethod method = fCgFactory.createMethod("telegramMethod",
+                "Returns the method of this telegram as a string.");
+        fCgClass.getMethodList().add(method);
 
-        String line = "";
-        for (int indexField = 0; indexField < argTelegramStructure.getListField()
-                .size(); indexField++) {
-            final BlancoRestGeneratorTsTelegramFieldStructure field =
-                    argTelegramStructure.getListField().get(indexField);
+        method.setReturn(fCgFactory.createReturn("string",
+                "The method of this telegram."));
+        method.setNotnull(true);
+        /*
+         * Specified, but not valid in TypeScript.
+         */
+        method.setFinal(true);
+        method.setAccess("get");
 
-            if (!field.getExcludeToJson()) {
-                if (indexField > 0 && line.length() > 0) {
-                    listLine.add(line + ",");
-                }
-                line = field.getName() + ": this." + field.getName();
-            }
-        }
-        if (line.length() > 0) {
-            listLine.add(line);
-        }
-        listLine.add("};");
+        final List<String> listLine = method.getLineList();
+        listLine.add("return \"" + argTelegramStructure.getTelegramMethod() + "\";");
     }
 
     /**
