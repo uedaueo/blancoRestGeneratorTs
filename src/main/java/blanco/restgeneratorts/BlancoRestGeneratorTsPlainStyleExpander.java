@@ -10,8 +10,13 @@
 package blanco.restgeneratorts;
 
 import blanco.cg.BlancoCgObjectFactory;
+import blanco.cg.BlancoCgSupportedLang;
 import blanco.cg.transformer.BlancoCgTransformerFactory;
+import blanco.cg.util.BlancoCgSourceUtil;
+import blanco.cg.valueobject.BlancoCgField;
 import blanco.cg.valueobject.BlancoCgMethod;
+import blanco.cg.valueobject.BlancoCgParameter;
+import blanco.commons.util.BlancoNameAdjuster;
 import blanco.commons.util.BlancoStringUtil;
 import blanco.restgeneratorts.valueobject.BlancoRestGeneratorTsTelegramFieldStructure;
 import blanco.restgeneratorts.valueobject.BlancoRestGeneratorTsTelegramProcessStructure;
@@ -184,6 +189,7 @@ public class BlancoRestGeneratorTsPlainStyleExpander extends  BlancoRestGenerato
         buildMethodTelegramId(argTelegramStructure);
         buildMethodTelegramType(argTelegramStructure);
         buildMethodTelegramMethod(argTelegramStructure);
+        buildMethodAdditionalPath(argTelegramStructure);
 
         if (BlancoRestGeneratorTsConstants.TELEGRAM_TYPE_INPUT.equalsIgnoreCase(argTelegramStructure.getTelegramType())) {
             buildMethodGetPathParams(argTelegramStructure);
@@ -403,5 +409,78 @@ public class BlancoRestGeneratorTsPlainStyleExpander extends  BlancoRestGenerato
         } else {
             method.getLineList().addAll(listLine);
         }
+    }
+
+    /**
+     *
+     * @param argTelegramStructure
+     */
+    private void buildMethodAdditionalPath(
+            final BlancoRestGeneratorTsTelegramStructure  argTelegramStructure
+    ) {
+        // Creates an additionalPath.
+        String additionalPath = argTelegramStructure.getAdditionalPath();
+        if (BlancoStringUtil.null2Blank(additionalPath).trim().length() == 0) {
+            additionalPath = null;
+        }
+
+        final String fieldName = "_additionalPath";
+        final BlancoCgField field = fCgFactory.createField(fieldName,
+                "string | undefined", null);
+
+        fCgClass.getFieldList().add(field);
+        field.setAccess("private");
+        field.setNotnull(true);
+        field.getLangDoc().getDescriptionList().add(
+                BlancoCgSourceUtil.escapeStringAsLangDoc(BlancoCgSupportedLang.TS, fBundle.getXml2sourceFileFieldDefault(
+                        additionalPath)));
+        if (additionalPath != null) {
+            field.setDefault("\"" + additionalPath +"\"");
+        } else {
+            field.setDefault("undefined");
+        }
+
+        // Generates a setter method.
+        final BlancoCgMethod setterMethod = fCgFactory.createMethod(BlancoNameAdjuster.toParameterName(fieldName),
+                fBundle.getXml2sourceFileSetLangdoc01(fieldName));
+        fCgClass.getMethodList().add(setterMethod);
+
+        setterMethod.setAccess("set");
+
+        // JavaDoc configuration of the setter method.
+        setterMethod.getLangDoc().getDescriptionList().add(
+                fBundle.getXml2sourceFileSetLangdoc02("string | undefined"));
+
+        // param configuration of the setter method.
+        BlancoCgParameter param = fCgFactory.createParameter("arg"
+                        + BlancoNameAdjuster.toClassName(fieldName),
+                "string | undefined",
+                fBundle.getXml2sourceFileSetArgLangdoc(fieldName));
+        param.setNotnull(true);
+
+        setterMethod.getParameterList().add(param);
+
+        // Implements the setter method.
+        setterMethod.getLineList().add("this." + fieldName + " = "
+                + "arg" + BlancoNameAdjuster.toClassName(fieldName) + ";");
+
+        // Generates a getter method.
+        final BlancoCgMethod getterMethod = fCgFactory.createMethod(BlancoNameAdjuster.toParameterName(fieldName),
+                fBundle.getXml2sourceFileGetLangdoc01(fieldName));
+        fCgClass.getMethodList().add(getterMethod);
+
+        getterMethod.setAccess("get");
+
+        // JavaDoc configuration of the getter method.
+        getterMethod.getLangDoc().getDescriptionList().add(
+                fBundle.getXml2sourceFileGetLangdoc02("string|undefined"));
+
+        // Return value configuration of the getter method.
+        getterMethod.setNotnull(true);
+        getterMethod.setReturn(fCgFactory.createReturn("string | undefined",
+                fBundle.getXml2sourceFileGetReturnLangdoc(fieldName)));
+
+        // Implements the getter method.
+        getterMethod.getLineList().add("return this." + fieldName + ";");
     }
 }

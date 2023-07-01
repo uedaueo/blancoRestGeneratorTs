@@ -232,7 +232,7 @@ public abstract class BlancoRestGeneratorTsExpander implements BlancoRestGenerat
         }
 
         /* Sets the annotation for the class. */
-        List annotationList = argProcessStructure.getAnnotationList();
+        List<String> annotationList = argProcessStructure.getAnnotationList();
         if (annotationList != null && annotationList.size() > 0) {
             fCgClass.getAnnotationList().addAll(argProcessStructure.getAnnotationList());
             /* tueda DEBUG */
