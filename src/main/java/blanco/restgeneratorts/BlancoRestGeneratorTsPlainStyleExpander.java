@@ -191,6 +191,10 @@ public class BlancoRestGeneratorTsPlainStyleExpander extends  BlancoRestGenerato
         buildMethodTelegramMethod(argTelegramStructure);
         buildMethodAdditionalPath(argTelegramStructure);
 
+        if (BlancoRestGeneratorTsConstants.TELEGRAM_TYPE_ERROR.equalsIgnoreCase(argTelegramStructure.getTelegramType())) {
+            buildMethodStatusCode(argTelegramStructure);
+        }
+
         if (BlancoRestGeneratorTsConstants.TELEGRAM_TYPE_INPUT.equalsIgnoreCase(argTelegramStructure.getTelegramType())) {
             buildMethodGetPathParams(argTelegramStructure);
             buildMethodGetQueryParams(argTelegramStructure);
@@ -483,4 +487,72 @@ public class BlancoRestGeneratorTsPlainStyleExpander extends  BlancoRestGenerato
         // Implements the getter method.
         getterMethod.getLineList().add("return this." + fieldName + ";");
     }
-}
+
+    /**
+     *
+     * @param argTelegramStructure
+     */
+    private void buildMethodStatusCode(
+            final BlancoRestGeneratorTsTelegramStructure  argTelegramStructure
+    ) {
+        // Creates an statusCode.
+        String statusCode = argTelegramStructure.getStatusCode();
+        if (BlancoStringUtil.null2Blank(statusCode).trim().length() == 0) {
+            statusCode = "\"\"";
+        }
+
+        final String fieldName = "_statusCode";
+        final BlancoCgField field = fCgFactory.createField(fieldName,
+                "string", null);
+
+        fCgClass.getFieldList().add(field);
+        field.setAccess("private");
+        field.setNotnull(true);
+        field.getLangDoc().getDescriptionList().add(
+                BlancoCgSourceUtil.escapeStringAsLangDoc(BlancoCgSupportedLang.TS, fBundle.getXml2sourceFileFieldDefault(
+                        statusCode)));
+        field.setDefault(statusCode);
+
+        // Generates a setter method.
+        final BlancoCgMethod setterMethod = fCgFactory.createMethod(BlancoNameAdjuster.toParameterName(fieldName),
+                fBundle.getXml2sourceFileSetLangdoc01(fieldName));
+        fCgClass.getMethodList().add(setterMethod);
+
+        setterMethod.setAccess("set");
+
+        // JavaDoc configuration of the setter method.
+        setterMethod.getLangDoc().getDescriptionList().add(
+                fBundle.getXml2sourceFileSetLangdoc02("string"));
+
+        // param configuration of the setter method.
+        BlancoCgParameter param = fCgFactory.createParameter("arg"
+                        + BlancoNameAdjuster.toClassName(fieldName),
+                "string",
+                fBundle.getXml2sourceFileSetArgLangdoc(fieldName));
+        param.setNotnull(true);
+
+        setterMethod.getParameterList().add(param);
+
+        // Implements the setter method.
+        setterMethod.getLineList().add("this." + fieldName + " = "
+                + "arg" + BlancoNameAdjuster.toClassName(fieldName) + ";");
+
+        // Generates a getter method.
+        final BlancoCgMethod getterMethod = fCgFactory.createMethod(BlancoNameAdjuster.toParameterName(fieldName),
+                fBundle.getXml2sourceFileGetLangdoc01(fieldName));
+        fCgClass.getMethodList().add(getterMethod);
+
+        getterMethod.setAccess("get");
+
+        // JavaDoc configuration of the getter method.
+        getterMethod.getLangDoc().getDescriptionList().add(
+                fBundle.getXml2sourceFileGetLangdoc02("string"));
+
+        // Return value configuration of the getter method.
+        getterMethod.setNotnull(true);
+        getterMethod.setReturn(fCgFactory.createReturn("string",
+                fBundle.getXml2sourceFileGetReturnLangdoc(fieldName)));
+
+        // Implements the getter method.
+        getterMethod.getLineList().add("return this." + fieldName + ";");
+    }}
