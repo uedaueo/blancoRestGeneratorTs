@@ -668,23 +668,6 @@ public class BlancoRestGeneratorTsXmlParser {
 
             argTelegramStructure.getListField().add(fieldStructure);
         }
-
-        /* Set StatusCode for ErrorTelegram if telegram style is plain. */
-        if (BlancoRestGeneratorTsConstants.TELEGRAM_TYPE_ERROR.equals(argTelegramStructure.getTelegramType())) {
-            final BlancoRestGeneratorTsTelegramFieldStructure fieldStructure = new BlancoRestGeneratorTsTelegramFieldStructure();
-
-            fieldStructure.setNo("0");
-            fieldStructure.setName(BlancoRestGeneratorTsConstants.TELEGRAM_STATUS_CODE);
-            fieldStructure.setType("string");
-            fieldStructure.setNullable(false);
-            String statusCode = argTelegramStructure.getStatusCode();
-            if (BlancoStringUtil.null2Blank(statusCode).trim().length() == 0) {
-                throw new IllegalArgumentException(fBundle.getBlancorestTelegramStylePlainStatusCodeRequired());
-            }
-            fieldStructure.setDefault(statusCode);
-            fieldStructure.setDescription(fBundle.getBlancorestTelegramStylePlainStatusCodeLangdoc());
-            argTelegramStructure.getListField().add(fieldStructure);
-        }
     }
 
     /**

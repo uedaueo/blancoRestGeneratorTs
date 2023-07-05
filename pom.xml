@@ -5,7 +5,7 @@
 	<groupId>blanco.restgeneratorts</groupId>
 	<artifactId>blanco-restgeneratorts</artifactId>
 	<packaging>jar</packaging>
-	<version>3.1.2</version>
+	<version>3.1.3</version>
 	<name>blanco-restgeneratorts</name>
 	<url>https://igapyon.github.io/blancofw-maven2</url>
 
