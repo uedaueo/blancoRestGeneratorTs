@@ -527,7 +527,17 @@ public abstract class BlancoRestGeneratorTsExpander implements BlancoRestGenerat
 
     protected void createLocationUrl(BlancoRestGeneratorTsTelegramProcessStructure argStructure) {
         // Creates a location URL.
-        String locationUrl = argStructure.getLocation() + "/" + argStructure.getServiceId();
+        String locationUrl = argStructure.getLocation();
+        if (locationUrl == null || locationUrl.trim().equals("/")) {
+            locationUrl = "";
+        } else {
+            locationUrl = locationUrl.trim();
+        }
+        String sep = "";
+        if (!locationUrl.endsWith("/")) {
+            sep = "/";
+        }
+        locationUrl = locationUrl + sep + argStructure.getServiceId();
 
         final String fieldName = "_locationURL";
         final BlancoCgField field = fCgFactory.createField(fieldName,
