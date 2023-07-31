@@ -1,8 +1,10 @@
 package blanco.restgeneratorts;
 
 import blanco.cg.BlancoCgSupportedLang;
+import blanco.cg.valueobject.BlancoCgType;
 import blanco.restgeneratorts.resourcebundle.BlancoRestGeneratorTsResourceBundle;
 import blanco.restgeneratorts.task.valueobject.BlancoRestGeneratorTsProcessInput;
+import blanco.restgeneratorts.valueobject.BlancoRestGeneratorTsTelegramFieldStructure;
 import blanco.restgeneratorts.valueobject.BlancoRestGeneratorTsTelegramStructure;
 import blanco.valueobjectts.BlancoValueObjectTsXmlParser;
 import blanco.valueobjectts.valueobject.BlancoValueObjectTsClassStructure;
@@ -278,5 +280,58 @@ public class BlancoRestGeneratorTsUtil {
         }
 
         return telegrams;
+    }
+
+    static public String getNamePreferAlias(final BlancoRestGeneratorTsTelegramFieldStructure argFieldStructure) {
+        String alias = argFieldStructure.getName();
+        if (argFieldStructure.getAlias() != null && argFieldStructure.getAlias().trim().length() > 0) {
+            alias = argFieldStructure.getAlias();
+        }
+        return alias;
+    }
+
+    /**
+     * Get path string from fieldStructure.
+     * primitive => /{alias}
+     * otherwise => /JSONStringify, not URLEncoded.
+     * @param argFieldStructure
+     * @return
+     */
+    static public String getPathStringExpression(final BlancoRestGeneratorTsTelegramFieldStructure argFieldStructure) {
+        String pathStringExpr = "";
+        String alias = getNamePreferAlias(argFieldStructure);
+        String type = argFieldStructure.getType();
+        if (isTsPrimitive(type)) {
+            pathStringExpr = "\"/\" + this." + alias;
+        } else {
+            pathStringExpr = "\"/\" + JSON.stringify(this." + alias + ")";
+        }
+        return pathStringExpr;
+    }
+
+    /**
+     * Check a type is Typescript primitive or not.
+     * @param argType
+     * @return
+     */
+    static public boolean isTsPrimitive(final String argType) {
+        return "boolean".equalsIgnoreCase(argType) ||
+                "number".equalsIgnoreCase(argType) ||
+                "string".equalsIgnoreCase(argType);
+    }
+
+    /**
+     * Check a field type is Array of primitive or not.
+     * @param argFieldStructure
+     * @return
+     */
+    static public boolean isTsArrayPrimitive(final BlancoRestGeneratorTsTelegramFieldStructure argFieldStructure) {
+        boolean yes = false;
+        String type = argFieldStructure.getType();
+        if ("Array".equalsIgnoreCase(type)) {
+            String generic = argFieldStructure.getGeneric();
+            yes = isTsPrimitive(generic);
+        }
+        return yes;
     }
 }

@@ -195,11 +195,14 @@ public class BlancoRestGeneratorTsPlainStyleExpander extends  BlancoRestGenerato
             buildMethodStatusCode(argTelegramStructure);
         }
 
-        if (BlancoRestGeneratorTsConstants.TELEGRAM_TYPE_INPUT.equalsIgnoreCase(argTelegramStructure.getTelegramType())) {
+        if (BlancoRestGeneratorTsConstants.TELEGRAM_TYPE_INPUT
+                .equalsIgnoreCase(argTelegramStructure.getTelegramType())) {
             buildMethodGetPathParams(argTelegramStructure);
             buildMethodGetQueryParams(argTelegramStructure);
-            if (BlancoRestGeneratorTsConstants.TELEGRAM_METHOD_POST.equalsIgnoreCase(argTelegramStructure.getTelegramMethod()) ||
-            BlancoRestGeneratorTsConstants.TELEGRAM_METHOD_PUT.equalsIgnoreCase(argTelegramStructure.getTelegramMethod())) {
+            if (BlancoRestGeneratorTsConstants.TELEGRAM_METHOD_POST
+                    .equalsIgnoreCase(argTelegramStructure.getTelegramMethod()) ||
+            BlancoRestGeneratorTsConstants.TELEGRAM_METHOD_PUT
+                    .equalsIgnoreCase(argTelegramStructure.getTelegramMethod())) {
                 buildMethodGetBodyParams(argTelegramStructure);
             }
         }
@@ -263,6 +266,7 @@ public class BlancoRestGeneratorTsPlainStyleExpander extends  BlancoRestGenerato
 
     /**
      * Build method for path parameters.
+     * CAUTION: additionalPath should be preceded in runtime.
      * @param argTelegramStructure
      */
     private void buildMethodGetPathParams(
@@ -280,30 +284,28 @@ public class BlancoRestGeneratorTsPlainStyleExpander extends  BlancoRestGenerato
          */
         method.setFinal(true);
 
-        /* additional path */
-        String additionalPath = argTelegramStructure.getAdditionalPath();
-        String pathParams = "";
-        if (additionalPath != null && additionalPath.trim().length() > 0) {
-            pathParams += additionalPath;
-        }
-
+        final List<String> bodyLine = new ArrayList<>();
+        boolean hasPath = false;
         for (BlancoRestGeneratorTsTelegramFieldStructure fieldStructure : argTelegramStructure.getListField()) {
             if (BlancoRestGeneratorTsConstants.TELEGRAM_QUERY_KIND_PATH.equalsIgnoreCase(fieldStructure.getQueryKind())) {
-                String alias = fieldStructure.getName();
-                if (fieldStructure.getAlias() != null && fieldStructure.getAlias().trim().length() > 0) {
-                    alias = fieldStructure.getAlias();
-                }
-                pathParams += "/";
-                pathParams += alias;
+                hasPath = true;
+                String alias = BlancoRestGeneratorTsUtil.getNamePreferAlias(fieldStructure);
+                bodyLine.add("if (typeof this." + alias + " !== 'undefined') {");
+                bodyLine.add("pathParams += (" + BlancoRestGeneratorTsUtil.getPathStringExpression(fieldStructure) + ");");
+                bodyLine.add("} else {");
+                bodyLine.add("throw 'Invalid PathParam, " + alias + " is undefined.';");
+                bodyLine.add("}");
             }
         }
 
         final List<String> listLine = method.getLineList();
-        if (pathParams.length() == 0) {
-            listLine.add("return undefined;");
+        if (!hasPath) {
+            bodyLine.add("return undefined;");
         } else {
-            listLine.add("return \"" + pathParams + "\";");
+            listLine.add("let pathParams = \"\";");
+            bodyLine.add("return pathParams;");
         }
+        listLine.addAll(bodyLine);
     }
 
     /**
