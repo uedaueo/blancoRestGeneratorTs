@@ -276,36 +276,41 @@ public class BlancoRestGeneratorTsPlainStyleExpander extends  BlancoRestGenerato
                 "Get the path parameters from this telegram.");
         fCgClass.getMethodList().add(method);
 
-        method.setReturn(fCgFactory.createReturn("string | undefined",
-                "A string returned by getPathParams"));
+        method.setReturn(fCgFactory.createReturn("any",
+                "An array will be returned by getPathParams"));
         method.setNotnull(true);
         /*
          * Specified, but not valid in TypeScript.
          */
         method.setFinal(true);
 
-        final List<String> bodyLine = new ArrayList<>();
-        boolean hasPath = false;
-        for (BlancoRestGeneratorTsTelegramFieldStructure fieldStructure : argTelegramStructure.getListField()) {
-            if (BlancoRestGeneratorTsConstants.TELEGRAM_QUERY_KIND_PATH.equalsIgnoreCase(fieldStructure.getQueryKind())) {
-                hasPath = true;
-                String alias = BlancoRestGeneratorTsUtil.getNamePreferAlias(fieldStructure);
-                bodyLine.add("if (typeof this." + alias + " !== 'undefined') {");
-                bodyLine.add("pathParams += (" + BlancoRestGeneratorTsUtil.getPathStringExpression(fieldStructure) + ");");
-                bodyLine.add("} else {");
-                bodyLine.add("throw 'Invalid PathParam, " + alias + " is undefined.';");
-                bodyLine.add("}");
+        final List<String> listLine = new ArrayList<>();
+        listLine.add("return [");
+        String line = "";
+        boolean isFirst = true;
+        for (BlancoRestGeneratorTsTelegramFieldStructure fieldStructure :
+                argTelegramStructure.getListField()) {
+            String queryKind = fieldStructure.getQueryKind();
+            /*
+             * Add to path params if queryKind is PATH,
+             */
+            if (BlancoRestGeneratorTsConstants.TELEGRAM_QUERY_KIND_PATH.equalsIgnoreCase(queryKind)) {
+                if (!isFirst) {
+                    listLine.add(line + ",");
+                }
+                isFirst = false;
+                line = BlancoRestGeneratorTsUtil.getTabSpace(1) + "this." + fieldStructure.getName();
             }
         }
-
-        final List<String> listLine = method.getLineList();
-        if (!hasPath) {
-            bodyLine.add("return undefined;");
-        } else {
-            listLine.add("let pathParams = \"\";");
-            bodyLine.add("return pathParams;");
+        if (line.length() > 0) {
+            listLine.add(line);
         }
-        listLine.addAll(bodyLine);
+        listLine.add("];");
+        if (isFirst) {
+            method.getLineList().add("return undefined;");
+        } else {
+            method.getLineList().addAll(listLine);
+        }
     }
 
     /**

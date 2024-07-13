@@ -654,7 +654,14 @@ public class BlancoRestGeneratorTsXmlParser {
                     elementList, "pattern"));
 
             /* alias */
-            fieldStructure.setAlias(BlancoXmlBindingUtil.getTextContent(elementList, "alias"));
+            String alias = BlancoXmlBindingUtil.getTextContent(elementList, "aliasTs");
+            if (BlancoStringUtil.null2Blank(alias).trim().isEmpty()) {
+                alias = BlancoXmlBindingUtil.getTextContent(elementList, "alias");
+            }
+            if (BlancoStringUtil.null2Blank(alias).trim().isEmpty()) {
+                alias = fieldStructure.getName();
+            }
+            fieldStructure.setAlias(alias);
             /* queryKind */
             fieldStructure.setQueryKind(BlancoXmlBindingUtil.getTextContent(elementList, "queryKind"));
             if (BlancoStringUtil.null2Blank(fieldStructure.getQueryKind()).trim().length() > 0) {

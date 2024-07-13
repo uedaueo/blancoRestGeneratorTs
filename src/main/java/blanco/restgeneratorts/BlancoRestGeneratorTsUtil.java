@@ -24,6 +24,8 @@ public class BlancoRestGeneratorTsUtil {
      */
     private final static BlancoRestGeneratorTsResourceBundle fBundle = new BlancoRestGeneratorTsResourceBundle();
 
+    public static int tabSpace = 4;
+
     public static Map<String, Integer> mapCommons = new HashMap<String, Integer>() {
         {put(fBundle.getMeta2xmlElementCommon(), BlancoCgSupportedLang.JAVA);}
         {put(fBundle.getMeta2xmlElementCommonCs(), BlancoCgSupportedLang.CS);}
@@ -333,5 +335,15 @@ public class BlancoRestGeneratorTsUtil {
             yes = isTsPrimitive(generic);
         }
         return yes;
+    }
+
+    static public String getTabSpace(int tabs) {
+        StringBuffer myTab = new StringBuffer();
+        for (int i = 0; i < tabs; i++) {
+            for (int j = 0; j < tabSpace; j++) {
+                myTab.append(" ");
+            }
+        }
+        return myTab.toString();
     }
 }

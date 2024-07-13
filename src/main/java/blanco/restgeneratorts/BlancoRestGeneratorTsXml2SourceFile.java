@@ -51,6 +51,7 @@ public class BlancoRestGeneratorTsXml2SourceFile {
     }
     public void setTabs(int fTabs) {
         this.fTabs = fTabs;
+        BlancoRestGeneratorTsUtil.tabSpace = fTabs;
     }
 
     private boolean fCreateServiceMethod = false;
