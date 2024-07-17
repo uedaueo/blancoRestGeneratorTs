@@ -457,6 +457,21 @@ public class BlancoRestGeneratorTsXmlParser {
                 continue;
             }
 
+            /* alias */
+            String alias = BlancoXmlBindingUtil.getTextContent(elementList, "aliasTs");
+            if (BlancoStringUtil.null2Blank(alias).trim().isEmpty()) {
+                alias = BlancoXmlBindingUtil.getTextContent(elementList, "alias");
+            }
+            if (BlancoStringUtil.null2Blank(alias).trim().isEmpty()) {
+                alias = fieldStructure.getName();
+            } else if (BlancoRestGeneratorTsUtil.isPreferAlias) {
+                if (isVerbose()) {
+                    System.out.println("CATION name [" + fieldStructure.getName() + "] is replaced by alias [" + alias + "]");
+                }
+                fieldStructure.setName(alias);
+            }
+            fieldStructure.setAlias(alias);
+
             /* if telegramStyle is plain, statusCode is reserved. */
             if (BlancoRestGeneratorTsConstants.TELEGRAM_TYPE_ERROR.equals(argTelegramStructure.getTelegramType()) &&
                     BlancoRestGeneratorTsConstants.TELEGRAM_STATUS_CODE.equals(fieldStructure.getName())) {
@@ -653,15 +668,6 @@ public class BlancoRestGeneratorTsXmlParser {
             fieldStructure.setPattern(BlancoXmlBindingUtil.getTextContent(
                     elementList, "pattern"));
 
-            /* alias */
-            String alias = BlancoXmlBindingUtil.getTextContent(elementList, "aliasTs");
-            if (BlancoStringUtil.null2Blank(alias).trim().isEmpty()) {
-                alias = BlancoXmlBindingUtil.getTextContent(elementList, "alias");
-            }
-            if (BlancoStringUtil.null2Blank(alias).trim().isEmpty()) {
-                alias = fieldStructure.getName();
-            }
-            fieldStructure.setAlias(alias);
             /* queryKind */
             fieldStructure.setQueryKind(BlancoXmlBindingUtil.getTextContent(elementList, "queryKind"));
             if (BlancoStringUtil.null2Blank(fieldStructure.getQueryKind()).trim().length() > 0) {

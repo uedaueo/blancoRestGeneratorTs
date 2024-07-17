@@ -130,6 +130,7 @@ public class BlancoRestGeneratorKtPlainTest {
         inputRestGenerator.setApiTelegramPackage("api.telegrams");
         inputRestGenerator.setSearchTmpdir("tmpSample,tmpSample2");
         inputRestGenerator.setTelegramStyle("plain");
+        inputRestGenerator.setPreferAlias(true);
 
         BlancoRestGeneratorTsProcessImpl imple = new BlancoRestGeneratorTsProcessImpl();
         imple.execute(inputRestGenerator);

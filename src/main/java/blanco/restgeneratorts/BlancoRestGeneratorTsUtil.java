@@ -41,6 +41,7 @@ public class BlancoRestGeneratorTsUtil {
     static public boolean isVerbose = false;
     public static boolean isTelegramStyleBlanco = true;
     public static boolean isTelegramStylePlain = false;
+    public static boolean isPreferAlias = false;
 
     public static HashMap<String, BlancoValueObjectTsClassStructure> objects = new HashMap<>();
 

@@ -152,6 +152,14 @@ public class BlancoRestGeneratorTsProcessInput {
     private String fTelegramStyle = "blanco";
 
     /**
+     * プロパティ値に別名が設定されていた場合、name を alias で上書きする。
+     *
+     * フィールド: [preferAlias]。
+     * デフォルト: [false]。
+     */
+    private boolean fPreferAlias = false;
+
+    /**
      * フィールド [verbose] の値を設定します。
      *
      * フィールドの説明: [Whether to run in verbose mode.]。
@@ -584,6 +592,29 @@ public class BlancoRestGeneratorTsProcessInput {
     }
 
     /**
+     * フィールド [preferAlias] の値を設定します。
+     *
+     * フィールドの説明: [プロパティ値に別名が設定されていた場合、name を alias で上書きする。]。
+     *
+     * @param argPreferAlias フィールド[preferAlias]に設定する値。
+     */
+    public void setPreferAlias(final boolean argPreferAlias) {
+        fPreferAlias = argPreferAlias;
+    }
+
+    /**
+     * フィールド [preferAlias] の値を取得します。
+     *
+     * フィールドの説明: [プロパティ値に別名が設定されていた場合、name を alias で上書きする。]。
+     * デフォルト: [false]。
+     *
+     * @return フィールド[preferAlias]から取得した値。
+     */
+    public boolean getPreferAlias() {
+        return fPreferAlias;
+    }
+
+    /**
      * Gets the string representation of this value object.
      *
      * <P>Precautions for use</P>
@@ -617,6 +648,7 @@ public class BlancoRestGeneratorTsProcessInput {
         buf.append(",apiTelegramPackage=" + fApiTelegramPackage);
         buf.append(",apiTelegramBase=" + fApiTelegramBase);
         buf.append(",telegramStyle=" + fTelegramStyle);
+        buf.append(",preferAlias=" + fPreferAlias);
         buf.append("]");
         return buf.toString();
     }
@@ -696,5 +728,8 @@ public class BlancoRestGeneratorTsProcessInput {
         // Name: fTelegramStyle
         // Type: java.lang.String
         target.fTelegramStyle = this.fTelegramStyle;
+        // Name: fPreferAlias
+        // Type: boolean
+        target.fPreferAlias = this.fPreferAlias;
     }
 }

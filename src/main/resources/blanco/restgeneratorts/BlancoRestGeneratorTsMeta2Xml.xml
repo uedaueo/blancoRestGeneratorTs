@@ -163,6 +163,7 @@ JavaDocに利用されます</value>
                 </tablecolumn>
                 <tablecolumn name="aliasTs">
                     <value>別名(ts)</value>
+                    <value>別名(Ts)</value>
                 </tablecolumn>
                 <tablecolumn name="queryKind">
                     <value>クエリ種別</value>

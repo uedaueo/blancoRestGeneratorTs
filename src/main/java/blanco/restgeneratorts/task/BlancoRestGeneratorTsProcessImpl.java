@@ -139,6 +139,7 @@ public class BlancoRestGeneratorTsProcessImpl implements
                 BlancoRestGeneratorTsUtil.isTelegramStyleBlanco = false;
                 BlancoRestGeneratorTsUtil.isTelegramStylePlain = true;
             }
+            BlancoRestGeneratorTsUtil.isPreferAlias = input.getPreferAlias();
 
             // Creates a temporary directory.
             new File(input.getTmpdir()

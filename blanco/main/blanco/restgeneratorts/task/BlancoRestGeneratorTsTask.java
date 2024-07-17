@@ -119,6 +119,11 @@ public class BlancoRestGeneratorTsTask extends Task {
     protected boolean fIsFieldTelegramStyleProcessed = false;
 
     /**
+     * フィールド [preferAlias] に値がセットされたかどうか。
+     */
+    protected boolean fIsFieldPreferAliasProcessed = false;
+
+    /**
      * verboseモードで動作させるかどうか。
      *
      * @param arg verboseモードで動作させるかどうか。
@@ -605,6 +610,32 @@ public class BlancoRestGeneratorTsTask extends Task {
     }
 
     /**
+     * Antタスクの[preferAlias]アトリビュートのセッターメソッド。
+     *
+     * 項目番号: 19<br>
+     * プロパティ値に別名が設定されていた場合、name を alias で上書きする。<br>
+     *
+     * @param arg セットしたい値
+     */
+    public void setPreferAlias(final boolean arg) {
+        fInput.setPreferAlias(arg);
+        fIsFieldPreferAliasProcessed = true;
+    }
+
+    /**
+     * Antタスクの[preferAlias]アトリビュートのゲッターメソッド。
+     *
+     * 項目番号: 19<br>
+     * プロパティ値に別名が設定されていた場合、name を alias で上書きする。<br>
+     * デフォルト値[false]が設定されています。Apache Antタスク上でアトリビュートの指定が無い場合には、デフォルト値が設定されます。<br>
+     *
+     * @return このフィールドの値
+     */
+    public boolean getPreferAlias() {
+        return fInput.getPreferAlias();
+    }
+
+    /**
      * Antタスクのメイン処理。Apache Antから このメソッドが呼び出されます。
      *
      * @throws BuildException タスクとしての例外が発生した場合。
@@ -638,6 +669,7 @@ public class BlancoRestGeneratorTsTask extends Task {
             System.out.println("- apiTelegramPackage:[" + getApiTelegramPackage() + "]");
             System.out.println("- apiTelegramBase:[" + getApiTelegramBase() + "]");
             System.out.println("- telegramStyle:[" + getTelegramStyle() + "]");
+            System.out.println("- preferAlias:[" + getPreferAlias() + "]");
         }
 
         try {
