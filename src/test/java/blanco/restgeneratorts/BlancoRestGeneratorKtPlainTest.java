@@ -131,6 +131,8 @@ public class BlancoRestGeneratorKtPlainTest {
         inputRestGenerator.setSearchTmpdir("tmpSample,tmpSample2");
         inputRestGenerator.setTelegramStyle("plain");
         inputRestGenerator.setPreferAlias(true);
+        inputRestGenerator.setStringifyObjectQuery(true);
+        inputRestGenerator.setStringifyArrayQuery(true);
 
         BlancoRestGeneratorTsProcessImpl imple = new BlancoRestGeneratorTsProcessImpl();
         imple.execute(inputRestGenerator);

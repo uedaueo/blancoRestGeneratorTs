@@ -140,6 +140,8 @@ public class BlancoRestGeneratorTsProcessImpl implements
                 BlancoRestGeneratorTsUtil.isTelegramStylePlain = true;
             }
             BlancoRestGeneratorTsUtil.isPreferAlias = input.getPreferAlias();
+            BlancoRestGeneratorTsUtil.stringifyObjectQuery = input.getStringifyObjectQuery();
+            BlancoRestGeneratorTsUtil.stringifyArrayQuery = input.getStringifyArrayQuery();
 
             // Creates a temporary directory.
             new File(input.getTmpdir()

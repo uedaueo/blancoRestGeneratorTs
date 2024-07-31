@@ -42,6 +42,8 @@ public class BlancoRestGeneratorTsUtil {
     public static boolean isTelegramStyleBlanco = true;
     public static boolean isTelegramStylePlain = false;
     public static boolean isPreferAlias = false;
+    public static boolean stringifyObjectQuery = false;
+    public static boolean stringifyArrayQuery = false;
 
     public static HashMap<String, BlancoValueObjectTsClassStructure> objects = new HashMap<>();
 
@@ -310,6 +312,25 @@ public class BlancoRestGeneratorTsUtil {
             pathStringExpr = "\"/\" + JSON.stringify(this." + alias + ")";
         }
         return pathStringExpr;
+    }
+
+    /**
+     * Get Query value from fieldStructure.
+     * primitive => simple value
+     * otherwise => JSONStringify, not URLEncoded
+     * @param argFieldStructure
+     * @return
+     */
+    static public String getQueryValueExpression(final BlancoRestGeneratorTsTelegramFieldStructure argFieldStructure) {
+        String queryValueExpr = "this." + argFieldStructure.getName();
+
+        if (BlancoRestGeneratorTsUtil.stringifyObjectQuery) {
+            if (!isTsPrimitive(argFieldStructure.getType()) && (!isTsArrayPrimitive(argFieldStructure) || BlancoRestGeneratorTsUtil.stringifyArrayQuery)) {
+                queryValueExpr = "JSON.stringify(this." + argFieldStructure.getName() + ")";
+            }
+        }
+
+        return queryValueExpr;
     }
 
     /**

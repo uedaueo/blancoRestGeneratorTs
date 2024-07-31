@@ -124,6 +124,16 @@ public class BlancoRestGeneratorTsTask extends Task {
     protected boolean fIsFieldPreferAliasProcessed = false;
 
     /**
+     * フィールド [stringifyObjectQuery] に値がセットされたかどうか。
+     */
+    protected boolean fIsFieldStringifyObjectQueryProcessed = false;
+
+    /**
+     * フィールド [stringifyArrayQuery] に値がセットされたかどうか。
+     */
+    protected boolean fIsFieldStringifyArrayQueryProcessed = false;
+
+    /**
      * verboseモードで動作させるかどうか。
      *
      * @param arg verboseモードで動作させるかどうか。
@@ -636,6 +646,58 @@ public class BlancoRestGeneratorTsTask extends Task {
     }
 
     /**
+     * Antタスクの[stringifyObjectQuery]アトリビュートのセッターメソッド。
+     *
+     * 項目番号: 20<br>
+     * クエリ文字列にObjectが指定された場合はJSON文字列化して渡す。配列の要素がprimitiveでない場合は配列全体をJSON化する。<br>
+     *
+     * @param arg セットしたい値
+     */
+    public void setStringifyObjectQuery(final boolean arg) {
+        fInput.setStringifyObjectQuery(arg);
+        fIsFieldStringifyObjectQueryProcessed = true;
+    }
+
+    /**
+     * Antタスクの[stringifyObjectQuery]アトリビュートのゲッターメソッド。
+     *
+     * 項目番号: 20<br>
+     * クエリ文字列にObjectが指定された場合はJSON文字列化して渡す。配列の要素がprimitiveでない場合は配列全体をJSON化する。<br>
+     * デフォルト値[false]が設定されています。Apache Antタスク上でアトリビュートの指定が無い場合には、デフォルト値が設定されます。<br>
+     *
+     * @return このフィールドの値
+     */
+    public boolean getStringifyObjectQuery() {
+        return fInput.getStringifyObjectQuery();
+    }
+
+    /**
+     * Antタスクの[stringifyArrayQuery]アトリビュートのセッターメソッド。
+     *
+     * 項目番号: 21<br>
+     * クエリ文字列に配列が指定された場合は配列全体をJSON文字列化して渡す<br>
+     *
+     * @param arg セットしたい値
+     */
+    public void setStringifyArrayQuery(final boolean arg) {
+        fInput.setStringifyArrayQuery(arg);
+        fIsFieldStringifyArrayQueryProcessed = true;
+    }
+
+    /**
+     * Antタスクの[stringifyArrayQuery]アトリビュートのゲッターメソッド。
+     *
+     * 項目番号: 21<br>
+     * クエリ文字列に配列が指定された場合は配列全体をJSON文字列化して渡す<br>
+     * デフォルト値[false]が設定されています。Apache Antタスク上でアトリビュートの指定が無い場合には、デフォルト値が設定されます。<br>
+     *
+     * @return このフィールドの値
+     */
+    public boolean getStringifyArrayQuery() {
+        return fInput.getStringifyArrayQuery();
+    }
+
+    /**
      * Antタスクのメイン処理。Apache Antから このメソッドが呼び出されます。
      *
      * @throws BuildException タスクとしての例外が発生した場合。
@@ -670,6 +732,8 @@ public class BlancoRestGeneratorTsTask extends Task {
             System.out.println("- apiTelegramBase:[" + getApiTelegramBase() + "]");
             System.out.println("- telegramStyle:[" + getTelegramStyle() + "]");
             System.out.println("- preferAlias:[" + getPreferAlias() + "]");
+            System.out.println("- stringifyObjectQuery:[" + getStringifyObjectQuery() + "]");
+            System.out.println("- stringifyArrayQuery:[" + getStringifyArrayQuery() + "]");
         }
 
         try {

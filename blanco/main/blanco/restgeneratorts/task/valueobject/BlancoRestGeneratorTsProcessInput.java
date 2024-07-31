@@ -160,6 +160,22 @@ public class BlancoRestGeneratorTsProcessInput {
     private boolean fPreferAlias = false;
 
     /**
+     * クエリ文字列にObjectが指定された場合はJSON文字列化して渡す。配列の要素がprimitiveでない場合は配列全体をJSON化する。
+     *
+     * フィールド: [stringifyObjectQuery]。
+     * デフォルト: [false]。
+     */
+    private boolean fStringifyObjectQuery = false;
+
+    /**
+     * クエリ文字列に配列が指定された場合は配列全体をJSON文字列化して渡す
+     *
+     * フィールド: [stringifyArrayQuery]。
+     * デフォルト: [false]。
+     */
+    private boolean fStringifyArrayQuery = false;
+
+    /**
      * フィールド [verbose] の値を設定します。
      *
      * フィールドの説明: [Whether to run in verbose mode.]。
@@ -615,6 +631,52 @@ public class BlancoRestGeneratorTsProcessInput {
     }
 
     /**
+     * フィールド [stringifyObjectQuery] の値を設定します。
+     *
+     * フィールドの説明: [クエリ文字列にObjectが指定された場合はJSON文字列化して渡す。配列の要素がprimitiveでない場合は配列全体をJSON化する。]。
+     *
+     * @param argStringifyObjectQuery フィールド[stringifyObjectQuery]に設定する値。
+     */
+    public void setStringifyObjectQuery(final boolean argStringifyObjectQuery) {
+        fStringifyObjectQuery = argStringifyObjectQuery;
+    }
+
+    /**
+     * フィールド [stringifyObjectQuery] の値を取得します。
+     *
+     * フィールドの説明: [クエリ文字列にObjectが指定された場合はJSON文字列化して渡す。配列の要素がprimitiveでない場合は配列全体をJSON化する。]。
+     * デフォルト: [false]。
+     *
+     * @return フィールド[stringifyObjectQuery]から取得した値。
+     */
+    public boolean getStringifyObjectQuery() {
+        return fStringifyObjectQuery;
+    }
+
+    /**
+     * フィールド [stringifyArrayQuery] の値を設定します。
+     *
+     * フィールドの説明: [クエリ文字列に配列が指定された場合は配列全体をJSON文字列化して渡す]。
+     *
+     * @param argStringifyArrayQuery フィールド[stringifyArrayQuery]に設定する値。
+     */
+    public void setStringifyArrayQuery(final boolean argStringifyArrayQuery) {
+        fStringifyArrayQuery = argStringifyArrayQuery;
+    }
+
+    /**
+     * フィールド [stringifyArrayQuery] の値を取得します。
+     *
+     * フィールドの説明: [クエリ文字列に配列が指定された場合は配列全体をJSON文字列化して渡す]。
+     * デフォルト: [false]。
+     *
+     * @return フィールド[stringifyArrayQuery]から取得した値。
+     */
+    public boolean getStringifyArrayQuery() {
+        return fStringifyArrayQuery;
+    }
+
+    /**
      * Gets the string representation of this value object.
      *
      * <P>Precautions for use</P>
@@ -649,6 +711,8 @@ public class BlancoRestGeneratorTsProcessInput {
         buf.append(",apiTelegramBase=" + fApiTelegramBase);
         buf.append(",telegramStyle=" + fTelegramStyle);
         buf.append(",preferAlias=" + fPreferAlias);
+        buf.append(",stringifyObjectQuery=" + fStringifyObjectQuery);
+        buf.append(",stringifyArrayQuery=" + fStringifyArrayQuery);
         buf.append("]");
         return buf.toString();
     }
@@ -731,5 +795,11 @@ public class BlancoRestGeneratorTsProcessInput {
         // Name: fPreferAlias
         // Type: boolean
         target.fPreferAlias = this.fPreferAlias;
+        // Name: fStringifyObjectQuery
+        // Type: boolean
+        target.fStringifyObjectQuery = this.fStringifyObjectQuery;
+        // Name: fStringifyArrayQuery
+        // Type: boolean
+        target.fStringifyArrayQuery = this.fStringifyArrayQuery;
     }
 }

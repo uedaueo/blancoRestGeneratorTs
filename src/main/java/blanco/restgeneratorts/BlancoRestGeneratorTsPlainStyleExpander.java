@@ -357,7 +357,7 @@ public class BlancoRestGeneratorTsPlainStyleExpander extends  BlancoRestGenerato
                 if (fieldStructure.getAlias() != null && fieldStructure.getAlias().trim().length() > 0) {
                     alias = fieldStructure.getAlias();
                 }
-                line = alias + ": this." + fieldStructure.getName();
+                line = alias + ": " + BlancoRestGeneratorTsUtil.getQueryValueExpression(fieldStructure);
             }
         }
         if (line.length() > 0) {

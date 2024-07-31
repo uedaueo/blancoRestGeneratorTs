@@ -96,6 +96,10 @@ public class BlancoRestGeneratorTsBatchProcess {
                 input.setTelegramStyle(arg.substring(15));
             } else if (arg.startsWith("-preferAlias=")) {
                 input.setPreferAlias(Boolean.valueOf(arg.substring(13)).booleanValue());
+            } else if (arg.startsWith("-stringifyObjectQuery=")) {
+                input.setStringifyObjectQuery(Boolean.valueOf(arg.substring(22)).booleanValue());
+            } else if (arg.startsWith("-stringifyArrayQuery=")) {
+                input.setStringifyArrayQuery(Boolean.valueOf(arg.substring(21)).booleanValue());
             } else if (arg.equals("-?") || arg.equals("-help")) {
                 usage();
                 System.exit(END_SUCCESS);
@@ -189,7 +193,7 @@ public class BlancoRestGeneratorTsBatchProcess {
      */
     public static final void usage() {
         System.out.println("BlancoRestGeneratorTsBatchProcess: Usage:");
-        System.out.println("  java blanco.restgeneratorts.task.BlancoRestGeneratorTsBatchProcess -verbose=value1 -metadir=value2 -targetdir=value3 -tmpdir=value4 -nameAdjust=value5 -encoding=value6 -tabs=value7 -xmlrootelement=value8 -sheetType=value9 -targetStyle=value10 -client=value11 -processlist=value12 -processlistBase=value13 -lineSeparator=value14 -searchTmpdir=value15 -generateToJson=value16 -apiTelegramPackage=value17 -apiTelegramBase=value18 -telegramStyle=value19 -preferAlias=value20");
+        System.out.println("  java blanco.restgeneratorts.task.BlancoRestGeneratorTsBatchProcess -verbose=value1 -metadir=value2 -targetdir=value3 -tmpdir=value4 -nameAdjust=value5 -encoding=value6 -tabs=value7 -xmlrootelement=value8 -sheetType=value9 -targetStyle=value10 -client=value11 -processlist=value12 -processlistBase=value13 -lineSeparator=value14 -searchTmpdir=value15 -generateToJson=value16 -apiTelegramPackage=value17 -apiTelegramBase=value18 -telegramStyle=value19 -preferAlias=value20 -stringifyObjectQuery=value21 -stringifyArrayQuery=value22");
         System.out.println("    -verbose");
         System.out.println("      explanation[Whether to run in verbose mode.]");
         System.out.println("      type[boolean]");
@@ -264,6 +268,14 @@ public class BlancoRestGeneratorTsBatchProcess {
         System.out.println("      default value[blanco]");
         System.out.println("    -preferAlias");
         System.out.println("      explanation[プロパティ値に別名が設定されていた場合、name を alias で上書きする。]");
+        System.out.println("      type[boolean]");
+        System.out.println("      default value[false]");
+        System.out.println("    -stringifyObjectQuery");
+        System.out.println("      explanation[クエリ文字列にObjectが指定された場合はJSON文字列化して渡す。配列の要素がprimitiveでない場合は配列全体をJSON化する。]");
+        System.out.println("      type[boolean]");
+        System.out.println("      default value[false]");
+        System.out.println("    -stringifyArrayQuery");
+        System.out.println("      explanation[クエリ文字列に配列が指定された場合は配列全体をJSON文字列化して渡す]");
         System.out.println("      type[boolean]");
         System.out.println("      default value[false]");
         System.out.println("    -? , -help");
