@@ -176,6 +176,14 @@ public class BlancoRestGeneratorTsProcessInput {
     private boolean fStringifyArrayQuery = false;
 
     /**
+     * Nullable な property に対して、? の付与をやめて | undefined | null の定義を行う。false の場合は ? が付与されて | undefined のみ付与される。
+     *
+     * フィールド: [strictNullable]。
+     * デフォルト: [false]。
+     */
+    private boolean fStrictNullable = false;
+
+    /**
      * フィールド [verbose] の値を設定します。
      *
      * フィールドの説明: [Whether to run in verbose mode.]。
@@ -677,6 +685,29 @@ public class BlancoRestGeneratorTsProcessInput {
     }
 
     /**
+     * フィールド [strictNullable] の値を設定します。
+     *
+     * フィールドの説明: [Nullable な property に対して、? の付与をやめて | undefined | null の定義を行う。false の場合は ? が付与されて | undefined のみ付与される。]。
+     *
+     * @param argStrictNullable フィールド[strictNullable]に設定する値。
+     */
+    public void setStrictNullable(final boolean argStrictNullable) {
+        fStrictNullable = argStrictNullable;
+    }
+
+    /**
+     * フィールド [strictNullable] の値を取得します。
+     *
+     * フィールドの説明: [Nullable な property に対して、? の付与をやめて | undefined | null の定義を行う。false の場合は ? が付与されて | undefined のみ付与される。]。
+     * デフォルト: [false]。
+     *
+     * @return フィールド[strictNullable]から取得した値。
+     */
+    public boolean getStrictNullable() {
+        return fStrictNullable;
+    }
+
+    /**
      * Gets the string representation of this value object.
      *
      * <P>Precautions for use</P>
@@ -713,6 +744,7 @@ public class BlancoRestGeneratorTsProcessInput {
         buf.append(",preferAlias=" + fPreferAlias);
         buf.append(",stringifyObjectQuery=" + fStringifyObjectQuery);
         buf.append(",stringifyArrayQuery=" + fStringifyArrayQuery);
+        buf.append(",strictNullable=" + fStrictNullable);
         buf.append("]");
         return buf.toString();
     }
@@ -801,5 +833,8 @@ public class BlancoRestGeneratorTsProcessInput {
         // Name: fStringifyArrayQuery
         // Type: boolean
         target.fStringifyArrayQuery = this.fStringifyArrayQuery;
+        // Name: fStrictNullable
+        // Type: boolean
+        target.fStrictNullable = this.fStrictNullable;
     }
 }

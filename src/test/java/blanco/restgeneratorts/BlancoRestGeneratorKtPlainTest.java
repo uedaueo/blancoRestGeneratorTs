@@ -54,6 +54,7 @@ public class BlancoRestGeneratorKtPlainTest {
         inputValueObject.setTabs(2);
         inputValueObject.setGenerateToJson(true);
         inputValueObject.setLineSeparator("CRLF");
+        inputValueObject.setStrictNullable(true);
 
         BlancoValueObjectTsProcessImpl impleValueObject = new BlancoValueObjectTsProcessImpl();
         try {
@@ -76,6 +77,7 @@ public class BlancoRestGeneratorKtPlainTest {
         inputValueObject.setTabs(2);
         inputValueObject.setGenerateToJson(true);
         inputValueObject.setLineSeparator("CRLF");
+        inputValueObject.setStrictNullable(true);
 
         impleValueObject = new BlancoValueObjectTsProcessImpl();
         try {
@@ -98,6 +100,7 @@ public class BlancoRestGeneratorKtPlainTest {
         inputValueObject.setTabs(2);
         inputValueObject.setGenerateToJson(true);
         inputValueObject.setLineSeparator("CRLF");
+        inputValueObject.setStrictNullable(true);
 
         impleValueObject = new BlancoValueObjectTsProcessImpl();
         try {
@@ -133,6 +136,7 @@ public class BlancoRestGeneratorKtPlainTest {
         inputRestGenerator.setPreferAlias(true);
         inputRestGenerator.setStringifyObjectQuery(true);
         inputRestGenerator.setStringifyArrayQuery(true);
+        inputRestGenerator.setStrictNullable(true);
 
         BlancoRestGeneratorTsProcessImpl imple = new BlancoRestGeneratorTsProcessImpl();
         imple.execute(inputRestGenerator);

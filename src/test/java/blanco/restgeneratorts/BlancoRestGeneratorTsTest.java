@@ -42,6 +42,7 @@ public class BlancoRestGeneratorTsTest {
         inputValueObject.setTabs(2);
         inputValueObject.setGenerateToJson(true);
         inputValueObject.setLineSeparator("CRLF");
+        inputValueObject.setStrictNullable(true);
 
         BlancoValueObjectTsProcessImpl impleValueObject = new BlancoValueObjectTsProcessImpl();
         try {
@@ -64,6 +65,7 @@ public class BlancoRestGeneratorTsTest {
         inputValueObject.setTabs(2);
         inputValueObject.setGenerateToJson(true);
         inputValueObject.setLineSeparator("CRLF");
+        inputValueObject.setStrictNullable(true);
 
         impleValueObject = new BlancoValueObjectTsProcessImpl();
         try {
@@ -86,6 +88,7 @@ public class BlancoRestGeneratorTsTest {
         inputValueObject.setTabs(2);
         inputValueObject.setGenerateToJson(true);
         inputValueObject.setLineSeparator("CRLF");
+        inputValueObject.setStrictNullable(true);
 
         impleValueObject = new BlancoValueObjectTsProcessImpl();
         try {
@@ -115,6 +118,7 @@ public class BlancoRestGeneratorTsTest {
         inputRestGenerator.setSearchTmpdir("tmpSample,tmpSample2");
         inputRestGenerator.setApiTelegramPackage("api.telegrams");
         inputRestGenerator.setApiTelegramBase("%%");
+        inputRestGenerator.setStrictNullable(true);
 
         BlancoRestGeneratorTsProcessImpl imple = new BlancoRestGeneratorTsProcessImpl();
         imple.execute(inputRestGenerator);

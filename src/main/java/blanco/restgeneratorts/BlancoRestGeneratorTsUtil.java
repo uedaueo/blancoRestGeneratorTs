@@ -44,6 +44,7 @@ public class BlancoRestGeneratorTsUtil {
     public static boolean isPreferAlias = false;
     public static boolean stringifyObjectQuery = false;
     public static boolean stringifyArrayQuery = false;
+    public static boolean isStrictNullable = false;
 
     public static HashMap<String, BlancoValueObjectTsClassStructure> objects = new HashMap<>();
 

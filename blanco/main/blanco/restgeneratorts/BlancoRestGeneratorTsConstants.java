@@ -20,7 +20,7 @@ public class BlancoRestGeneratorTsConstants {
      * 項目番号:3<br>
      * バージョン番号。
      */
-    public static final String VERSION = "0.2.0";
+    public static final String VERSION = "3.1.10";
 
     /**
      * 項目番号:4<br>
