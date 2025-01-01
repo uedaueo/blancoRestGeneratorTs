@@ -23,7 +23,9 @@ import javax.xml.transform.TransformerException;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class BlancoRestGeneratorTsProcessImpl implements
         BlancoRestGeneratorTsProcess {
@@ -118,6 +120,8 @@ public class BlancoRestGeneratorTsProcessImpl implements
             String processListId = input.getProcesslist();
             boolean createProcessList = false;
             List<BlancoRestGeneratorTsTelegramProcessStructure> processStructureList = new ArrayList<>();
+            List<BlancoRestGeneratorTsTelegramProcessStructure> sortedProcessStructureList = new ArrayList<>();
+
             if (processListId != null && processListId.length() > 0) {
                 createProcessList = true;
             }
@@ -191,7 +195,21 @@ public class BlancoRestGeneratorTsProcessImpl implements
             /*
              * Generates processList.
              */
-            if (createProcessList && processStructureList.size() > 0) {
+            if (createProcessList && !processStructureList.isEmpty()) {
+
+                /* sort processStructureList */
+                if (processStructureList.size() == 1) {
+                    sortedProcessStructureList.add(processStructureList.get(0));
+                } else /* if (processStructureList.size() > 1) */ {
+                    sortedProcessStructureList = processStructureList.stream().sorted(
+                            new Comparator<BlancoRestGeneratorTsTelegramProcessStructure>() {
+                                @Override
+                                public int compare(BlancoRestGeneratorTsTelegramProcessStructure o1, BlancoRestGeneratorTsTelegramProcessStructure o2) {
+                                    return o1.getName().compareTo(o2.getName());
+                                }
+                            }
+                    ).collect(Collectors.toList());
+                }
 
 
                 final BlancoRestGeneratorTsXml2SourceFile xml2source = new BlancoRestGeneratorTsXml2SourceFile();
@@ -204,7 +222,7 @@ public class BlancoRestGeneratorTsProcessImpl implements
                  * In processList, it does not generate toJSON method.
                  */
                 xml2source.setDefaultGenerateToJson(false);
-                xml2source.processProcessList(processStructureList, processListId, input.getProcesslistBase(), new File(strTarget));
+                xml2source.processProcessList(sortedProcessStructureList, processListId, input.getProcesslistBase(), new File(strTarget));
             }
         } catch (IOException ex) {
             throw new IllegalArgumentException(ex.toString());
