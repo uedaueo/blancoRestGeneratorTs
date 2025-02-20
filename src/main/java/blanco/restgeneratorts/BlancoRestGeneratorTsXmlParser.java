@@ -250,7 +250,11 @@ public class BlancoRestGeneratorTsXmlParser {
                 argElementCommon, "name"));
         // Package
         argTelegramStructure.setPackage(BlancoXmlBindingUtil.getTextContent(
-                argElementCommon, "package"));
+                argElementCommon, "packageTs"));
+        if (argTelegramStructure.getPackage() == null || argTelegramStructure.getPackage().trim().isEmpty()) {
+            argTelegramStructure.setPackage(BlancoXmlBindingUtil.getTextContent(
+                    argElementCommon, "package"));
+        }
         // Description
         argTelegramStructure.setDescription(BlancoXmlBindingUtil.getTextContent(argElementCommon, "description"));
         if (BlancoStringUtil.null2Blank(argTelegramStructure.getDescription())
@@ -922,7 +926,11 @@ public class BlancoRestGeneratorTsXmlParser {
 
         // Package
         argProcessStructure.setPackage(BlancoXmlBindingUtil.getTextContent(
-                argElementCommon, "package"));
+                argElementCommon, "packageTs"));
+        if (argProcessStructure.getPackage() == null || argProcessStructure.getPackage().trim().isEmpty()) {
+            argProcessStructure.setPackage(BlancoXmlBindingUtil.getTextContent(
+                    argElementCommon, "package"));
+        }
 
         // Base directory
         argProcessStructure.setBasedir(BlancoXmlBindingUtil.getTextContent(

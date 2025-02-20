@@ -37,6 +37,10 @@
                 <propertykey name="package" waitX="2">
                     <value>パッケージ</value>
                 </propertykey>
+                <propertykey name="packageTs" waitX="2">
+                    <value>パッケージ(ts)</value>
+                    <value>パッケージ(Ts)</value>
+                </propertykey>
                 <propertykey name="basedir" waitX="2">
                     <value>配置ディレクトリ</value>
                 </propertykey>
@@ -225,6 +229,10 @@ JavaDocに利用されます</value>
                 </propertykey>
                 <propertykey name="package" waitX="3">
                     <value>パッケージ</value>
+                </propertykey>
+                <propertykey name="packageTs" waitX="3">
+                    <value>パッケージ(ts)</value>
+                    <value>パッケージ(Ts)</value>
                 </propertykey>
                 <propertykey name="basedir" waitX="3">
                     <value>配置ディレクトリ</value>
